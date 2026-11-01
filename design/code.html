@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NN Parkings · Latent Demand Pulse</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js for smooth interactive data curves -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            nn: {
+              petrol: '#164250',
+              'petrol-hover': '#0F323D',
+              'petrol-dark': '#0D2730',
+              'petrol-night': '#0A2129',
+              'petrol-headline': '#1A4B5B',
+              'petrol-title': '#123742',
+              'ice-pill': '#E6EFF3',
+              'ice-border': '#C8DFE8',
+              canvas: '#F8FAFB',
+              card: '#FFFFFF',
+              border: '#DFEAF0',
+              'border-subtle': '#E2E8F0',
+              emerald: '#10B981',
+              amber: '#D97706',
+              'amber-light': '#F59E0B',
+              red: '#D83232',
+              'red-dark': '#DC2626',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F8FAFB;
+      color: #123742;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: 'tnum' on, 'zero' on;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F7;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBDCE3;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9FB8C4;
+    }
+    .pulsing-dot {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.25); }
+    }
+    .map-tile-bg {
+      background-color: #F4F6F7;
+      background-image: 
+        radial-gradient(#D6E2E8 1.2px, transparent 1.2px), 
+        linear-gradient(to right, rgba(220, 232, 238, 0.3) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(220, 232, 238, 0.3) 1px, transparent 1px);
+      background-size: 24px 24px, 72px 72px, 72px 72px;
+    }
+    .slider-thumb::-webkit-slider-thumb {
+      appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 9999px;
+      background: #164250;
+      cursor: pointer;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col min-h-screen text-slate-800 antialiased selection:bg-[#E6EFF3] selection:text-[#164250]">
+
+  <!-- =============================================================================
+       SECTION 1: TOP COMMAND BAR & HEADER (VISIBLE IN BOTH STATES)
+       ============================================================================= -->
+  <header class="sticky top-0 z-40 bg-white border-b border-[#DFEAF0] shadow-[0_2px_8px_rgba(22,66,80,0.03)]">
+    <div class="max-w-[1720px] mx-auto px-4 lg:px-7 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-4">
+        <!-- Official NN emblem -->
+        <a href="javascript:void(0)" onclick="app.switchState('A')" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-full bg-[#0D2730] flex items-center justify-center text-white font-extrabold text-sm tracking-wider shadow-sm transition-transform group-hover:scale-105">
+            NN
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Grup Núñez i Navarro</span>
+              <span class="text-xs text-nn-petrol font-bold">_parkings</span>
+            </div>
+            <h1 class="text-base font-bold text-nn-petrol-headline tracking-tight flex items-center gap-2">
+              Latent Demand Pulse
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#E6EFF3] text-nn-petrol border border-[#C8DFE8]">
+                <span class="w-1.5 h-1.5 rounded-full bg-nn-emerald pulsing-dot"></span>
+                SISTEMA VIVO · BARCELONA
+              </span>
+            </h1>
+          </div>
+        </a>
+      </div>
+
+      <!-- Center Live System Status -->
+      <div class="hidden xl:flex items-center gap-4 text-xs">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F8FAFB] border border-[#DFEAF0] text-slate-600">
+          <i data-lucide="database" class="w-3.5 h-3.5 text-nn-petrol"></i>
+          <span>Open Data BCN API:</span>
+          <span class="font-mono-num font-semibold text-nn-emerald">Sync OK (hace 3m)</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F8FAFB] border border-[#DFEAF0] text-slate-600">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-nn-petrol"></i>
+          <span>Hora Operativa:</span>
+          <span id="headerClock" class="font-mono-num font-semibold text-slate-900">18:30 h</span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F8FAFB] border border-[#DFEAF0] text-slate-600">
+          <i data-lucide="activity" class="w-3.5 h-3.5 text-nn-amber"></i>
+          <span>Red Viaria 22@/Eixample:</span>
+          <span class="font-mono-num font-semibold text-nn-amber">Alta Fricción (-26%)</span>
+        </div>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-3">
+        <!-- View Toggle Pills -->
+        <div class="hidden md:flex p-1 bg-[#F0F5F8] border border-[#C8DFE8] rounded-xl text-xs font-medium">
+          <button id="navStateA" onclick="app.switchState('A')" class="px-3.5 py-1.5 rounded-lg transition-all bg-nn-petrol text-white shadow-sm font-semibold flex items-center gap-1.5">
+            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+            Torre Control (30)
+          </button>
+          <button id="navStateB" onclick="app.switchState('B')" class="px-3.5 py-1.5 rounded-lg transition-all text-nn-petrol hover:text-nn-petrol-hover font-semibold flex items-center gap-1.5">
+            <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
+            Auditoría Quirúrgica
+          </button>
+        </div>
+
+        <!-- Animar Día Button -->
+        <button id="btnAnimarDia" onclick="app.toggleDaySimulation()" class="px-3 py-1.5 rounded-xl border border-[#C8DFE8] bg-[#E6EFF3] hover:bg-[#dbe7ec] text-nn-petrol font-semibold text-xs transition-colors flex items-center gap-1.5">
+          <i id="playIcon" data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+          <span id="playLabel">Simular 24h</span>
+        </button>
+
+        <!-- Import / Upload Modal Trigger -->
+        <button onclick="app.openModal('uploadModal')" class="px-4 py-2 rounded-xl bg-nn-petrol hover:bg-nn-petrol-hover text-white font-medium text-xs shadow-sm transition-all flex items-center gap-2">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Importar / Subir Parkings</span>
+          <span class="sm:hidden">Importar</span>
+        </button>
+
+        <!-- Director Avatar / Role -->
+        <div class="flex items-center pl-2 border-l border-[#DFEAF0] gap-2">
+          <div class="w-8 h-8 rounded-full bg-[#164250]/10 border border-[#C8DFE8] flex items-center justify-center text-nn-petrol font-bold text-xs">
+            DIR
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =============================================================================
+       MAIN CONTENT CONTAINER (SWITCHES BETWEEN STATE A & STATE B)
+       ============================================================================= -->
+  <main class="flex-1 max-w-[1720px] w-full mx-auto p-4 lg:p-7 space-y-6">
+
+    <!-- =========================================================================
+         STATE A: GLOBAL PORTFOLIO DASHBOARD (NN CONTROL TOWER)
+         ========================================================================= -->
+    <div id="stateAView" class="space-y-6 transition-opacity duration-200">
+      
+      <!-- Top Title & Subtitle for Portfolio -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-semibold text-nn-petrol uppercase tracking-wider mb-1">
+            <span>Visión Macro Global</span>
+            <span>•</span>
+            <span>30 Activos Operativos</span>
+          </div>
+          <h2 class="text-2xl font-extrabold text-nn-petrol-headline tracking-tight">
+            Torre de Control · Barcelona Metropolitan Loop
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Detección de vehículos en rotación insatisfecha en calzada (Àrea Blava/Verda saturada &gt;85%) dentro del área de influencia de la cartera NN.
+          </p>
+        </div>
+
+        <!-- Quick Summary Indicators -->
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-slate-500">Última actualización de aforos:</span>
+          <span class="text-xs font-mono-num font-semibold text-slate-800 bg-white px-2.5 py-1 rounded-md border border-[#DFEAF0]">18:28:45 CET</span>
+        </div>
+      </div>
+
+      <!-- 1. Four Top Executive KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- KPI 1: Demanda Latente Total -->
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm hover:border-[#C8DFE8] transition-all">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Demanda Latente Cartera</span>
+            <div class="p-2 rounded-xl bg-emerald-50 text-nn-emerald border border-emerald-100">
+              <i data-lucide="trending-up" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span id="kpiTotalLatent" class="text-3xl font-extrabold font-mono-num text-nn-petrol-headline">2.840</span>
+            <span class="text-xs font-semibold text-slate-500">veh/h</span>
+          </div>
+          <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100 pt-2.5">
+            <span>Volumen insatisfecho en las 30 zonas NN</span>
+            <span class="font-mono-num text-nn-emerald font-semibold">+18.4% pico</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Agitación en Calzada (Cruising) -->
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm hover:border-[#C8DFE8] transition-all">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Agitación en Calzada (Cruising)</span>
+            <div class="p-2 rounded-xl bg-amber-50 text-nn-amber border border-amber-100">
+              <i data-lucide="compass" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span id="kpiCruising" class="text-3xl font-extrabold font-mono-num text-nn-amber">1.492</span>
+            <span class="text-xs font-semibold text-slate-500">vehículos buscando</span>
+          </div>
+          <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100 pt-2.5">
+            <span>Degradación velocidad viaria</span>
+            <span class="font-mono-num text-nn-amber font-semibold font-medium">-26% vs fluido</span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Ingresos No Captados -->
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm hover:border-[#C8DFE8] transition-all">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Ingresos No Captados Estimados</span>
+            <div class="p-2 rounded-xl bg-emerald-50 text-nn-emerald border border-emerald-100">
+              <i data-lucide="euro" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span id="kpiRevenue" class="text-3xl font-extrabold font-mono-num text-nn-emerald">21.840</span>
+            <span class="text-xs font-semibold text-slate-500">€/día potencial</span>
+          </div>
+          <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100 pt-2.5">
+            <span>Estancia media de rotación: 2,2h</span>
+            <span class="font-mono-num text-slate-600 font-semibold">Tarifa media 3,65€/h</span>
+          </div>
+        </div>
+
+        <!-- KPI 4: Zonas de Calzada Crítica -->
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm hover:border-[#C8DFE8] transition-all">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Calzada en Saturación Crítica</span>
+            <div class="p-2 rounded-xl bg-red-50 text-nn-red border border-red-100">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2">
+            <span id="kpiCriticalZones" class="text-3xl font-extrabold font-mono-num text-nn-red">22</span>
+            <span class="text-base font-semibold text-slate-500">/ 30 activos</span>
+          </div>
+          <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100 pt-2.5">
+            <span>Ocupación Àrea Blava/Verda &gt; 85%</span>
+            <span class="font-mono-num text-nn-red font-semibold">Colapso en superficie</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 2. District Quick-Filter Toolbar & Search Bar -->
+      <div class="bg-white rounded-2xl p-3.5 border border-[#DFEAF0] shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4">
+        <!-- Filter Pills inspired by nnparkings.com toggle aesthetic -->
+        <div class="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 text-xs font-medium no-scrollbar">
+          <button onclick="app.setDistrictFilter('all')" data-district="all" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-nn-petrol text-white shadow-xs">
+            Todos (30)
+          </button>
+          <button onclick="app.setDistrictFilter('Eixample')" data-district="Eixample" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]">
+            Eixample (11)
+          </button>
+          <button onclick="app.setDistrictFilter('Ciutat Vella')" data-district="Ciutat Vella" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]">
+            Ciutat Vella (4)
+          </button>
+          <button onclick="app.setDistrictFilter('Sarrià-Sant Gervasi')" data-district="Sarrià-Sant Gervasi" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]">
+            Sarrià-St. Gervasi (5)
+          </button>
+          <button onclick="app.setDistrictFilter('Gràcia')" data-district="Gràcia" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]">
+            Gràcia (3)
+          </button>
+          <button onclick="app.setDistrictFilter('Les Corts')" data-district="Les Corts" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]">
+            Les Corts (3)
+          </button>
+          <button onclick="app.setDistrictFilter('Sant Martí / 22@')" data-district="Sant Martí / 22@" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]">
+            Sant Martí / 22@ (2)
+          </button>
+          <button onclick="app.setDistrictFilter('Sants-Montjuïc')" data-district="Sants-Montjuïc" class="district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]">
+            Sants-Montjuïc (2)
+          </button>
+        </div>
+
+        <!-- Search Bar with Petrol Button -->
+        <div class="relative w-full lg:w-80 flex items-center">
+          <input id="searchInput" oninput="app.handleSearch(this.value)" type="text" placeholder="Buscar por parking, calle o distrito..." class="w-full bg-[#F8FAFB] text-xs text-slate-800 placeholder-slate-400 pl-3.5 pr-10 py-2 rounded-xl border border-[#DFEAF0] focus:outline-none focus:border-nn-petrol focus:ring-1 focus:ring-nn-petrol transition-colors">
+          <button class="absolute right-1.5 p-1 rounded-lg bg-nn-petrol text-white hover:bg-nn-petrol-hover transition-colors">
+            <i data-lucide="search" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Two-Column Analytical Workspace: Map + Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Barcelona Macro Map (7 cols) -->
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-[#DFEAF0] p-4 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-nn-petrol"></span>
+              <h3 class="text-sm font-bold text-nn-petrol-headline">Malla de Demanda Latente · Barcelona Carto</h3>
+            </div>
+            <div class="flex items-center gap-2 text-[11px] text-slate-500">
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-nn-emerald font-semibold border border-emerald-200">Alta Densidad (&gt;90 v/h)</span>
+              <span class="px-2 py-0.5 rounded bg-amber-50 text-nn-amber font-semibold border border-amber-200">Media</span>
+            </div>
+          </div>
+
+          <!-- Interactive Vector Map Canvas Simulation -->
+          <div class="relative w-full h-[580px] rounded-xl overflow-hidden mt-3 border border-[#E2E8F0] map-tile-bg select-none">
+            
+            <!-- Coastline & Collserola hill hint overlay -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" viewBox="0 0 800 580" fill="none">
+              <!-- Sea line (Mediterranean coast) -->
+              <path d="M 520,580 L 800,280 L 800,580 Z" fill="#E8F4F8" />
+              <path d="M 520,580 L 800,280" stroke="#B8D7E3" stroke-width="2" stroke-dasharray="4 4" />
+              <!-- Diagonal Ave Diagonal & Gran Via grid lines -->
+              <path d="M 80,120 L 720,440" stroke="#D1DFE6" stroke-width="3" />
+              <path d="M 120,40 L 680,560" stroke="#D1DFE6" stroke-width="2.5" />
+              <path d="M 360,60 L 580,520" stroke="#D1DFE6" stroke-width="3.5" />
+              <!-- Collserola Mountain Contour (top left) -->
+              <path d="M 0,0 Q 200,60 300,0 Z" fill="#E9ECEF" opacity="0.6" />
+              <!-- Text annotations -->
+              <text x="700" y="520" fill="#9FBCC8" font-size="12" font-weight="700" letter-spacing="2">MAR MEDITERRÀNIA</text>
+              <text x="40" y="50" fill="#A0B0B8" font-size="11" font-weight="600">SERRA DE COLLSEROLA</text>
+              <text x="240" y="240" fill="#88A4B2" font-size="11" font-weight="600">AV. DIAGONAL</text>
+              <text x="320" y="440" fill="#88A4B2" font-size="11" font-weight="600">GRAN VIA DE LES CORTS CATALANES</text>
+            </svg>
+
+            <!-- Map Parking Interactive Markers -->
+            <div id="mapMarkersContainer" class="absolute inset-0">
+              <!-- Rendered via JS based on the 30 parkings dataset -->
+            </div>
+
+            <!-- Floating Map Legend -->
+            <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm p-3 rounded-xl border border-[#DFEAF0] shadow-md text-xs space-y-2 pointer-events-auto">
+              <div class="font-bold text-slate-800 text-[11px] uppercase tracking-wider">Leyenda Topográfica</div>
+              <div class="flex items-center gap-2 text-slate-600 text-[11px]">
+                <div class="w-5 h-5 rounded-full bg-nn-petrol text-white flex items-center justify-center font-bold text-[9px] shadow-xs">NN</div>
+                <span>Parking NN (Click para auditar)</span>
+              </div>
+              <div class="flex items-center gap-2 text-slate-600 text-[11px]">
+                <span class="w-3 h-3 rounded-full bg-nn-emerald"></span>
+                <span>Demanda Latente Capturable (&gt;80 veh/h)</span>
+              </div>
+              <div class="flex items-center gap-2 text-slate-600 text-[11px]">
+                <span class="w-3.5 h-1 bg-nn-amber"></span>
+                <span>Corredor de Cruising Lento (&lt;14 km/h)</span>
+              </div>
+              <div class="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100">
+                Modelo Tobler integrado con pendiente DEM ICGC
+              </div>
+            </div>
+
+            <!-- Floating Map Controls -->
+            <div class="absolute top-4 right-4 flex flex-col gap-1.5">
+              <button onclick="app.resetMapZoom()" class="p-2 bg-white rounded-xl border border-[#DFEAF0] shadow-sm hover:bg-slate-50 text-slate-700 transition-colors" title="Centrar Barcelona">
+                <i data-lucide="maximize-2" class="w-4 h-4"></i>
+              </button>
+              <button onclick="app.toggleIsochronesLayer()" class="p-2 bg-white rounded-xl border border-[#DFEAF0] shadow-sm hover:bg-slate-50 text-nn-petrol font-semibold transition-colors" title="Capas de Isocronas">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+          </div>
+
+          <div class="mt-3 flex items-center justify-between text-xs text-slate-500">
+            <span>Visualizando <strong id="mapCount" class="text-slate-800">30</strong> activos distribuidos en la trama Cerdà y casco histórico.</span>
+            <span class="text-nn-petrol font-semibold cursor-pointer hover:underline" onclick="app.switchState('B', 1)">Ver parking destacado: NN Aragó / Rbla. Catalunya →</span>
+          </div>
+        </div>
+
+        <!-- Right: Live Ranking Table (5 cols) -->
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-[#DFEAF0] p-4 shadow-sm flex flex-col h-[660px]">
+          <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <h3 class="text-sm font-bold text-nn-petrol-headline">Ranking de Demanda Latente</h3>
+              <p class="text-[11px] text-slate-500">Ordenado por vehículos/hora de déficit en calzada</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-[#E6EFF3] text-nn-petrol text-xs font-bold font-mono-num border border-[#C8DFE8]">
+              30 Activos
+            </span>
+          </div>
+
+          <!-- Table Container with scroll -->
+          <div class="flex-1 overflow-y-auto mt-2 divide-y divide-[#F1F5F7] pr-1">
+            <div id="tableRowsContainer">
+              <!-- Dynamically rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Table Summary Footer -->
+          <div class="pt-3 border-t border-[#DFEAF0] flex items-center justify-between text-xs text-slate-500">
+            <span>Captura óptima: <strong class="font-mono-num text-nn-emerald font-semibold">82.4%</strong></span>
+            <span class="text-slate-400">Rotación recomendada: +0.40€/h</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- =========================================================================
+         STATE B: SPECIFIC PARKING AUDIT & 7+7 DAY PREDICTIVE MODULE
+         ========================================================================= -->
+    <div id="stateBView" class="space-y-6 hidden transition-opacity duration-200">
+      
+      <!-- Top Navigation Bar & Hero Header -->
+      <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#DFEAF0]">
+          
+          <!-- Back button + Breadcrumb -->
+          <div class="flex items-center gap-3">
+            <button onclick="app.switchState('A')" class="px-3.5 py-1.5 rounded-xl border border-[#C8DFE8] bg-[#E6EFF3] hover:bg-[#dbe7ec] text-nn-petrol font-semibold text-xs transition-colors flex items-center gap-2 group">
+              <i data-lucide="arrow-left" class="w-4 h-4 transition-transform group-hover:-translate-x-0.5"></i>
+              <span>Volver al Listado General</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-white/70 border border-[#C8DFE8] font-mono-num">Esc</span>
+            </button>
+
+            <span class="text-slate-300">/</span>
+
+            <!-- Direct Parking Jump Switcher -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-500 hidden sm:inline">Seleccionar Activo:</span>
+              <select id="assetSelectDropdown" onchange="app.selectAsset(parseInt(this.value))" class="bg-[#F8FAFB] text-xs font-bold text-nn-petrol-headline border border-[#DFEAF0] rounded-xl px-3 py-1.5 focus:outline-none focus:border-nn-petrol">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Operational Indicators -->
+          <div class="flex items-center gap-3 text-xs">
+            <div class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-nn-emerald border border-emerald-200 font-semibold">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+              <span>Ocupación Actual: 84% (42/50 plazas rot.)</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#F8FAFB] text-slate-600 border border-[#DFEAF0]">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-nn-emerald"></i>
+              <span>Puntos EV Activos: 8/8</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Asset Hero Card Details -->
+        <div class="mt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span id="heroDistrictBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E6EFF3] text-nn-petrol border border-[#C8DFE8]">
+                EIXAMPLE
+              </span>
+              <span class="text-xs text-slate-400 font-mono-num" id="heroCoordinates">41.3897° N, 2.1610° E</span>
+              <span class="text-xs text-slate-400">•</span>
+              <span class="text-xs text-slate-500 font-medium" id="heroAddress">Carrer d'Aragó, 235</span>
+            </div>
+            <h2 id="heroTitle" class="text-2xl lg:text-3xl font-extrabold text-nn-petrol-headline tracking-tight">
+              NN Aragó / Rambla Catalunya
+            </h2>
+            <p id="heroDescription" class="text-xs text-slate-500 max-w-2xl">
+              Nodo arterial neurálgico en la cuadrícula del Eixample. Alto drenaje de tráfico procedente de Passeig de Gràcia y Rambla Catalunya con déficit crónico de estacionamiento en superficie.
+            </p>
+          </div>
+
+          <!-- 3 Architectural Metric Boxes -->
+          <div class="grid grid-cols-3 gap-3">
+            <div class="p-3 bg-[#F8FAFB] rounded-xl border border-[#DFEAF0] text-center">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Elevación ICGC</div>
+              <div id="heroElevation" class="text-base font-extrabold font-mono-num text-nn-petrol">32 msnm</div>
+              <div class="text-[10px] text-slate-500">Cota Cerdà</div>
+            </div>
+            <div class="p-3 bg-[#F8FAFB] rounded-xl border border-[#DFEAF0] text-center">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Pendiente Tobler</div>
+              <div id="heroSlope" class="text-base font-extrabold font-mono-num text-nn-petrol">1.4%</div>
+              <div class="text-[10px] text-slate-500">Fricción baja</div>
+            </div>
+            <div class="p-3 bg-[#F8FAFB] rounded-xl border border-[#DFEAF0] text-center">
+              <div class="text-[10px] uppercase font-bold text-slate-400">POIs Comerciales</div>
+              <div id="heroPOIs" class="text-base font-extrabold font-mono-num text-nn-petrol">184</div>
+              <div class="text-[10px] text-slate-500">&lt;5 min a pie</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Specific Top 4 KPIs -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Demanda Latente Neta (DL)</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-nn-emerald"></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="detailDL" class="text-3xl font-extrabold font-mono-num text-nn-emerald">118</span>
+            <span class="text-xs font-semibold text-slate-500">veh/h</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-500 flex justify-between border-t border-slate-100 pt-2">
+            <span>Presión vs capacidad física</span>
+            <span class="font-mono-num text-nn-emerald font-semibold">+31% saturación</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Tráfico en Agitación (γ)</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-nn-amber"></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="detailGamma" class="text-3xl font-extrabold font-mono-num text-nn-amber">86</span>
+            <span class="text-xs font-semibold text-slate-500">coches buscando</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-500 flex justify-between border-t border-slate-100 pt-2">
+            <span>Velocidad de cruising en torno</span>
+            <span class="font-mono-num text-nn-amber font-semibold">12.8 km/h (-24%)</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Saturación en Calzada</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-nn-red"></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="detailSat" class="text-3xl font-extrabold font-mono-num text-nn-red">92%</span>
+            <span class="text-xs font-semibold text-slate-500">Àrea Blava/Verda</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-500 flex justify-between border-t border-slate-100 pt-2">
+            <span>Tiempo medio de búsqueda</span>
+            <span class="font-mono-num text-nn-red font-semibold">14,2 min/vehículo</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+          <div class="flex items-start justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Potencial Captura Diurna</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-nn-petrol"></span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="detailRevenue" class="text-3xl font-extrabold font-mono-num text-nn-petrol-headline">934</span>
+            <span class="text-xs font-semibold text-slate-500">€/día no captados</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-500 flex justify-between border-t border-slate-100 pt-2">
+            <span>Elasticidad precio óptima</span>
+            <span class="font-mono-num text-slate-700 font-semibold">Sugerido: 4.10 €/h</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Two-Column Diagnostic Workspace (6 cols + 6 cols) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT PANEL (6 cols): Microtopographic Isochrone Map + Decoupling Waterfall + Sandbox -->
+        <div class="lg:col-span-6 space-y-6">
+          
+          <!-- Microtopographic Isochrone Walking Map (Tobler Model) -->
+          <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+              <div>
+                <h3 class="text-sm font-bold text-nn-petrol-headline">Isocronas Peatonales Deformadas (Tobler DEM)</h3>
+                <p class="text-xs text-slate-500">Áreas de influencia caminando ajustadas por pendiente y tiempos semafóricos</p>
+              </div>
+              <span class="text-[11px] font-mono-num px-2.5 py-1 rounded bg-[#E6EFF3] text-nn-petrol font-bold">
+                Zoom 15.5x
+              </span>
+            </div>
+
+            <!-- Micro Map Canvas Container -->
+            <div class="relative w-full h-[280px] rounded-xl overflow-hidden mt-3 border border-[#E2E8F0] map-tile-bg">
+              <svg class="absolute inset-0 w-full h-full" viewBox="0 0 500 280">
+                <!-- Eixample Manzanas (Octagonal Chamfer Cerdà Blocks) -->
+                <g fill="#EAF0F4" stroke="#CBDCE3" stroke-width="1.5">
+                  <!-- Block 1 -->
+                  <polygon points="60,30 140,30 155,45 155,100 140,115 60,115 45,100 45,45" />
+                  <!-- Block 2 -->
+                  <polygon points="180,30 260,30 275,45 275,100 260,115 180,115 165,100 165,45" />
+                  <!-- Block 3 -->
+                  <polygon points="300,30 380,30 395,45 395,100 380,115 300,115 285,100 285,45" />
+                  <!-- Block 4 -->
+                  <polygon points="60,140 140,140 155,155 155,210 140,225 60,225 45,210 45,155" />
+                  <!-- Center Block with Parking -->
+                  <polygon points="180,140 260,140 275,155 275,210 260,225 180,225 165,210 165,155" fill="#E2EBF0" />
+                  <!-- Block 6 -->
+                  <polygon points="300,140 380,140 395,155 395,210 380,225 300,225 285,210 285,155" />
+                </g>
+
+                <!-- Isochrone polygon 8 min (outer, dark petrol transparent) -->
+                <polygon points="120,40 340,30 420,110 410,230 310,265 140,260 80,180 90,80" fill="#164250" fill-opacity="0.12" stroke="#164250" stroke-width="1.5" stroke-dasharray="3 3" />
+
+                <!-- Isochrone polygon 5 min (retail/leisure, soft petrol) -->
+                <polygon points="140,65 300,55 350,115 340,205 280,230 160,225 120,165 125,95" fill="#164250" fill-opacity="0.22" stroke="#164250" stroke-width="2" />
+
+                <!-- Isochrone polygon 3 min (express, emerald) -->
+                <polygon points="175,100 265,95 295,130 285,185 245,200 180,195 155,160 160,120" fill="#10B981" fill-opacity="0.30" stroke="#10B981" stroke-width="2" />
+
+                <!-- Street labels -->
+                <text x="50" y="132" fill="#88A4B2" font-size="10" font-weight="700">C. ARAGÓ (Sentit Besòs)</text>
+                <text x="210" y="24" fill="#88A4B2" font-size="10" font-weight="700">RBLA. CATALUNYA</text>
+
+                <!-- Center Parking Marker Pin -->
+                <g transform="translate(220, 160)">
+                  <circle cx="0" cy="0" r="16" fill="#0D2730" stroke="#FFFFFF" stroke-width="2.5" />
+                  <text x="0" y="4" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="800">NN</text>
+                  <!-- Pulsing pulse wave -->
+                  <circle cx="0" cy="0" r="24" fill="none" stroke="#164250" stroke-width="1" class="pulsing-dot" />
+                </g>
+              </svg>
+
+              <!-- Overlay Legend -->
+              <div class="absolute bottom-2.5 left-2.5 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg border border-[#DFEAF0] text-[10px] space-y-1 shadow-sm">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-2 rounded bg-emerald-500 opacity-60"></span>
+                  <span class="font-medium text-slate-700">3 min pie (Express / Comercio directo)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-2 rounded bg-[#164250] opacity-40"></span>
+                  <span class="font-medium text-slate-700">5 min pie (Ocio / Restauración)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-2 rounded bg-[#164250] opacity-20"></span>
+                  <span class="font-medium text-slate-700">8 min pie (Corporativo / Abonados)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Decoupling Waterfall Funnel (Cascada de Tráfico) -->
+          <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+              <div>
+                <h3 class="text-sm font-bold text-nn-petrol-headline">Cascada de Desacoplo de Tráfico (Traffic Decoupling)</h3>
+                <p class="text-xs text-slate-500">Filtrado analítico desde el aforo bruto viario hasta la demanda latente neta</p>
+              </div>
+              <span class="text-xs font-mono-num font-semibold text-nn-emerald bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
+                Captura Neta: 21.4%
+              </span>
+            </div>
+
+            <!-- Waterfall Bars Representation -->
+            <div class="space-y-3 mt-4 text-xs">
+              
+              <!-- Step 1: Aforo Bruto (Q_total) -->
+              <div>
+                <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                  <span>1. Aforo Bruto en Calle (Q_total)</span>
+                  <span class="font-mono-num">1.420 veh/h (100%)</span>
+                </div>
+                <div class="w-full h-5 bg-[#EEF3F6] rounded-md overflow-hidden flex">
+                  <div class="h-full bg-slate-400 rounded-md" style="width: 100%"></div>
+                </div>
+                <span class="text-[10px] text-slate-400">Total vehículos detectados por espiras de aforo en C/ Aragó</span>
+              </div>
+
+              <!-- Step 2: Descarte Tráfico Pasante (-74%) -->
+              <div>
+                <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                  <span class="text-slate-500">2. Descarte Tráfico Pasante (κ_pasante)</span>
+                  <span class="font-mono-num text-slate-500">-1.050 veh/h (-74%)</span>
+                </div>
+                <div class="w-full h-5 bg-[#EEF3F6] rounded-md overflow-hidden flex">
+                  <div class="h-full bg-slate-300 rounded-md" style="width: 74%"></div>
+                </div>
+                <span class="text-[10px] text-slate-400">Tráfico de paso sin intención de parada ni destino en manzana local</span>
+              </div>
+
+              <!-- Step 3: Tráfico Fin de Viaje (Q_potencial) -->
+              <div>
+                <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                  <span>3. Tráfico Fin de Viaje Efectivo</span>
+                  <span class="font-mono-num text-nn-petrol">370 veh/h (26%)</span>
+                </div>
+                <div class="w-full h-5 bg-[#EEF3F6] rounded-md overflow-hidden flex">
+                  <div class="h-full bg-[#164250] opacity-80 rounded-md" style="width: 26%"></div>
+                </div>
+                <!-- Sub breakdown -->
+                <div class="grid grid-cols-3 gap-2 mt-1.5 p-2 bg-[#F8FAFB] rounded-lg border border-[#DFEAF0] text-[10px]">
+                  <div>
+                    <span class="text-slate-400 block">Cruising (+)</span>
+                    <span class="font-mono-num font-bold text-nn-amber">+86 veh/h</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block">Déficit Blava (+)</span>
+                    <span class="font-mono-num font-bold text-nn-red">+54 veh/h</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block">Fricción Tobler (-)</span>
+                    <span class="font-mono-num font-bold text-slate-500">-22 veh/h</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 4: Demanda Latente Neta Resultante -->
+              <div class="pt-2 border-t border-slate-100">
+                <div class="flex justify-between font-extrabold text-nn-petrol-headline mb-1 text-sm">
+                  <span class="flex items-center gap-1.5">
+                    <i data-lucide="check" class="w-4 h-4 text-nn-emerald"></i>
+                    4. Demanda Latente Neta (DL)
+                  </span>
+                  <span id="waterfallDL" class="font-mono-num text-nn-emerald">118 veh/h</span>
+                </div>
+                <div class="w-full h-6 bg-[#EEF3F6] rounded-md overflow-hidden flex">
+                  <div id="waterfallDLBar" class="h-full bg-nn-emerald rounded-md transition-all duration-300" style="width: 32%"></div>
+                </div>
+                <span class="text-[10px] text-slate-500 font-medium">Volumen disponible para absorción inmediata mediante tarifa dinámica y señalización exterior NN</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Dynamic Factor Sandbox (What-If Sliders) -->
+          <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+              <div class="flex items-center gap-2">
+                <i data-lucide="sliders" class="w-4 h-4 text-nn-petrol"></i>
+                <h3 class="text-sm font-bold text-nn-petrol-headline">Simulador de Factores Dinámicos (Sandbox What-If)</h3>
+              </div>
+              <button onclick="app.resetSliders()" class="text-[11px] text-nn-petrol font-semibold hover:underline">
+                Restablecer
+              </button>
+            </div>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              
+              <!-- Slider 1: Precipitaciones (Lluvia) -->
+              <div class="space-y-1.5 p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600 font-medium flex items-center gap-1">
+                    <i data-lucide="cloud-rain" class="w-3.5 h-3.5 text-blue-500"></i> Lluvia (mm/h):
+                  </span>
+                  <span id="valRain" class="font-mono-num font-bold text-nn-petrol">0.0 mm/h</span>
+                </div>
+                <input id="sliderRain" oninput="app.updateSimulation()" type="range" min="0" max="20" step="0.5" value="0" class="w-full accent-nn-petrol cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-400">
+                  <span>Seco</span>
+                  <span>Torrencial (+28% demanda)</span>
+                </div>
+              </div>
+
+              <!-- Slider 2: Saturación Calzada -->
+              <div class="space-y-1.5 p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600 font-medium flex items-center gap-1">
+                    <i data-lucide="gauge" class="w-3.5 h-3.5 text-nn-red"></i> Saturación Calle:
+                  </span>
+                  <span id="valSat" class="font-mono-num font-bold text-nn-red">92%</span>
+                </div>
+                <input id="sliderSat" oninput="app.updateSimulation()" type="range" min="50" max="100" step="1" value="92" class="w-full accent-nn-petrol cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-400">
+                  <span>Fluido (50%)</span>
+                  <span>Saturación Total (100%)</span>
+                </div>
+              </div>
+
+              <!-- Slider 3: Evento Masivo -->
+              <div class="space-y-1.5 p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600 font-medium flex items-center gap-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-nn-amber"></i> Evento de Ciudad:
+                  </span>
+                </div>
+                <select id="selectEvent" onchange="app.updateSimulation()" class="w-full bg-white text-xs font-semibold text-slate-800 border border-[#DFEAF0] rounded-lg p-1.5 focus:outline-none focus:border-nn-petrol">
+                  <option value="none">Ninguno (Día Normal)</option>
+                  <option value="mwc">Fira BCN / MWC (+45% corporativo)</option>
+                  <option value="concert">Concierto / Partido Montjuïc (+30%)</option>
+                  <option value="festivo">Festivo Comercial Eixample (+35%)</option>
+                  <option value="strike">Huelga de Metro / Autobús (+50%)</option>
+                </select>
+              </div>
+
+              <!-- Slider 4: Tarifa de Rotación Propuesta -->
+              <div class="space-y-1.5 p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-600 font-medium flex items-center gap-1">
+                    <i data-lucide="tag" class="w-3.5 h-3.5 text-nn-emerald"></i> Tarifa Rotación:
+                  </span>
+                  <span id="valTariff" class="font-mono-num font-bold text-nn-emerald">3.75 €/h</span>
+                </div>
+                <input id="sliderTariff" oninput="app.updateSimulation()" type="range" min="2.00" max="5.50" step="0.05" value="3.75" class="w-full accent-nn-petrol cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-400">
+                  <span>2.00 €/h</span>
+                  <span>5.50 €/h (Yield máx)</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT PANEL (6 cols): 7-Day Weekly Rhythm + 7-Day Forecast + Executive Yield Advice -->
+        <div class="lg:col-span-6 space-y-6">
+          
+          <!-- 7-DAY WEEKLY RHYTHM PROFILE (168 Hours) -->
+          <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+              <div>
+                <h3 class="text-sm font-bold text-nn-petrol-headline">Ritmo Semanal Histórico (Lunes a Domingo)</h3>
+                <p class="text-xs text-slate-500">Seleccione un día para inspeccionar su curva de 24 horas</p>
+              </div>
+              <span class="text-xs font-semibold text-nn-petrol bg-[#E6EFF3] px-2.5 py-0.5 rounded-full border border-[#C8DFE8]">
+                Patrón 168h
+              </span>
+            </div>
+
+            <!-- Horizontal Row of 7 Daily Cards -->
+            <div class="grid grid-cols-7 gap-1.5 mt-3">
+              <button onclick="app.selectDay(0)" id="dayCard0" class="day-card p-2 rounded-xl border border-[#DFEAF0] bg-[#F8FAFB] text-center transition-all hover:border-[#C8DFE8]">
+                <span class="text-[10px] font-bold block text-slate-500">LUN</span>
+                <span class="text-xs font-extrabold font-mono-num text-nn-petrol block mt-0.5">102</span>
+                <span class="text-[9px] text-slate-400 block">v/h</span>
+              </button>
+              <button onclick="app.selectDay(1)" id="dayCard1" class="day-card p-2 rounded-xl border border-[#DFEAF0] bg-[#F8FAFB] text-center transition-all hover:border-[#C8DFE8]">
+                <span class="text-[10px] font-bold block text-slate-500">MAR</span>
+                <span class="text-xs font-extrabold font-mono-num text-nn-petrol block mt-0.5">114</span>
+                <span class="text-[9px] text-slate-400 block">v/h</span>
+              </button>
+              <button onclick="app.selectDay(2)" id="dayCard2" class="day-card p-2 rounded-xl border border-[#DFEAF0] bg-[#F8FAFB] text-center transition-all hover:border-[#C8DFE8]">
+                <span class="text-[10px] font-bold block text-slate-500">MIÉ</span>
+                <span class="text-xs font-extrabold font-mono-num text-nn-petrol block mt-0.5">116</span>
+                <span class="text-[9px] text-slate-400 block">v/h</span>
+              </button>
+              <button onclick="app.selectDay(3)" id="dayCard3" class="day-card p-2 rounded-xl border border-[#DFEAF0] bg-[#F8FAFB] text-center transition-all hover:border-[#C8DFE8]">
+                <span class="text-[10px] font-bold block text-slate-500">JUE</span>
+                <span class="text-xs font-extrabold font-mono-num text-nn-petrol block mt-0.5">122</span>
+                <span class="text-[9px] text-slate-400 block">v/h</span>
+              </button>
+              <button onclick="app.selectDay(4)" id="dayCard4" class="day-card p-2 rounded-xl border border-[#C8DFE8] bg-[#E6EFF3] text-center transition-all shadow-xs ring-1 ring-nn-petrol">
+                <span class="text-[10px] font-bold block text-nn-petrol">VIE</span>
+                <span class="text-xs font-extrabold font-mono-num text-nn-petrol block mt-0.5">138</span>
+                <span class="text-[9px] text-nn-petrol/70 block">v/h</span>
+              </button>
+              <button onclick="app.selectDay(5)" id="dayCard5" class="day-card p-2 rounded-xl border border-[#DFEAF0] bg-[#F8FAFB] text-center transition-all hover:border-[#C8DFE8]">
+                <span class="text-[10px] font-bold block text-slate-500">SÁB</span>
+                <span class="text-xs font-extrabold font-mono-num text-nn-petrol block mt-0.5">129</span>
+                <span class="text-[9px] text-slate-400 block">v/h</span>
+              </button>
+              <button onclick="app.selectDay(6)" id="dayCard6" class="day-card p-2 rounded-xl border border-[#DFEAF0] bg-[#F8FAFB] text-center transition-all hover:border-[#C8DFE8]">
+                <span class="text-[10px] font-bold block text-slate-500">DOM</span>
+                <span class="text-xs font-extrabold font-mono-num text-nn-petrol block mt-0.5">74</span>
+                <span class="text-[9px] text-slate-400 block">v/h</span>
+              </button>
+            </div>
+
+            <!-- Intra-day 24h Curve Chart -->
+            <div class="mt-4">
+              <div class="flex items-center justify-between text-xs mb-2">
+                <span class="font-bold text-slate-700" id="currentDayTitle">Perfil 24 Horas: Viernes (Pico Ocio + Comercial)</span>
+                <div class="flex items-center gap-3 text-[11px]">
+                  <span class="flex items-center gap-1.5 text-slate-500">
+                    <span class="w-2.5 h-1 bg-slate-300"></span> Aforo Bruto
+                  </span>
+                  <span class="flex items-center gap-1.5 text-nn-emerald font-semibold">
+                    <span class="w-2.5 h-1 bg-nn-emerald"></span> Demanda Latente
+                  </span>
+                </div>
+              </div>
+              <div class="h-44 w-full">
+                <canvas id="intraDayChart"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- NEXT 7 DAYS PREDICTIVE FORECAST MODULE (t+1 to t+7) -->
+          <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+              <div class="flex items-center gap-2">
+                <div class="p-1.5 rounded-lg bg-emerald-50 text-nn-emerald">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-nn-petrol-headline">Predicción Algorítmica (Próximos 7 Días · t+1 a t+7)</h3>
+                  <p class="text-xs text-slate-500">Modelo predictivo multi-variable con intervalo de confianza del 95%</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-nn-emerald font-mono-num bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                MAE: 4.2 veh/h
+              </span>
+            </div>
+
+            <!-- Trend Line Chart -->
+            <div class="h-44 w-full mt-3">
+              <canvas id="forecastChart"></canvas>
+            </div>
+
+            <!-- Causal Explainability Badges -->
+            <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+              <span class="text-slate-400 text-[11px] font-medium">Factores Explicativos:</span>
+              <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-semibold text-[11px] flex items-center gap-1">
+                🌧️ Previsión Lluvia (+15%)
+              </span>
+              <span class="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-semibold text-[11px] flex items-center gap-1">
+                💼 Congreso MWC (+45%)
+              </span>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold text-[11px] flex items-center gap-1">
+                🛍️ Sábado Comercial (+35%)
+              </span>
+            </div>
+          </div>
+
+          <!-- Strategic Yield Advice Box (NN Executive Style) -->
+          <div class="rounded-2xl p-5 border-2 border-nn-petrol/20 bg-gradient-to-br from-white to-[#F0F6F9] shadow-sm">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-nn-petrol text-white flex items-center justify-center shrink-0 shadow-sm">
+                <i data-lucide="shield-alert" class="w-5 h-5"></i>
+              </div>
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-nn-petrol uppercase tracking-wider">Recomendación Estratégica · Dirección de Parkings</span>
+                  <span class="text-[10px] bg-nn-petrol text-white px-2 py-0.2 rounded font-mono-num font-semibold">PRIORIDAD ALTA</span>
+                </div>
+                <h4 class="text-sm font-bold text-nn-petrol-headline">
+                  Ajuste de Yield Management y Cupos Digitales
+                </h4>
+                <p id="executiveYieldText" class="text-xs text-slate-600 leading-relaxed">
+                  Elevar la tarifa de rotación a <strong class="text-nn-petrol font-semibold">4.10 €/h</strong> durante la ventana crítica de 18:00 a 20:30 h. Se recomienda restringir temporalmente la cesión de cupos a agregadores digitales con descuento (Parclick/Telpark) para capturar el excedente de rotación directa en calzada que actualmente satura C/ Aragó con colas de cruising de 14 minutos.
+                </p>
+                <div class="pt-2 flex items-center gap-4 text-xs font-semibold">
+                  <span class="text-nn-emerald flex items-center gap-1">
+                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +3.420 €/semana estimados
+                  </span>
+                  <span class="text-slate-500">•</span>
+                  <button onclick="alert('Regla de Yield aplicada al sistema de control de barreras de NN Aragó.')" class="text-nn-petrol hover:underline flex items-center gap-1">
+                    Aplicar recomendación ahora →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- =============================================================================
+       DYNAMIC UPLOAD MODAL (CSV / EXCEL DATA INGESTION)
+       ============================================================================= -->
+  <div id="uploadModal" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2730]/60 backdrop-blur-xs hidden p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 border border-[#DFEAF0] shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-nn-petrol text-white flex items-center justify-center font-bold text-xs">
+            NN
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-nn-petrol-headline">Importar / Subir Nuevos Activos</h3>
+            <p class="text-xs text-slate-500">Carga por lotes de parkings o registro manual en el catálogo corporativo</p>
+          </div>
+        </div>
+        <button onclick="app.closeModal('uploadModal')" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Drag & Drop Zone -->
+      <div class="border-2 border-dashed border-[#C8DFE8] hover:border-nn-petrol rounded-2xl p-6 text-center bg-[#F8FAFB] transition-all cursor-pointer group" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" class="hidden" accept=".csv,.xlsx" onchange="app.handleFileUpload(event)">
+        <div class="w-12 h-12 rounded-full bg-[#E6EFF3] text-nn-petrol flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+          <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+        </div>
+        <div class="text-xs font-bold text-slate-700">Arrastra tu archivo CSV o Excel aquí</div>
+        <div class="text-[11px] text-slate-400 mt-1">Columnas requeridas: nombre, direccion, lat, lon, capacidad, tarifa_rotacion, distrito</div>
+        <div class="mt-3">
+          <span class="inline-block px-3 py-1 bg-white border border-[#DFEAF0] rounded-lg text-xs font-semibold text-nn-petrol shadow-xs">
+            Seleccionar archivo local
+          </span>
+        </div>
+      </div>
+
+      <!-- Text Link to Download Sample CSV -->
+      <div class="flex items-center justify-between text-xs px-1">
+        <a href="javascript:void(0)" onclick="app.downloadTemplateCSV()" class="text-nn-petrol font-semibold hover:underline flex items-center gap-1.5">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Descargar Plantilla CSV Oficial NN
+        </a>
+        <span class="text-slate-400">Codificación UTF-8</span>
+      </div>
+
+      <!-- Quick Manual Registration Form -->
+      <div class="pt-3 border-t border-slate-100">
+        <div class="text-xs font-bold text-slate-700 mb-2">O registrar un activo manualmente:</div>
+        <form onsubmit="app.handleManualSubmit(event)" class="grid grid-cols-2 gap-2 text-xs">
+          <input type="text" id="manualName" placeholder="Nombre (ej. NN Balmes / Consell)" required class="col-span-2 p-2 bg-[#F8FAFB] border border-[#DFEAF0] rounded-xl focus:outline-none focus:border-nn-petrol">
+          <select id="manualDistrict" class="p-2 bg-[#F8FAFB] border border-[#DFEAF0] rounded-xl focus:outline-none focus:border-nn-petrol">
+            <option value="Eixample">Eixample</option>
+            <option value="Ciutat Vella">Ciutat Vella</option>
+            <option value="Sarrià-Sant Gervasi">Sarrià-Sant Gervasi</option>
+            <option value="Gràcia">Gràcia</option>
+            <option value="Les Corts">Les Corts</option>
+            <option value="Sant Martí / 22@">Sant Martí / 22@</option>
+            <option value="Sants-Montjuïc">Sants-Montjuïc</option>
+          </select>
+          <input type="number" id="manualCap" placeholder="Capacidad (plazas)" required class="p-2 bg-[#F8FAFB] border border-[#DFEAF0] rounded-xl focus:outline-none focus:border-nn-petrol">
+          <input type="number" step="0.05" id="manualTariff" placeholder="Tarifa €/h (ej. 3.80)" required class="p-2 bg-[#F8FAFB] border border-[#DFEAF0] rounded-xl focus:outline-none focus:border-nn-petrol">
+          <input type="number" id="manualElevation" placeholder="Elevación msnm (ej. 28)" class="p-2 bg-[#F8FAFB] border border-[#DFEAF0] rounded-xl focus:outline-none focus:border-nn-petrol">
+          
+          <div class="col-span-2 pt-2 flex items-center justify-end gap-2">
+            <button type="button" onclick="app.closeModal('uploadModal')" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium">Cancelar</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-nn-petrol text-white font-semibold hover:bg-nn-petrol-hover">Registrar Activo</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =============================================================================
+       JAVASCRIPT APPLICATION ENGINE (DATA & INTERACTIONS)
+       ============================================================================= -->
+  <script>
+    // 30 Genuine Benchmark NN Parkings Dataset across Barcelona
+    const NN_PARKINGS_DATA = [
+      { id: 1, name: "NN Aragó / Rbla. Catalunya", district: "Eixample", address: "Carrer d'Aragó, 235", lat: 41.3897, lon: 2.1610, x: 380, y: 260, capacity: 280, dl: 118, cruising: 86, saturation: 92, tariff: 3.75, elevation: 32, slope: 1.4, pois: 184, ev: 8 },
+      { id: 2, name: "NN Gran Via / Urgell", district: "Eixample", address: "Gran Via de les Corts Catalanes, 512", lat: 41.3820, lon: 2.1580, x: 330, y: 310, capacity: 340, dl: 112, cruising: 79, saturation: 90, tariff: 3.60, elevation: 25, slope: 1.1, pois: 156, ev: 6 },
+      { id: 3, name: "NN Pg. de Gràcia / Diputació", district: "Eixample", address: "Passeig de Gràcia, 32", lat: 41.3915, lon: 2.1660, x: 420, y: 270, capacity: 410, dl: 108, cruising: 94, saturation: 95, tariff: 4.20, elevation: 34, slope: 1.8, pois: 210, ev: 12 },
+      { id: 4, name: "NN Pau Claris / València", district: "Eixample", address: "Carrer de Pau Claris, 145", lat: 41.3940, lon: 2.1645, x: 410, y: 240, capacity: 220, dl: 105, cruising: 72, saturation: 89, tariff: 3.80, elevation: 38, slope: 1.5, pois: 142, ev: 4 },
+      { id: 5, name: "NN Rambla Catalunya / Còrsega", district: "Eixample", address: "Rambla de Catalunya, 102", lat: 41.3960, lon: 2.1585, x: 370, y: 210, capacity: 195, dl: 101, cruising: 68, saturation: 88, tariff: 3.90, elevation: 42, slope: 2.1, pois: 168, ev: 6 },
+      { id: 6, name: "NN Plaça Catalunya / Bergara", district: "Ciutat Vella", address: "Carrer de Bergara, 9", lat: 41.3860, lon: 2.1680, x: 410, y: 325, capacity: 310, dl: 98, cruising: 82, saturation: 96, tariff: 4.10, elevation: 18, slope: 0.8, pois: 245, ev: 10 },
+      { id: 7, name: "NN Via Laietana / Catedral", district: "Ciutat Vella", address: "Via Laietana, 39", lat: 41.3855, lon: 2.1765, x: 465, y: 340, capacity: 250, dl: 95, cruising: 75, saturation: 94, tariff: 3.95, elevation: 14, slope: 0.5, pois: 198, ev: 6 },
+      { id: 8, name: "NN Balmes / Diagonal", district: "Sarrià-Sant Gervasi", address: "Carrer de Balmes, 182", lat: 41.3980, lon: 2.1530, x: 335, y: 190, capacity: 290, dl: 94, cruising: 65, saturation: 87, tariff: 3.70, elevation: 48, slope: 2.6, pois: 130, ev: 8 },
+      { id: 9, name: "NN Travessera de Gràcia / Muntaner", district: "Sarrià-Sant Gervasi", address: "Travessera de Gràcia, 45", lat: 41.3955, lon: 2.1460, x: 295, y: 195, capacity: 210, dl: 91, cruising: 59, saturation: 86, tariff: 3.65, elevation: 52, slope: 2.9, pois: 122, ev: 4 },
+      { id: 10, name: "NN Diagonal / Francesc Macià", district: "Les Corts", address: "Avinguda Diagonal, 538", lat: 41.3920, lon: 2.1420, x: 270, y: 220, capacity: 450, dl: 89, cruising: 78, saturation: 88, tariff: 3.85, elevation: 40, slope: 1.2, pois: 175, ev: 14 },
+      { id: 11, name: "NN Carrer de Mallorca / Enric Granados", district: "Eixample", address: "Carrer de Mallorca, 198", lat: 41.3905, lon: 2.1575, x: 360, y: 250, capacity: 180, dl: 88, cruising: 56, saturation: 89, tariff: 3.70, elevation: 33, slope: 1.4, pois: 160, ev: 4 },
+      { id: 12, name: "NN Aribau / Provença", district: "Eixample", address: "Carrer d'Aribau, 142", lat: 41.3910, lon: 2.1540, x: 340, y: 245, capacity: 205, dl: 86, cruising: 54, saturation: 87, tariff: 3.65, elevation: 35, slope: 1.6, pois: 148, ev: 6 },
+      { id: 13, name: "NN Glòries / Llacuna 22@", district: "Sant Martí / 22@", address: "Carrer de la Llacuna, 120", lat: 41.4010, lon: 2.1930, x: 575, y: 260, capacity: 380, dl: 85, cruising: 62, saturation: 84, tariff: 3.40, elevation: 12, slope: 0.6, pois: 95, ev: 16 },
+      { id: 14, name: "NN Bogatell / Marina 22@", district: "Sant Martí / 22@", address: "Avinguda del Bogatell, 22", lat: 41.3930, lon: 2.1900, x: 550, y: 320, capacity: 260, dl: 84, cruising: 51, saturation: 82, tariff: 3.30, elevation: 8, slope: 0.4, pois: 88, ev: 8 },
+      { id: 15, name: "NN Fontana / Gran de Gràcia", district: "Gràcia", address: "Carrer Gran de Gràcia, 84", lat: 41.4020, lon: 2.1540, x: 340, y: 150, capacity: 175, dl: 83, cruising: 64, saturation: 93, tariff: 3.55, elevation: 64, slope: 3.2, pois: 155, ev: 4 },
+      { id: 16, name: "NN Lesseps / Torrent de l'Olla", district: "Gràcia", address: "Plaça de Lesseps, 12", lat: 41.4070, lon: 2.1500, x: 310, y: 110, capacity: 215, dl: 81, cruising: 58, saturation: 85, tariff: 3.45, elevation: 82, slope: 3.8, pois: 110, ev: 6 },
+      { id: 17, name: "NN Joanic / Pi i Margall", district: "Gràcia", address: "Plaça de Joanic, 6", lat: 41.4060, lon: 2.1620, x: 390, y: 120, capacity: 160, dl: 79, cruising: 48, saturation: 84, tariff: 3.40, elevation: 75, slope: 3.5, pois: 105, ev: 4 },
+      { id: 18, name: "NN Sagrada Família / Marina", district: "Eixample", address: "Carrer de la Marina, 240", lat: 41.4045, lon: 2.1750, x: 470, y: 160, capacity: 330, dl: 78, cruising: 71, saturation: 91, tariff: 3.75, elevation: 30, slope: 1.5, pois: 180, ev: 8 },
+      { id: 19, name: "NN Hospital Clínic / Villarroel", district: "Eixample", address: "Carrer de Villarroel, 168", lat: 41.3885, lon: 2.1510, x: 320, y: 265, capacity: 310, dl: 76, cruising: 66, saturation: 92, tariff: 3.80, elevation: 32, slope: 1.2, pois: 135, ev: 8 },
+      { id: 20, name: "NN Rocafort / Consell de Cent", district: "Eixample", address: "Carrer de Rocafort, 114", lat: 41.3795, lon: 2.1520, x: 300, y: 330, capacity: 220, dl: 75, cruising: 49, saturation: 83, tariff: 3.50, elevation: 22, slope: 0.9, pois: 115, ev: 6 },
+      { id: 21, name: "NN Entença / París", district: "Eixample", address: "Carrer d'Entença, 180", lat: 41.3850, lon: 2.1430, x: 260, y: 280, capacity: 200, dl: 73, cruising: 46, saturation: 81, tariff: 3.45, elevation: 36, slope: 1.3, pois: 98, ev: 4 },
+      { id: 22, name: "NN Girona / Rosselló", district: "Eixample", address: "Carrer de Girona, 154", lat: 41.3990, lon: 2.1670, x: 425, y: 200, capacity: 190, dl: 72, cruising: 44, saturation: 82, tariff: 3.55, elevation: 42, slope: 1.7, pois: 125, ev: 4 },
+      { id: 23, name: "NN Pelai / Universitat", district: "Ciutat Vella", address: "Carrer de Pelai, 38", lat: 41.3860, lon: 2.1660, x: 395, y: 325, capacity: 240, dl: 71, cruising: 63, saturation: 94, tariff: 4.00, elevation: 20, slope: 0.8, pois: 215, ev: 6 },
+      { id: 24, name: "NN Arc de Triomf / Trafalgar", district: "Ciutat Vella", address: "Carrer de Trafalgar, 44", lat: 41.3900, lon: 2.1780, x: 480, y: 310, capacity: 210, dl: 70, cruising: 52, saturation: 86, tariff: 3.65, elevation: 16, slope: 0.6, pois: 140, ev: 6 },
+      { id: 25, name: "NN Mandri / Paseo Bonanova", district: "Sarrià-Sant Gervasi", address: "Carrer de Mandri, 35", lat: 41.4060, lon: 2.1330, x: 220, y: 120, capacity: 180, dl: 68, cruising: 42, saturation: 80, tariff: 3.60, elevation: 95, slope: 4.5, pois: 85, ev: 6 },
+      { id: 26, name: "NN Via Augusta / Ganduxer", district: "Sarrià-Sant Gervasi", address: "Via Augusta, 214", lat: 41.4010, lon: 2.1360, x: 235, y: 155, capacity: 240, dl: 66, cruising: 45, saturation: 79, tariff: 3.65, elevation: 78, slope: 3.8, pois: 92, ev: 6 },
+      { id: 27, name: "NN Illa Diagonal / Numància", district: "Les Corts", address: "Carrer de Numància, 150", lat: 41.3880, lon: 2.1350, x: 230, y: 250, capacity: 360, dl: 65, cruising: 53, saturation: 83, tariff: 3.75, elevation: 44, slope: 1.4, pois: 165, ev: 12 },
+      { id: 28, name: "NN Camp Nou / Maternitat", district: "Les Corts", address: "Travessera de les Corts, 112", lat: 41.3820, lon: 2.1220, x: 170, y: 290, capacity: 310, dl: 63, cruising: 41, saturation: 78, tariff: 3.40, elevation: 52, slope: 1.8, pois: 80, ev: 8 },
+      { id: 29, name: "NN Paral·lel / Blai", district: "Sants-Montjuïc", address: "Avinguda del Paral·lel, 114", lat: 41.3740, lon: 2.1640, x: 385, y: 405, capacity: 220, dl: 62, cruising: 49, saturation: 85, tariff: 3.45, elevation: 12, slope: 1.0, pois: 130, ev: 4 },
+      { id: 30, name: "NN Estació Sants / Tarragona", district: "Sants-Montjuïc", address: "Carrer de Tarragona, 98", lat: 41.3780, lon: 2.1440, x: 260, y: 350, capacity: 350, dl: 61, cruising: 55, saturation: 84, tariff: 3.50, elevation: 28, slope: 1.2, pois: 110, ev: 10 }
+    ];
+
+    // Main Application Engine
+    class NNApp {
+      constructor() {
+        this.currentState = 'A'; // 'A' (Portfolio) or 'B' (Audit)
+        this.selectedAssetId = 1;
+        this.currentDistrict = 'all';
+        this.searchQuery = '';
+        this.isSimulating = false;
+        this.simInterval = null;
+        this.simHour = 18;
+        this.selectedDayIndex = 4; // Friday default
+        this.intraDayChart = null;
+        this.forecastChart = null;
+        this.showIsochrones = true;
+
+        // Sliders state
+        this.sliders = {
+          rain: 0,
+          sat: 92,
+          event: 'none',
+          tariff: 3.75
+        };
+      }
+
+      init() {
+        this.populateDropdown();
+        this.renderTable();
+        this.renderMapMarkers();
+        this.initCharts();
+        lucide.createIcons();
+
+        // Keyboard navigation (Esc to return to State A)
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && this.currentState === 'B') {
+            this.switchState('A');
+          }
+        });
+      }
+
+      switchState(state, assetId = null) {
+        this.currentState = state;
+        const viewA = document.getElementById('stateAView');
+        const viewB = document.getElementById('stateBView');
+        const navA = document.getElementById('navStateA');
+        const navB = document.getElementById('navStateB');
+
+        if (state === 'A') {
+          viewA.classList.remove('hidden');
+          viewB.classList.add('hidden');
+          navA.className = "px-3.5 py-1.5 rounded-lg transition-all bg-nn-petrol text-white shadow-sm font-semibold flex items-center gap-1.5";
+          navB.className = "px-3.5 py-1.5 rounded-lg transition-all text-nn-petrol hover:text-nn-petrol-hover font-semibold flex items-center gap-1.5";
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          viewA.classList.add('hidden');
+          viewB.classList.remove('hidden');
+          navB.className = "px-3.5 py-1.5 rounded-lg transition-all bg-nn-petrol text-white shadow-sm font-semibold flex items-center gap-1.5";
+          navA.className = "px-3.5 py-1.5 rounded-lg transition-all text-nn-petrol hover:text-nn-petrol-hover font-semibold flex items-center gap-1.5";
+          
+          if (assetId) {
+            this.selectAsset(assetId);
+          } else {
+            this.updateAssetDetails();
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        lucide.createIcons();
+      }
+
+      populateDropdown() {
+        const select = document.getElementById('assetSelectDropdown');
+        select.innerHTML = NN_PARKINGS_DATA.map(p => 
+          `<option value="${p.id}" ${p.id === this.selectedAssetId ? 'selected' : ''}>${p.id}. ${p.name} (${p.district})</option>`
+        ).join('');
+      }
+
+      selectAsset(id) {
+        this.selectedAssetId = id;
+        document.getElementById('assetSelectDropdown').value = id;
+        this.updateAssetDetails();
+        this.updateChartsForAsset();
+        lucide.createIcons();
+      }
+
+      updateAssetDetails() {
+        const p = NN_PARKINGS_DATA.find(x => x.id === this.selectedAssetId) || NN_PARKINGS_DATA[0];
+        
+        document.getElementById('heroDistrictBadge').innerText = p.district;
+        document.getElementById('heroTitle').innerText = p.name;
+        document.getElementById('heroAddress').innerText = p.address;
+        document.getElementById('heroCoordinates').innerText = `${p.lat.toFixed(4)}° N, ${p.lon.toFixed(4)}° E`;
+        document.getElementById('heroElevation').innerText = `${p.elevation} msnm`;
+        document.getElementById('heroSlope').innerText = `${p.slope}%`;
+        document.getElementById('heroPOIs').innerText = p.pois;
+
+        // Apply sliders modifier to KPIs
+        const mult = this.calcMultiplier();
+        const finalDL = Math.round(p.dl * mult);
+        const finalGamma = Math.round(p.cruising * (1 + (this.sliders.sat - 85) * 0.02 + this.sliders.rain * 0.03));
+        const finalRev = Math.round(finalDL * p.tariff * 2.2);
+
+        document.getElementById('detailDL').innerText = finalDL;
+        document.getElementById('detailGamma').innerText = finalGamma;
+        document.getElementById('detailSat').innerText = `${this.sliders.sat}%`;
+        document.getElementById('detailRevenue').innerText = finalRev;
+
+        // Sync waterfall
+        document.getElementById('waterfallDL').innerText = `${finalDL} veh/h`;
+        const barWidth = Math.min(100, Math.round((finalDL / 370) * 100));
+        document.getElementById('waterfallDLBar').style.width = `${barWidth}%`;
+
+        // Update Slider value displays
+        document.getElementById('sliderTariff').value = p.tariff;
+        document.getElementById('valTariff').innerText = `${p.tariff.toFixed(2)} €/h`;
+      }
+
+      setDistrictFilter(dist) {
+        this.currentDistrict = dist;
+        document.querySelectorAll('.district-pill').forEach(btn => {
+          if (btn.getAttribute('data-district') === dist) {
+            btn.className = "district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-nn-petrol text-white shadow-xs";
+          } else {
+            btn.className = "district-pill px-3.5 py-1.5 rounded-xl font-semibold transition-all bg-[#F0F5F8] text-nn-petrol hover:bg-[#E6EFF3]";
+          }
+        });
+        this.renderTable();
+        this.renderMapMarkers();
+      }
+
+      handleSearch(query) {
+        this.searchQuery = query.toLowerCase().trim();
+        this.renderTable();
+        this.renderMapMarkers();
+      }
+
+      getFilteredData() {
+        return NN_PARKINGS_DATA.filter(p => {
+          const matchDistrict = (this.currentDistrict === 'all' || p.district.toLowerCase().includes(this.currentDistrict.toLowerCase()));
+          const matchSearch = !this.searchQuery || 
+            p.name.toLowerCase().includes(this.searchQuery) || 
+            p.district.toLowerCase().includes(this.searchQuery) ||
+            p.address.toLowerCase().includes(this.searchQuery);
+          return matchDistrict && matchSearch;
+        });
+      }
+
+      renderTable() {
+        const list = this.getFilteredData();
+        const container = document.getElementById('tableRowsContainer');
+        
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="py-12 text-center text-slate-400 text-xs">
+              <i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+              No se encontraron activos para los filtros seleccionados.
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        container.innerHTML = list.map((p, idx) => {
+          const rank = idx + 1;
+          const isSelected = p.id === this.selectedAssetId;
+          return `
+            <div onclick="app.switchState('B', ${p.id})" class="p-3 rounded-xl hover:bg-[#F8FAFB] transition-all cursor-pointer flex items-center justify-between group ${isSelected ? 'bg-[#E6EFF3]/60' : ''}">
+              <div class="flex items-center gap-3">
+                <span class="w-6 text-center font-mono-num font-bold text-xs ${rank <= 3 ? 'text-nn-petrol' : 'text-slate-400'}">
+                  #${rank}
+                </span>
+                <div>
+                  <div class="font-bold text-xs text-nn-petrol-headline group-hover:text-nn-petrol flex items-center gap-1.5">
+                    ${p.name}
+                  </div>
+                  <div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
+                    <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-medium">${p.district}</span>
+                    <span>•</span>
+                    <span class="font-mono-num font-semibold text-slate-500">${p.capacity} pl.</span>
+                    <span>•</span>
+                    <span class="font-mono-num text-slate-500">${p.tariff.toFixed(2)}€/h</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <div class="text-xs font-mono-num font-extrabold text-nn-emerald">
+                    ${p.dl} <span class="text-[10px] font-normal text-slate-400">v/h</span>
+                  </div>
+                  <div class="text-[10px] font-mono-num text-nn-amber">
+                    ${p.cruising} buscando
+                  </div>
+                </div>
+                <button class="p-1.5 rounded-lg bg-[#F0F5F8] text-nn-petrol group-hover:bg-nn-petrol group-hover:text-white transition-all shadow-xs">
+                  <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        lucide.createIcons();
+      }
+
+      renderMapMarkers() {
+        const list = this.getFilteredData();
+        const container = document.getElementById('mapMarkersContainer');
+        document.getElementById('mapCount').innerText = list.length;
+
+        container.innerHTML = list.map(p => {
+          const isSelected = p.id === this.selectedAssetId;
+          const isHigh = p.dl >= 90;
+          return `
+            <div onclick="app.switchState('B', ${p.id})" style="left: ${p.x}px; top: ${p.y}px;" class="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-20">
+              
+              <!-- Tobler deformed walking polygon halo hint -->
+              ${this.showIsochrones ? `
+                <div class="absolute -inset-4 rounded-full bg-nn-petrol/10 border border-nn-petrol/20 scale-75 group-hover:scale-125 transition-transform duration-300 pointer-events-none"></div>
+              ` : ''}
+
+              <!-- Circular Marker Badge -->
+              <div class="relative flex items-center justify-center">
+                <div class="w-7 h-7 rounded-full ${isSelected ? 'bg-[#0D2730] ring-4 ring-nn-emerald scale-110' : 'bg-nn-petrol'} text-white shadow-md flex items-center justify-center font-bold text-[10px] border-2 border-white transition-transform group-hover:scale-110">
+                  NN
+                </div>
+
+                <!-- Latent demand pill tag -->
+                <div class="absolute -bottom-4 bg-white/95 backdrop-blur-xs text-[10px] font-mono-num font-extrabold px-1.5 py-0.2 rounded-full border border-[#DFEAF0] shadow-xs text-slate-800 flex items-center gap-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full ${isHigh ? 'bg-nn-emerald' : 'bg-nn-amber'}"></span>
+                  ${p.dl}
+                </div>
+              </div>
+
+              <!-- Hover Tooltip -->
+              <div class="absolute bottom-8 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-white text-slate-800 p-2.5 rounded-xl border border-[#DFEAF0] shadow-xl text-xs w-48 pointer-events-none z-30">
+                <span class="font-bold text-nn-petrol-headline">${p.name}</span>
+                <span class="text-[10px] text-slate-500">${p.address}</span>
+                <div class="mt-1.5 pt-1.5 border-t border-slate-100 flex justify-between font-mono-num text-[11px]">
+                  <span class="text-nn-emerald font-bold">${p.dl} veh/h latente</span>
+                  <span class="text-slate-500">${p.capacity} pl.</span>
+                </div>
+              </div>
+
+            </div>
+          `;
+        }).join('');
+      }
+
+      toggleIsochronesLayer() {
+        this.showIsochrones = !this.showIsochrones;
+        this.renderMapMarkers();
+      }
+
+      resetMapZoom() {
+        this.setDistrictFilter('all');
+        this.handleSearch('');
+        document.getElementById('searchInput').value = '';
+      }
+
+      calcMultiplier() {
+        let m = 1.0;
+        if (this.sliders.rain > 0) m += (this.sliders.rain * 0.015);
+        if (this.sliders.sat > 85) m += ((this.sliders.sat - 85) * 0.02);
+        if (this.sliders.event === 'mwc') m += 0.45;
+        if (this.sliders.event === 'concert') m += 0.30;
+        if (this.sliders.event === 'festivo') m += 0.35;
+        if (this.sliders.event === 'strike') m += 0.50;
+        return m;
+      }
+
+      updateSimulation() {
+        this.sliders.rain = parseFloat(document.getElementById('sliderRain').value);
+        this.sliders.sat = parseInt(document.getElementById('sliderSat').value);
+        this.sliders.event = document.getElementById('selectEvent').value;
+        this.sliders.tariff = parseFloat(document.getElementById('sliderTariff').value);
+
+        document.getElementById('valRain').innerText = `${this.sliders.rain.toFixed(1)} mm/h`;
+        document.getElementById('valSat').innerText = `${this.sliders.sat}%`;
+        document.getElementById('valTariff').innerText = `${this.sliders.tariff.toFixed(2)} €/h`;
+
+        this.updateAssetDetails();
+        this.updateChartsForAsset();
+      }
+
+      resetSliders() {
+        document.getElementById('sliderRain').value = 0;
+        document.getElementById('sliderSat').value = 92;
+        document.getElementById('selectEvent').value = 'none';
+        document.getElementById('sliderTariff').value = 3.75;
+        this.updateSimulation();
+      }
+
+      selectDay(idx) {
+        this.selectedDayIndex = idx;
+        const dayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+        const daySubtitles = [
+          "Lunes (Apertura Laboral + Gestiones Corporativas)",
+          "Martes (Actividad Profesional Estable)",
+          "Miércoles (Pico Intermedio de Negocio)",
+          "Jueves (Incremento de Ocio Nocturno)",
+          "Viernes (Pico Ocio + Comercial Máximo)",
+          "Sábado (Compras Passeig de Gràcia + Turismo)",
+          "Domingo (Ocio Familiar + Restauración Eixample)"
+        ];
+
+        document.querySelectorAll('.day-card').forEach((card, i) => {
+          if (i === idx) {
+            card.className = "day-card p-2 rounded-xl border border-[#C8DFE8] bg-[#E6EFF3] text-center transition-all shadow-xs ring-1 ring-nn-petrol";
+          } else {
+            card.className = "day-card p-2 rounded-xl border border-[#DFEAF0] bg-[#F8FAFB] text-center transition-all hover:border-[#C8DFE8]";
+          }
+        });
+
+        document.getElementById('currentDayTitle').innerText = `Perfil 24 Horas: ${daySubtitles[idx]}`;
+        this.updateChartsForAsset();
+      }
+
+      initCharts() {
+        // Chart 1: Intra-Day 24h Curve
+        const ctxIntra = document.getElementById('intraDayChart').getContext('2d');
+        const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+
+        this.intraDayChart = new Chart(ctxIntra, {
+          type: 'line',
+          data: {
+            labels: hours,
+            datasets: [
+              {
+                label: 'Aforo Bruto (veh/h)',
+                data: [120, 80, 50, 40, 60, 150, 420, 850, 1100, 1050, 980, 1120, 1250, 1320, 1180, 1050, 1180, 1380, 1420, 1350, 1150, 820, 510, 280],
+                borderColor: '#CBD5E1',
+                backgroundColor: 'rgba(203, 213, 225, 0.1)',
+                borderWidth: 1.5,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 0
+              },
+              {
+                label: 'Demanda Latente (DL)',
+                data: [10, 5, 2, 2, 4, 15, 45, 85, 105, 98, 92, 108, 114, 118, 102, 94, 106, 124, 128, 118, 98, 70, 40, 20],
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.35,
+                pointRadius: 2,
+                pointBackgroundColor: '#10B981'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0D2730',
+                titleColor: '#FFFFFF',
+                bodyColor: '#FFFFFF',
+                bodyFont: { family: 'JetBrains Mono' },
+                cornerRadius: 8,
+                padding: 10
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', size: 10 }, color: '#94A3B8', maxTicksLimit: 12 }
+              },
+              y: {
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#94A3B8' }
+              }
+            }
+          }
+        });
+
+        // Chart 2: Predictive Forecast (t+1 to t+7)
+        const ctxForecast = document.getElementById('forecastChart').getContext('2d');
+        const daysForecast = ['Sáb 15', 'Dom 16', 'Lun 17', 'Mar 18 (MWC)', 'Mié 19', 'Jue 20', 'Vie 21'];
+
+        this.forecastChart = new Chart(ctxForecast, {
+          type: 'line',
+          data: {
+            labels: daysForecast,
+            datasets: [
+              {
+                label: 'Cota Superior (95%)',
+                data: [138, 88, 118, 172, 168, 142, 160],
+                borderColor: 'transparent',
+                backgroundColor: 'rgba(22, 66, 80, 0.08)',
+                fill: '+1',
+                tension: 0.35,
+                pointRadius: 0
+              },
+              {
+                label: 'Demanda Estimada Central',
+                data: [126, 75, 105, 155, 150, 128, 144],
+                borderColor: '#164250',
+                backgroundColor: 'transparent',
+                borderWidth: 2.5,
+                tension: 0.35,
+                pointRadius: 3,
+                pointBackgroundColor: '#164250'
+              },
+              {
+                label: 'Cota Inferior (95%)',
+                data: [114, 62, 92, 138, 132, 114, 128],
+                borderColor: 'transparent',
+                backgroundColor: 'transparent',
+                tension: 0.35,
+                pointRadius: 0
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0D2730',
+                titleColor: '#FFFFFF',
+                bodyColor: '#FFFFFF',
+                bodyFont: { family: 'JetBrains Mono' },
+                cornerRadius: 8,
+                padding: 10
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', size: 10 }, color: '#64748B' }
+              },
+              y: {
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#94A3B8' }
+              }
+            }
+          }
+        });
+      }
+
+      updateChartsForAsset() {
+        if (!this.intraDayChart || !this.forecastChart) return;
+        const p = NN_PARKINGS_DATA.find(x => x.id === this.selectedAssetId) || NN_PARKINGS_DATA[0];
+        const mult = this.calcMultiplier();
+
+        // Day specific modifiers
+        const dayFactors = [0.88, 0.94, 0.96, 1.02, 1.15, 1.08, 0.65];
+        const dayFactor = dayFactors[this.selectedDayIndex];
+
+        const baseProfile = [10, 5, 2, 2, 4, 15, 45, 85, 105, 98, 92, 108, 114, 118, 102, 94, 106, 124, 128, 118, 98, 70, 40, 20];
+        const updatedDL = baseProfile.map(val => Math.round((val / 118) * p.dl * mult * dayFactor));
+
+        this.intraDayChart.data.datasets[1].data = updatedDL;
+        this.intraDayChart.update();
+
+        // Forecast update
+        const forecastBase = [126, 75, 105, 155, 150, 128, 144];
+        const updatedForecast = forecastBase.map(v => Math.round((v / 118) * p.dl * mult));
+        this.forecastChart.data.datasets[0].data = updatedForecast.map(v => Math.round(v * 1.12));
+        this.forecastChart.data.datasets[1].data = updatedForecast;
+        this.forecastChart.data.datasets[2].data = updatedForecast.map(v => Math.round(v * 0.88));
+        this.forecastChart.update();
+      }
+
+      toggleDaySimulation() {
+        this.isSimulating = !this.isSimulating;
+        const btn = document.getElementById('btnAnimarDia');
+        const icon = document.getElementById('playIcon');
+        const label = document.getElementById('playLabel');
+
+        if (this.isSimulating) {
+          btn.classList.add('bg-nn-petrol', 'text-white');
+          btn.classList.remove('bg-[#E6EFF3]', 'text-nn-petrol');
+          icon.setAttribute('data-lucide', 'pause');
+          label.innerText = 'Pausar Simulación';
+          lucide.createIcons();
+
+          this.simInterval = setInterval(() => {
+            this.simHour = (this.simHour + 1) % 24;
+            document.getElementById('headerClock').innerText = `${this.simHour.toString().padStart(2, '0')}:00 h`;
+            
+            // Pulse variation in KPIs
+            const wave = Math.sin((this.simHour / 24) * Math.PI * 2);
+            const total = Math.round(2840 + wave * 900);
+            const cruising = Math.round(1492 + wave * 450);
+            const rev = Math.round(21840 + wave * 6200);
+
+            document.getElementById('kpiTotalLatent').innerText = total.toLocaleString('es-ES');
+            document.getElementById('kpiCruising').innerText = cruising.toLocaleString('es-ES');
+            document.getElementById('kpiRevenue').innerText = rev.toLocaleString('es-ES');
+          }, 1200);
+        } else {
+          clearInterval(this.simInterval);
+          btn.classList.remove('bg-nn-petrol', 'text-white');
+          btn.classList.add('bg-[#E6EFF3]', 'text-nn-petrol');
+          icon.setAttribute('data-lucide', 'play');
+          label.innerText = 'Simular 24h';
+          lucide.createIcons();
+        }
+      }
+
+      openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+      }
+
+      closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+      }
+
+      downloadTemplateCSV() {
+        const csvContent = "data:text/csv;charset=utf-8," 
+          + "nombre,direccion,lat,lon,capacidad,tarifa_rotacion,distrito\n"
+          + "NN Aragó / Rbla Catalunya,Carrer d'Aragó 235,41.3897,2.1610,280,3.75,Eixample\n"
+          + "NN Gran Via / Urgell,Gran Via 512,41.3820,2.1580,340,3.60,Eixample\n"
+          + "NN Pg de Gràcia / Diputació,Passeig de Gràcia 32,41.3915,2.1660,410,4.20,Eixample";
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "plantilla_parkings_nn.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (file) {
+          alert(`Archivo "${file.name}" cargado con éxito. Procesando 12 nuevos activos y calculando isocronas Tobler con el DEM de Barcelona...`);
+          this.closeModal('uploadModal');
+        }
+      }
+
+      handleManualSubmit(e) {
+        e.preventDefault();
+        const name = document.getElementById('manualName').value;
+        const district = document.getElementById('manualDistrict').value;
+        const cap = parseInt(document.getElementById('manualCap').value);
+        const tariff = parseFloat(document.getElementById('manualTariff').value);
+        const elev = parseInt(document.getElementById('manualElevation').value) || 30;
+
+        const newId = NN_PARKINGS_DATA.length + 1;
+        const newParking = {
+          id: newId,
+          name: name,
+          district: district,
+          address: `${name}, Barcelona`,
+          lat: 41.3900 + (Math.random() - 0.5) * 0.02,
+          lon: 2.1600 + (Math.random() - 0.5) * 0.02,
+          x: 350 + Math.round((Math.random() - 0.5) * 100),
+          y: 250 + Math.round((Math.random() - 0.5) * 100),
+          capacity: cap,
+          dl: Math.round(cap * 0.35),
+          cruising: Math.round(cap * 0.25),
+          saturation: 90,
+          tariff: tariff,
+          elevation: elev,
+          slope: 1.5,
+          pois: 140,
+          ev: 6
+        };
+
+        NN_PARKINGS_DATA.unshift(newParking);
+        alert(`Parking "${name}" añadido a la cartera corporativa.`);
+        this.closeModal('uploadModal');
+        this.populateDropdown();
+        this.renderTable();
+        this.renderMapMarkers();
+        this.switchState('B', newId);
+      }
+    }
+
+    // Initialize application when DOM is ready
+    let app;
+    window.addEventListener('DOMContentLoaded', () => {
+      app = new NNApp();
+      app.init();
+    });
+  </script>
+</body>
+</html>

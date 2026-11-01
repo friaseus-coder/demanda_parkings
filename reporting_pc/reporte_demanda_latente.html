@@ -1,0 +1,3047 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe de Demanda Latente · NN Parkings Barcelona</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F8FAFB;
+      color: #123742;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background-color: #ffffff; }
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Top Action Bar (Print / Web) -->
+    <div class="no-print flex items-center justify-between pb-4 border-b border-[#DFEAF0]">
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+          INFORME TÉCNICO OFICIAL
+        </span>
+        <span class="text-xs text-slate-400">Generado desde: aparcamientos_analizar.txt</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-[#164250] hover:bg-[#0F323D] text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          Imprimir / Guardar en PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Header Corporativo NN Parkings -->
+    <header class="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFEAF0] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="flex items-center space-x-4">
+        <div class="w-14 h-14 rounded-full bg-[#0D2730] flex items-center justify-center text-white font-extrabold text-xl tracking-wider shadow-sm shrink-0">
+          NN
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Grup Núñez i Navarro</span>
+            <span class="text-xs text-[#164250] font-bold">_parkings</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1A4B5B] tracking-tight">
+            Auditoría de Demanda Latente de Aparcamientos
+          </h1>
+          <p class="text-xs text-slate-500 mt-1">
+            Evaluación técnica de vehículos insatisfechos en calzada y potencial de captación subterránea en Barcelona.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-right text-xs text-slate-500 shrink-0">
+        <div>Emisión: <strong>12/10/2026 a las 11:51</strong></div>
+        <div>Muestra: <strong>20 aparcamientos</strong></div>
+        <div>Entorno: <strong>Barcelona Metropolitan Area</strong></div>
+      </div>
+    </header>
+
+    <!-- 4 KPIs Ejecutivos -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Demanda Latente Total</span>
+        <div class="mt-2 text-3xl font-extrabold font-mono text-[#1A4B5B]">4,405 <span class="text-xs font-normal text-slate-400">veh/h</span></div>
+        <span class="text-[11px] text-[#10B981] font-semibold mt-1 block">Demanda neta no capturada</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Tráfico en Cruising</span>
+        <div class="mt-2 text-3xl font-extrabold font-mono text-[#D97706]">10,350 <span class="text-xs font-normal text-slate-400">veh/h</span></div>
+        <span class="text-[11px] text-slate-500 font-semibold mt-1 block">Buscando plaza en superficie</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Ingresos No Captados</span>
+        <div class="mt-2 text-3xl font-extrabold font-mono text-[#10B981]">33,508 <span class="text-xs font-normal text-slate-400">€/día</span></div>
+        <span class="text-[11px] text-slate-500 font-semibold mt-1 block">~1,005,240 € al mes</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Capacidad Auditada</span>
+        <div class="mt-2 text-3xl font-extrabold font-mono text-slate-800">6,230 <span class="text-xs font-normal text-slate-400">plazas</span></div>
+        <span class="text-[11px] text-slate-500 font-semibold mt-1 block">Oferta física en cartera</span>
+      </div>
+    </div>
+
+    <!-- Tabla Comparativa -->
+    <div class="bg-white rounded-3xl border border-[#DFEAF0] shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-[#DFEAF0] flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-[#1A4B5B]">Ranking de Aparcamientos Auditados</h2>
+          <p class="text-xs text-slate-400">Ordenados de mayor a menor demanda latente insatisfecha en su área de influencia</p>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-[#F8FAFB] text-slate-500 border-b border-[#DFEAF0] uppercase font-semibold">
+            <tr>
+              <th class="py-3 px-4">#</th>
+              <th class="py-3 px-4">Aparcamiento</th>
+              <th class="py-3 px-4">Distrito</th>
+              <th class="py-3 px-4 text-right">Plazas</th>
+              <th class="py-3 px-4 text-right">Demanda Latente (D_L)</th>
+              <th class="py-3 px-4 text-right">Cruising</th>
+              <th class="py-3 px-4 text-right">Déficit Calzada</th>
+              <th class="py-3 px-4 text-right">Ingresos Potenciales</th>
+              <th class="py-3 px-4 text-center">Prioridad Yield</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#1</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Illa Diagonal / Numància</div>
+            <div class="text-xs text-slate-400">Carrer de Numància. 150</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Les Corts
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">610 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">417 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">722</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">26</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">3.131 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#2</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Pg. de Gràcia / Diputació</div>
+            <div class="text-xs text-slate-400">Passeig de Gràcia. 32</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Eixample
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">520 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">374 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">769</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">22</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">3.145 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#3</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Hospital Clínic / Villarroel</div>
+            <div class="text-xs text-slate-400">Carrer de Villarroel. 168</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Eixample
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">310 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">301 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">716</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">13</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">2.290 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#4</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Diagonal / Francesc Macià</div>
+            <div class="text-xs text-slate-400">Avinguda Diagonal. 538</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Les Corts
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">450 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">280 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">555</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">19</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">2.158 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#5</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Gran Via / Urgell</div>
+            <div class="text-xs text-slate-400">Gran Via de les Corts Catalanes. 512</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Eixample
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">410 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">248 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">465</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">18</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.787 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#6</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Plaça Catalunya / Bergara</div>
+            <div class="text-xs text-slate-400">Carrer de Bergara. 9</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Ciutat Vella
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">310 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">224 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">534</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">13</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.839 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#7</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Plaça Catalunya / Bergara</div>
+            <div class="text-xs text-slate-400">Carrer de Bergara. 9</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Ciutat Vella
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">310 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">224 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">534</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">13</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.839 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#8</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Plaça Catalunya / Bergara</div>
+            <div class="text-xs text-slate-400">Carrer de Bergara. 9</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Ciutat Vella
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">310 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">224 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">534</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">13</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.839 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#9</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Paral·lel / Blai</div>
+            <div class="text-xs text-slate-400">Avinguda del Paral·lel. 114</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Sants-Montjuïc
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">260 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">218 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">512</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">11</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.506 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#10</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN 22@ Pallars</div>
+            <div class="text-xs text-slate-400">NN 22@ Pallars</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Sant Martí / 22@
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">260 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">198 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">474</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">11</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.427 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#11</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Fontana / Gran de Gràcia</div>
+            <div class="text-xs text-slate-400">Carrer Gran de Gràcia. 84</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Gràcia
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">175 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">195 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">627</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">8</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.386 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#12</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Fontana / Gran de Gràcia</div>
+            <div class="text-xs text-slate-400">Carrer Gran de Gràcia. 84</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Gràcia
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">175 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">195 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">627</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">8</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.386 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#13</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Aragó / Rbla. Catalunya</div>
+            <div class="text-xs text-slate-400">Carrer d'Aragó. 235</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Eixample
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">380 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">185 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">358</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">16</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.389 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#14</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Balmes / Diagonal</div>
+            <div class="text-xs text-slate-400">Carrer de Balmes. 182</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Sarrià-Sant Gervasi
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">290 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">185 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">443</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">12</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.370 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#15</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Via Laietana / Catedral</div>
+            <div class="text-xs text-slate-400">Via Laietana. 39</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Ciutat Vella
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">280 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">185 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">455</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">12</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.463 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#16</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Sarrià Major</div>
+            <div class="text-xs text-slate-400">NN Sarrià Major</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Sarrià-Sant Gervasi
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">260 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">178 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">474</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">11</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.283 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#17</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Sagrada Família / Marina</div>
+            <div class="text-xs text-slate-400">Carrer de la Marina. 240</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Eixample
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">240 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">168 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">436</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">10</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.261 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#18</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Pau Claris / València</div>
+            <div class="text-xs text-slate-400">Carrer de Pau Claris. 145</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Eixample
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">220 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">144 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">400</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">9</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">1.095 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#19</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Travessera de Gràcia / Muntaner</div>
+            <div class="text-xs text-slate-400">Travessera de Gràcia. 45</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Sarrià-Sant Gervasi
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">210 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">134 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">382</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">9</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">979 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+        <tr class="hover:bg-[#F8FAFB] transition-colors border-b border-[#DFEAF0]">
+          <td class="py-3 px-4 font-mono font-bold text-slate-400">#20</td>
+          <td class="py-3 px-4">
+            <div class="font-bold text-[#1A4B5B] text-sm">NN Via Augusta / Ganduxer</div>
+            <div class="text-xs text-slate-400">Via Augusta. 214</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+              Sarrià-Sant Gervasi
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-right font-semibold text-slate-600">250 pl.</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#10B981] text-base">128 <span class="text-xs font-normal text-slate-400">veh/h</span></td>
+          <td class="py-3 px-4 font-mono text-right text-[#D97706] font-semibold">333</td>
+          <td class="py-3 px-4 font-mono text-right text-slate-600">11</td>
+          <td class="py-3 px-4 font-mono text-right font-bold text-[#1A4B5B]">935 €/d</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold border bg-red-50 text-red-700 border-red-200">
+              ALTA
+            </span>
+          </td>
+        </tr>
+        
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tarjetas de Detalle Quirúrgico -->
+    <div class="space-y-4">
+      <h2 class="text-xl font-bold text-[#1A4B5B] pt-4">Diagnóstico Quirúrgico y Cascada por Aparcamiento</h2>
+      <div class="grid grid-cols-1 gap-6">
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#1</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Illa Diagonal / Numància</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de Numància. 150 • Distrito: <strong>Les Corts</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">417 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">3.131 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">610 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.75 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">46.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">1.5%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">3129 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (74.5%)</span>
+                <span class="font-bold text-slate-500">-2333 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 75%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (722 veh) + Déficit Calzada (26 veh)</span>
+                <span class="font-bold text-[#D97706]">+748 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-7.7%)</span>
+                <span class="font-bold text-red-500">-61 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">417 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 13%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">717.590 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 688.666 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">24.895 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 20.480 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">24.658 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (417 veh/h. +68% de rotación potencial). Se aconseja elevar tarifa a 4.15 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#2</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Pg. de Gràcia / Diputació</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Passeig de Gràcia. 32 • Distrito: <strong>Eixample</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">374 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">3.145 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">520 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">4.20 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">45.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">1.8%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">2668 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (68.3%)</span>
+                <span class="font-bold text-slate-500">-1821 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 68%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (769 veh) + Déficit Calzada (22 veh)</span>
+                <span class="font-bold text-[#D97706]">+791 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-8.2%)</span>
+                <span class="font-bold text-red-500">-69 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">374 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 14%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">611.715 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 587.059 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">21.222 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 17.458 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">21.020 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (374 veh/h. +72% de rotación potencial). Se aconseja elevar tarifa a 4.60 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#3</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Hospital Clínic / Villarroel</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de Villarroel. 168 • Distrito: <strong>Eixample</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">301 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">2.290 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">310 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.80 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">32.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">1.2%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1590 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (50.4%)</span>
+                <span class="font-bold text-slate-500">-801 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 50%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (716 veh) + Déficit Calzada (13 veh)</span>
+                <span class="font-bold text-[#D97706]">+729 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-7.2%)</span>
+                <span class="font-bold text-red-500">-54 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">301 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 19%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">364.677 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 349.978 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.651 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 10.407 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.530 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (301 veh/h. +97% de rotación potencial). Se aconseja elevar tarifa a 4.20 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#4</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Diagonal / Francesc Macià</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Avinguda Diagonal. 538 • Distrito: <strong>Les Corts</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">280 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">2.158 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">450 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.85 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">55.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">2.2%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">2308 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (73.5%)</span>
+                <span class="font-bold text-slate-500">-1696 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 73%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (555 veh) + Déficit Calzada (19 veh)</span>
+                <span class="font-bold text-[#D97706]">+574 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-9.0%)</span>
+                <span class="font-bold text-red-500">-55 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">280 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 12%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">529.369 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 508.032 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">18.365 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 15.108 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">18.190 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (280 veh/h. +62% de rotación potencial). Se aconseja elevar tarifa a 4.25 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#5</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Gran Via / Urgell</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Gran Via de les Corts Catalanes. 512 • Distrito: <strong>Eixample</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">248 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.787 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">410 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.60 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">28.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">1.0%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">2103 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (75.6%)</span>
+                <span class="font-bold text-slate-500">-1590 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 76%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (465 veh) + Déficit Calzada (18 veh)</span>
+                <span class="font-bold text-[#D97706]">+483 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-6.8%)</span>
+                <span class="font-bold text-red-500">-35 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">248 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 12%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">482.315 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 462.874 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">16.732 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 13.765 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">16.573 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (248 veh/h. +60% de rotación potencial). Se aconseja elevar tarifa a 4.00 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#6</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Plaça Catalunya / Bergara</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de Bergara. 9 • Distrito: <strong>Ciutat Vella</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">224 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.839 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">310 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">4.10 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">18.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">0.8%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1590 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (63.0%)</span>
+                <span class="font-bold text-slate-500">-1002 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 63%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (534 veh) + Déficit Calzada (13 veh)</span>
+                <span class="font-bold text-[#D97706]">+547 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-6.4%)</span>
+                <span class="font-bold text-red-500">-39 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">224 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 14%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">343.678 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 349.978 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-rose-100 text-rose-800">
+                ▼ Decreció -1.8%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.651 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 10.407 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.530 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (224 veh/h. +72% de rotación potencial). Se aconseja elevar tarifa a 4.50 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#7</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Plaça Catalunya / Bergara</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de Bergara. 9 • Distrito: <strong>Ciutat Vella</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">224 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.839 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">310 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">4.10 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">18.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">0.8%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1590 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (63.0%)</span>
+                <span class="font-bold text-slate-500">-1002 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 63%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (534 veh) + Déficit Calzada (13 veh)</span>
+                <span class="font-bold text-[#D97706]">+547 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-6.4%)</span>
+                <span class="font-bold text-red-500">-39 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">224 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 14%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">343.678 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 349.978 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-rose-100 text-rose-800">
+                ▼ Decreció -1.8%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.651 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 10.407 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.530 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (224 veh/h. +72% de rotación potencial). Se aconseja elevar tarifa a 4.50 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#8</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Plaça Catalunya / Bergara</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de Bergara. 9 • Distrito: <strong>Ciutat Vella</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">224 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.839 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">310 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">4.10 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">18.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">0.8%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1590 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (63.0%)</span>
+                <span class="font-bold text-slate-500">-1002 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 63%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (534 veh) + Déficit Calzada (13 veh)</span>
+                <span class="font-bold text-[#D97706]">+547 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-6.4%)</span>
+                <span class="font-bold text-red-500">-39 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">224 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 14%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">343.678 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 349.978 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-rose-100 text-rose-800">
+                ▼ Decreció -1.8%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.651 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 10.407 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">12.530 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (224 veh/h. +72% de rotación potencial). Se aconseja elevar tarifa a 4.50 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#9</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Paral·lel / Blai</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Avinguda del Paral·lel. 114 • Distrito: <strong>Sants-Montjuïc</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">218 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.506 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">260 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.45 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">12.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">0.9%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1334 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (57.8%)</span>
+                <span class="font-bold text-slate-500">-770 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 58%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (512 veh) + Déficit Calzada (11 veh)</span>
+                <span class="font-bold text-[#D97706]">+523 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-6.6%)</span>
+                <span class="font-bold text-red-500">-37 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">218 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 16%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">305.858 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 293.530 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.610 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 8.729 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.509 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (218 veh/h. +84% de rotación potencial). Se aconseja elevar tarifa a 3.85 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#10</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN 22@ Pallars</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">NN 22@ Pallars • Distrito: <strong>Sant Martí / 22@</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">198 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.427 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">260 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.60 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">10.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">0.5%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1334 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (60.9%)</span>
+                <span class="font-bold text-slate-500">-812 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 61%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (474 veh) + Déficit Calzada (11 veh)</span>
+                <span class="font-bold text-[#D97706]">+485 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-5.9%)</span>
+                <span class="font-bold text-red-500">-31 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">198 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 15%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">305.858 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 293.530 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.610 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 8.729 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.509 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (198 veh/h. +76% de rotación potencial). Se aconseja elevar tarifa a 4.00 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#11</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Fontana / Gran de Gràcia</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer Gran de Gràcia. 84 • Distrito: <strong>Gràcia</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">195 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.386 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">175 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.55 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">64.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.2%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">898 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (23.1%)</span>
+                <span class="font-bold text-slate-500">-207 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 23%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (627 veh) + Déficit Calzada (8 veh)</span>
+                <span class="font-bold text-[#D97706]">+635 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-10.8%)</span>
+                <span class="font-bold text-red-500">-72 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">195 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 22%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">205.866 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 197.568 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">7.142 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 5.875 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">7.074 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (195 veh/h. +111% de rotación potencial). Se aconseja elevar tarifa a 3.95 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#12</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Fontana / Gran de Gràcia</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer Gran de Gràcia. 84 • Distrito: <strong>Gràcia</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">195 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.386 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">175 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.55 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">64.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.2%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">898 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (23.1%)</span>
+                <span class="font-bold text-slate-500">-207 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 23%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (627 veh) + Déficit Calzada (8 veh)</span>
+                <span class="font-bold text-[#D97706]">+635 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-10.8%)</span>
+                <span class="font-bold text-red-500">-72 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">195 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 22%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">205.866 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 197.568 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">7.142 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 5.875 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">7.074 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (195 veh/h. +111% de rotación potencial). Se aconseja elevar tarifa a 3.95 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#13</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Aragó / Rbla. Catalunya</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer d'Aragó. 235 • Distrito: <strong>Eixample</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">185 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.389 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">380 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.75 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">32.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">1.1%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1949 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (79.8%)</span>
+                <span class="font-bold text-slate-500">-1555 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 80%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (358 veh) + Déficit Calzada (16 veh)</span>
+                <span class="font-bold text-[#D97706]">+374 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-7.0%)</span>
+                <span class="font-bold text-red-500">-29 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">185 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 9%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">447.023 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 429.005 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">15.509 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 12.758 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">15.361 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (185 veh/h. +49% de rotación potencial). Se aconseja elevar tarifa a 4.15 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#14</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Balmes / Diagonal</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de Balmes. 182 • Distrito: <strong>Sarrià-Sant Gervasi</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">185 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.370 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">290 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.70 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">48.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">2.6%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1488 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (67.2%)</span>
+                <span class="font-bold text-slate-500">-1000 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 67%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (443 veh) + Déficit Calzada (12 veh)</span>
+                <span class="font-bold text-[#D97706]">+455 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-9.7%)</span>
+                <span class="font-bold text-red-500">-47 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">185 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 12%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">341.149 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 327.398 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">11.835 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 9.736 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">11.722 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (185 veh/h. +64% de rotación potencial). Se aconseja elevar tarifa a 4.10 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#15</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Via Laietana / Catedral</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Via Laietana. 39 • Distrito: <strong>Ciutat Vella</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">185 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.463 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">280 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.95 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">14.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">1.2%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1436 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (65.1%)</span>
+                <span class="font-bold text-slate-500">-935 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 65%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (455 veh) + Déficit Calzada (12 veh)</span>
+                <span class="font-bold text-[#D97706]">+467 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-7.2%)</span>
+                <span class="font-bold text-red-500">-37 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">185 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 13%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">310.419 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 316.109 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-rose-100 text-rose-800">
+                ▼ Decreció -1.8%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">11.426 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 9.400 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">11.317 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (185 veh/h. +66% de rotación potencial). Se aconseja elevar tarifa a 4.35 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#16</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Sarrià Major</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">NN Sarrià Major • Distrito: <strong>Sarrià-Sant Gervasi</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">178 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.283 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">260 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.60 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">92.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">5.8%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1334 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (60.9%)</span>
+                <span class="font-bold text-slate-500">-812 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 61%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (474 veh) + Déficit Calzada (11 veh)</span>
+                <span class="font-bold text-[#D97706]">+485 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-15.4%)</span>
+                <span class="font-bold text-red-500">-80 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">178 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 13%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">305.858 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 293.530 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.610 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 8.729 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.509 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (178 veh/h. +68% de rotación potencial). Se aconseja elevar tarifa a 4.00 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#17</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Sagrada Família / Marina</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de la Marina. 240 • Distrito: <strong>Eixample</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">168 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.261 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">240 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.75 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">38.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">2.0%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1231 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (60.9%)</span>
+                <span class="font-bold text-slate-500">-750 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 61%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (436 veh) + Déficit Calzada (10 veh)</span>
+                <span class="font-bold text-[#D97706]">+446 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-8.6%)</span>
+                <span class="font-bold text-red-500">-42 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">168 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 14%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">282.330 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 270.950 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">9.795 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 8.058 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">9.701 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (168 veh/h. +70% de rotación potencial). Se aconseja elevar tarifa a 4.15 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#18</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Pau Claris / València</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Carrer de Pau Claris. 145 • Distrito: <strong>Eixample</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">144 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">1.095 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">220 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.80 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">38.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">1.5%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1129 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (60.9%)</span>
+                <span class="font-bold text-slate-500">-688 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 61%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (400 veh) + Déficit Calzada (9 veh)</span>
+                <span class="font-bold text-[#D97706]">+409 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-7.7%)</span>
+                <span class="font-bold text-red-500">-34 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">144 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 13%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">258.803 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 248.371 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">8.979 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 7.386 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">8.893 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (144 veh/h. +65% de rotación potencial). Se aconseja elevar tarifa a 4.20 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#19</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Travessera de Gràcia / Muntaner</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Travessera de Gràcia. 45 • Distrito: <strong>Sarrià-Sant Gervasi</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">134 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">979 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">210 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.65 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">52.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">2.9%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1077 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (60.9%)</span>
+                <span class="font-bold text-slate-500">-656 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 61%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (382 veh) + Déficit Calzada (9 veh)</span>
+                <span class="font-bold text-[#D97706]">+391 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-10.2%)</span>
+                <span class="font-bold text-red-500">-43 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">134 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 12%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">247.039 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 237.082 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">8.571 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 7.051 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">8.489 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (134 veh/h. +64% de rotación potencial). Se aconseja elevar tarifa a 4.05 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#164250] text-white font-mono">#20</span>
+                <h3 class="text-lg font-bold text-[#1A4B5B]">NN Via Augusta / Ganduxer</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Via Augusta. 214 • Distrito: <strong>Sarrià-Sant Gervasi</strong></p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Demanda Latente</div>
+                <div class="text-2xl font-black font-mono text-[#10B981]">128 <span class="text-xs font-normal text-slate-500">veh/h</span></div>
+              </div>
+              <div class="text-right pl-3 border-l border-slate-200">
+                <div class="text-xs text-slate-400 uppercase font-semibold">Ingresos No Captados</div>
+                <div class="text-lg font-bold font-mono text-[#1A4B5B]">935 €/día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Métricas Técnicas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Capacidad Física</span>
+              <span class="text-base font-bold font-mono text-slate-800">250 plazas</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Tarifa Rotación</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.65 €/h</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Cota ICGC</span>
+              <span class="text-base font-bold font-mono text-slate-800">78.0 msnm</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0]">
+              <span class="text-slate-400 block font-medium">Pendiente Tobler</span>
+              <span class="text-base font-bold font-mono text-slate-800">3.8%</span>
+            </div>
+          </div>
+
+          <!-- Cascada Waterfall -->
+          <div class="space-y-2 pt-2">
+            <div class="text-xs font-bold text-slate-600 uppercase tracking-wider">Embudo de Desacoplamiento de Demanda (Waterfall):</div>
+            
+            <div class="space-y-1.5 text-xs font-mono">
+              <div class="flex items-center justify-between text-slate-500">
+                <span>1. Aforo Viario Bruto (Tramo de acceso)</span>
+                <span class="font-bold text-slate-800">1282 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-400 h-2 rounded-full" style="width: 100%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>2. Tráfico Pasante Descontado (71.4%)</span>
+                <span class="font-bold text-slate-500">-915 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-slate-300 h-2 rounded-full" style="width: 71%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>3. Tráfico Fin de Viaje + Agitación (333 veh) + Déficit Calzada (11 veh)</span>
+                <span class="font-bold text-[#D97706]">+344 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-slate-500 pt-1">
+                <span>4. Penalización Fricción Peatonal Tobler (-11.8%)</span>
+                <span class="font-bold text-red-500">-43 veh/h</span>
+              </div>
+
+              <div class="flex items-center justify-between text-[#10B981] font-bold text-sm pt-2 border-t border-slate-100">
+                <span>=> Demanda Latente Neta Capturable (D_L)</span>
+                <span class="text-base">128 veh/h</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-[#10B981] h-3 rounded-full" style="width: 10%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos Identificados (Tráfico de Paso. Entradas y Salidas) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-sky-50 border border-sky-100 space-y-1">
+              <span class="font-bold text-[#0284C7] block uppercase text-[10px]">Puntos de Paso (Aforo Calzada)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">294.094 veh/año</div>
+              <div class="text-[11px] text-slate-500">Año Anterior: 282.240 veh</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ Creció +4.2%
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 space-y-1">
+              <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada (2 accesos)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.202 v/mes</div>
+              <div class="text-[11px] text-slate-500">Inicio hace 1 año: 8.393 v/m</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
+                ▲ +18.0% evolución entradas
+              </span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-orange-50 border border-orange-100 space-y-1">
+              <span class="font-bold text-[#F97316] block uppercase text-[10px]">Puntos de Salida (2 viales)</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">10.105 v/mes</div>
+              <div class="text-[11px] text-slate-500">Evacuación fluida sin colas</div>
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-orange-100 text-orange-800">
+                Balance de Rotación OK
+              </span>
+            </div>
+          </div>
+
+          <!-- Yield Recommendation -->
+          <div class="p-3.5 rounded-xl bg-[#E6EFF3]/60 border border-[#C8DFE8] text-xs">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-[#164250] uppercase tracking-wider">Recomendación Estratégica de Precios & Cupos:</span>
+              <span class="px-2 py-0.2 rounded font-mono font-bold text-[10px] bg-red-50 text-red-700 border-red-200">ALTA</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed">Presión crítica de demanda latente (128 veh/h. +51% de rotación potencial). Se aconseja elevar tarifa a 4.05 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.</p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="pt-8 pb-12 text-center text-xs text-slate-400 space-y-1 border-t border-[#DFEAF0]">
+      <p><strong>NN Parkings · Latent Demand Pulse</strong> — Grup Núñez i Navarro</p>
+      <p>Formulación matemática conforme a la Guía Técnica de Ingeniería de Movilidad Urbana de Barcelona.</p>
+    </footer>
+
+  </div>
+</body>
+</html>

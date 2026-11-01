@@ -1,0 +1,40 @@
+================================================================================
+NN PARKINGS · SISTEMA DE DEMANDA LATENTE (SUITE PORTABLE USB)
+Grup Núñez i Navarro · Barcelona
+================================================================================
+
+Este paquete está diseñado para ser copiado directamente a un pendrive USB o disco
+externo. NO requiere instalación, NO modifica el registro de Windows y almacena
+todos los reportes y configuraciones dentro de su propia carpeta.
+
+ARCHIVOS Y CÓMO USARLOS:
+
+1. EJECUTAR_USB.bat:
+   - Haz doble clic para arrancar el servidor local portable.
+   - Abre automáticamente la página web en tu navegador (http://localhost:8080).
+   - Permite explorar la Torre de Control, el mapa de Barcelona, los 30 aparcamientos
+     oficiales de la cartera NN, y auditar activos quirúrgicamente.
+   - En la web, puedes arrastrar o subir cualquier archivo .txt o .csv para calcular
+     su demanda latente de inmediato.
+
+2. REPORTING_PC_USB.bat:
+   - Arrastra cualquier archivo .txt sobre este archivo .bat para generar un informe
+     técnico ejecutivo en HTML y TXT en pocos segundos.
+   - Si haces doble clic directamente, analizará el archivo 'aparcamientos_a_analizar.txt'
+     que se encuentra en esta misma carpeta.
+   - Los informes generados se guardan automáticamente en la carpeta 'reportes/'.
+
+3. VISOR_GUI_USB.bat:
+   - Haz doble clic para abrir el Visor de Escritorio (interfaz gráfica para PC).
+   - Te permite escribir, editar o pegar listas de aparcamientos y pulsar
+     "Calcular Demanda" para ver la tabla en vivo, el desglose Waterfall y las
+     recomendaciones de Yield Management sin abrir la consola de comandos.
+
+4. aparcamientos_a_analizar.txt:
+   - Plantilla de texto editable donde puedes añadir los nombres o direcciones de los
+     aparcamientos que te interese estudiar en Barcelona.
+
+REQUISITO DEL SISTEMA:
+- Cualquier ordenador con Windows y Python instalado (no requiere librerías complejas,
+  funciona con las bibliotecas estándar del sistema).
+================================================================================

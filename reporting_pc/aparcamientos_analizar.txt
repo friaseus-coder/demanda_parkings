@@ -1,0 +1,29 @@
+# =============================================================================
+# LISTA DE APARCAMIENTOS PARA AUDITORÍA DE DEMANDA LATENTE · BARCELONA
+# Identidad NN Parkings (Grup Núñez i Navarro)
+# =============================================================================
+# Puedes añadir los aparcamientos que desees en cualquiera de estos formatos:
+# 1. Simplemente el nombre del parking o la dirección (una por línea)
+# 2. Con detalles separados por '|' o comas: Nombre | Dirección | Plazas | Tarifa
+# =============================================================================
+
+NN Urgell 230
+NN Pg. de Gràcia / Diputació
+NN Francesc Macià
+NN València Aribau
+NN Rambla Catalunya 72
+NN Sarrià Major
+NN 22@ Pallars
+NN Rosselló Clínic
+NN Gran Via Rocafort
+NN Via Augusta Ganduxer
+NN Paral·lel Nou
+NN Sagrada Família / Marina
+Carrer d'Aragó 235
+Avinguda Diagonal 490
+Plaça de Lesseps 12
+Carrer de Balmes 182
+Gran de Gràcia 84
+Travessera de les Corts 112
+Plaça Catalunya / Bergara
+Via Laietana / Catedral

@@ -1,0 +1,29 @@
+# =============================================================================
+# APARCAMIENTOS A AUDITAR · UNIDAD USB PORTABLE
+# Identidad NN Parkings (Grup Núñez i Navarro, Barcelona)
+# =============================================================================
+# Instrucciones:
+# Escribe aquí los aparcamientos que deseas auditar.
+# Puedes poner nombres simples, direcciones o líneas detalladas.
+# =============================================================================
+
+NN Urgell 230
+NN Pg. de Gràcia / Diputació
+NN Francesc Macià
+NN València Aribau
+NN Rambla Catalunya 72
+NN Sarrià Major
+NN 22@ Pallars
+NN Rosselló Clínic
+NN Gran Via Rocafort
+NN Via Augusta Ganduxer
+NN Paral·lel Nou
+NN Sagrada Família / Marina
+Carrer d'Aragó 235
+Avinguda Diagonal 490
+Plaça de Lesseps 12
+Carrer de Balmes 182
+Gran de Gràcia 84
+Travessera de les Corts 112
+Plaça Catalunya / Bergara
+Via Laietana / Catedral
