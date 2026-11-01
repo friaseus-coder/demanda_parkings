@@ -19,6 +19,7 @@ class NNApp {
     this.searchQuery = "";
     this.rankingSortBy = "growth_pct"; // 'growth_pct', 'growth_units', 'inflow', 'outflow', 'net_diff'
     this.chart1Unit = "day"; // 'day' (IMD veh/día), 'hour' (veh/h), 'month' (veh/mes)
+    this.chart1SelectedDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
     this.currentEventFilter = "all"; // 'all', 'olimpic', 'fcb', 'fira'
     this.showIsochrones = true;
 
@@ -1702,10 +1703,98 @@ class NNApp {
         btn.className = "chart1-unit-btn px-2.5 py-1 rounded-lg font-medium text-[10.5px] text-slate-600 hover:text-slate-900 transition-all";
       }
     });
-    const current = this.parkings.find(p => p.id === this.selectedAssetId);
+
+    const dayTabsContainer = document.getElementById("chart1DayTabsContainer");
+    if (dayTabsContainer) {
+      if (unit === 'hour') {
+        dayTabsContainer.classList.remove('hidden');
+      } else {
+        dayTabsContainer.classList.add('hidden');
+      }
+    }
+
+    const current = this.parkings.find(p => p.id === this.selectedAssetId) || this.parkings[0];
     if (current) {
       this.renderChart1(current);
     }
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+
+  renderChart1DayButtons() {
+    const container = document.getElementById("chart1DayButtons");
+    const labelEl = document.getElementById("chart1SelectedDaysLabel");
+    if (!container) return;
+
+    const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK : [];
+    if (!this.chart1SelectedDays || this.chart1SelectedDays.length === 0) {
+      this.chart1SelectedDays = allDays.map(d => d.id);
+    }
+
+    container.innerHTML = allDays.map(d => {
+      const isSelected = this.chart1SelectedDays.includes(d.id);
+      if (isSelected) {
+        return `
+          <button type="button" onclick="app.toggleChart1Day('${d.id}')" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-[#004B57] hover:bg-[#0D2730] text-white shadow-xs border border-[#004B57] flex items-center gap-1.5 transition-all cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>${d.name}</span>
+          </button>
+        `;
+      } else {
+        return `
+          <button type="button" onclick="app.toggleChart1Day('${d.id}')" class="px-3 py-1.5 rounded-xl font-medium text-xs bg-white hover:bg-[#E6EFF3] text-slate-600 border border-[#DFEAF0] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+            <span>${d.name}</span>
+          </button>
+        `;
+      }
+    }).join("");
+
+    if (labelEl) {
+      if (this.chart1SelectedDays.length === 7) {
+        labelEl.innerText = "Toda la Semana (7 días)";
+      } else if (this.chart1SelectedDays.length === 5 && !this.chart1SelectedDays.includes('sabado') && !this.chart1SelectedDays.includes('domingo')) {
+        labelEl.innerText = "L-V Laborables (5 días)";
+      } else if (this.chart1SelectedDays.length === 2 && this.chart1SelectedDays.includes('sabado') && this.chart1SelectedDays.includes('domingo')) {
+        labelEl.innerText = "Fin de Semana (Sáb y Dom)";
+      } else {
+        const names = this.chart1SelectedDays.map(id => allDays.find(x => x.id === id)?.name || id);
+        labelEl.innerText = `${names.join(", ")} (${this.chart1SelectedDays.length} día${this.chart1SelectedDays.length === 1 ? '' : 's'})`;
+      }
+    }
+  }
+
+  toggleChart1Day(dayId) {
+    if (!this.chart1SelectedDays) this.chart1SelectedDays = [];
+    if (this.chart1SelectedDays.includes(dayId)) {
+      if (this.chart1SelectedDays.length <= 1) {
+        return; // Mantener al menos un día activo
+      }
+      this.chart1SelectedDays = this.chart1SelectedDays.filter(d => d !== dayId);
+    } else {
+      this.chart1SelectedDays.push(dayId);
+      const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK.map(d => d.id) : [];
+      this.chart1SelectedDays.sort((a, b) => allDays.indexOf(a) - allDays.indexOf(b));
+    }
+
+    const current = this.parkings.find(p => p.id === this.selectedAssetId) || this.parkings[0];
+    if (current) this.renderChart1(current);
+  }
+
+  setChart1DaysPreset(preset) {
+    const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK.map(d => d.id) : [];
+    if (preset === 'weekdays') {
+      this.chart1SelectedDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+    } else if (preset === 'weekend') {
+      this.chart1SelectedDays = ['sabado', 'domingo'];
+    } else {
+      this.chart1SelectedDays = [...allDays];
+    }
+
+    const current = this.parkings.find(p => p.id === this.selectedAssetId) || this.parkings[0];
+    if (current) this.renderChart1(current);
   }
 
   renderChart1(p) {
@@ -1735,37 +1824,163 @@ class NNApp {
       }
     }
 
-    // Conversión según unidad seleccionada (Día, Hora, Mes)
-    // Los datos base en rawCur y rawPrev representan el aforo diario medio (IMD de la calle)
-    const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     const unit = this.chart1Unit || 'day';
+    const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    const titleEl = document.getElementById("chart1GridTitle");
+    const subEl = document.getElementById("chart1GridSubtitle");
+    const chart1DiffGridEl = document.getElementById("chart1MonthlyDiffGrid");
+    const dayTabsContainer = document.getElementById("chart1DayTabsContainer");
+
+    // =========================================================================
+    // MODO 1: PROMEDIO HORA (HORAS DEL DÍA 00:00 - 23:00 SEGÚN DÍAS SELECCIONADOS)
+    // =========================================================================
+    if (unit === 'hour') {
+      if (dayTabsContainer) dayTabsContainer.classList.remove('hidden');
+      this.renderChart1DayButtons();
+
+      const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK : [];
+      const activeDays = allDays.filter(d => this.chart1SelectedDays.includes(d.id));
+      const safeActiveDays = activeDays.length > 0 ? activeDays : allDays;
+
+      // Calcular IMD medio anual actual y previo
+      const avgDayCur = rawCur.length > 0 ? (rawCur.reduce((a, b) => a + b, 0) / rawCur.length) : 24000;
+      const avgDayPrev = rawPrev.length > 0 ? (rawPrev.reduce((a, b) => a + b, 0) / rawPrev.length) : 23550;
+
+      const hourlyCur = [];
+      const hourlyPrev = [];
+
+      for (let h = 0; h < 24; h++) {
+        let sumCur = 0;
+        let sumPrev = 0;
+        for (const day of safeActiveDays) {
+          const curDayTraffic = avgDayCur * day.factor;
+          const prevDayTraffic = avgDayPrev * day.factor;
+          sumCur += curDayTraffic * (day.profile[h] / 100);
+          sumPrev += prevDayTraffic * (day.profile[h] / 100);
+        }
+        hourlyCur.push(Math.round(sumCur / safeActiveDays.length));
+        hourlyPrev.push(Math.round(sumPrev / safeActiveDays.length));
+      }
+
+      const activeDaysNames = safeActiveDays.map(d => d.name).join(", ");
+      if (titleEl) titleEl.innerText = `Perfil Horario de Aforo (00:00 - 23:00) · ${activeDaysNames}`;
+      if (subEl) subEl.innerText = `Año Actual (t) vs. Año Anterior (t-1) · Promedio acumulado de ${safeActiveDays.length} día(s)`;
+
+      if (this.chartTrafficPassing) {
+        this.chartTrafficPassing.data.labels = HOURS_24_LABELS;
+        this.chartTrafficPassing.data.datasets = [
+          {
+            label: `Año Anterior (t-1) [veh/h]`,
+            data: hourlyPrev,
+            borderColor: '#94A3B8',
+            borderDash: [5, 4],
+            borderWidth: 2,
+            backgroundColor: 'transparent',
+            tension: 0.35,
+            pointRadius: 2.5,
+            pointBackgroundColor: '#94A3B8'
+          },
+          {
+            label: `Año Actual (t) [veh/h]`,
+            data: hourlyCur,
+            borderColor: '#164250',
+            borderWidth: 2.5,
+            backgroundColor: 'rgba(22, 66, 80, 0.08)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3.5,
+            pointBackgroundColor: '#164250'
+          }
+        ];
+
+        if (this.chartTrafficPassing.options?.plugins?.tooltip?.callbacks) {
+          this.chartTrafficPassing.options.plugins.tooltip.callbacks.title = (items) => `Hora: ${items[0]?.label} · ${safeActiveDays.map(d => d.short).join(", ")}`;
+          this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh/h`;
+          this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
+            if (!items || items.length === 0) return [];
+            const idx = items[0].dataIndex;
+            const prevVal = hourlyPrev[idx] || 0;
+            const curVal = hourlyCur[idx] || 0;
+            const diffUnits = curVal - prevVal;
+            const pct = prevVal > 0 ? ((diffUnits / prevVal) * 100).toFixed(1) : '0.0';
+            const isUp = diffUnits >= 0;
+            const sign = isUp ? '+' : '';
+            const arrow = isUp ? '▲ Crecimiento' : '▼ Decrecimiento';
+            return [
+              ' ',
+              `-----------------------------------------`,
+              `${arrow}: ${sign}${diffUnits.toLocaleString("es-ES")} veh/h (${sign}${pct}%)`
+            ];
+          };
+        }
+
+        this.chartTrafficPassing.update();
+      }
+
+      if (chart1DiffGridEl) {
+        chart1DiffGridEl.innerHTML = HOURS_24_LABELS.map((hLabel, hIdx) => {
+          const curVal = hourlyCur[hIdx] || 0;
+          const prevVal = hourlyPrev[hIdx] || 0;
+          const diffUnits = curVal - prevVal;
+          const pct = prevVal > 0 ? ((diffUnits / prevVal) * 100).toFixed(1) : "0.0";
+          const isUp = diffUnits >= 0;
+          const sign = isUp ? "+" : "";
+
+          let tag = "";
+          if (hIdx >= 7 && hIdx <= 9) tag = "PUNTA MAÑANA";
+          else if (hIdx >= 13 && hIdx <= 14) tag = "MEDIODÍA";
+          else if (hIdx >= 18 && hIdx <= 20) tag = "PUNTA TARDE";
+
+          return `
+            <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all relative">
+              ${tag ? `<span class="text-[7.5px] font-extrabold uppercase tracking-tight text-[#0284C7] bg-sky-50 px-1 py-0.2 rounded mb-0.5">${tag}</span>` : ''}
+              <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${hLabel}</span>
+              
+              <span class="inline-flex items-center justify-center text-[9.5px] font-extrabold px-1.5 py-0.5 rounded-md mb-1 ${
+                isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+              }">
+                ${isUp ? '▲' : '▼'} ${sign}${pct}%
+              </span>
+
+              <span class="text-[10px] font-bold font-mono-num ${isUp ? 'text-emerald-700' : 'text-rose-700'}">
+                ${sign}${diffUnits.toLocaleString("es-ES")}
+              </span>
+              <span class="text-[8px] text-slate-400 block uppercase font-mono">veh/h</span>
+            </div>
+          `;
+        }).join("");
+      }
+      return;
+    }
+
+    // =========================================================================
+    // MODO 2: PROMEDIO DÍA (IMD) O TOTAL MES (12 MESES NATURALES INTERANUAL)
+    // =========================================================================
+    if (dayTabsContainer) dayTabsContainer.classList.add('hidden');
 
     let monthlyCur = [];
     let monthlyPrev = [];
     let unitLabel = 'veh/día';
     let unitLabelShort = 'veh/día';
 
-    if (unit === 'hour') {
-      // Intensidad horaria media
-      monthlyCur = rawCur.map(v => Math.round(v / 24));
-      monthlyPrev = rawPrev.map(v => Math.round(v / 24));
-      unitLabel = 'veh/h';
-      unitLabelShort = 'veh/h';
-    } else if (unit === 'month') {
-      // Total acumulado del mes
+    if (unit === 'month') {
       monthlyCur = rawCur.map((v, idx) => Math.round(v * (DAYS_IN_MONTH[MONTHS_INDEXES[idx]] || 30)));
       monthlyPrev = rawPrev.map((v, idx) => Math.round(v * (DAYS_IN_MONTH[MONTHS_INDEXES[idx]] || 30)));
       unitLabel = 'veh/mes';
       unitLabelShort = 'veh/mes';
     } else {
-      // Promedio Día (IMD estándar de tráfico)
       monthlyCur = [...rawCur];
       monthlyPrev = [...rawPrev];
       unitLabel = 'veh/día';
       unitLabelShort = 'veh/día';
     }
 
+    if (titleEl) titleEl.innerText = "Variación Interanual Mes a Mes (Unidades y %)";
+    if (subEl) subEl.innerText = "Año Actual (t) vs. Año Anterior (t-1)";
+
     if (this.chartTrafficPassing) {
+      this.chartTrafficPassing.data.labels = MONTHS_LABELS;
       this.chartTrafficPassing.data.datasets = [
         {
           label: `Año Anterior (t-1) [${unitLabelShort}]`,
@@ -1791,8 +2006,8 @@ class NNApp {
         }
       ];
 
-      // Actualizar tooltip dinámicamente con la unidad elegida
       if (this.chartTrafficPassing.options?.plugins?.tooltip?.callbacks) {
+        this.chartTrafficPassing.options.plugins.tooltip.callbacks.title = (items) => `Mes: ${items[0]?.label}`;
         this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} ${unitLabelShort}`;
         this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
           if (!items || items.length === 0) return [];
@@ -1815,8 +2030,6 @@ class NNApp {
       this.chartTrafficPassing.update();
     }
 
-    // Renderizar la rejilla de variación mensual de coches que pasan (crecimiento/decrecimiento en % y unidades)
-    const chart1DiffGridEl = document.getElementById("chart1MonthlyDiffGrid");
     if (chart1DiffGridEl) {
       if (monthlyCur.length === 0 || monthlyPrev.length === 0) {
         chart1DiffGridEl.innerHTML = `
@@ -1837,14 +2050,12 @@ class NNApp {
             <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all">
               <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
               
-              <!-- Variación en Porcentaje -->
               <span class="inline-flex items-center justify-center text-[10px] font-extrabold px-1.5 py-0.5 rounded-md mb-1 ${
                 isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
               }">
                 ${isUp ? '▲' : '▼'} ${sign}${pct}%
               </span>
 
-              <!-- Variación en Unidades Netas -->
               <span class="text-[10px] font-bold font-mono-num ${isUp ? 'text-emerald-700' : 'text-rose-700'}">
                 ${sign}${diffUnits.toLocaleString("es-ES")}
               </span>
