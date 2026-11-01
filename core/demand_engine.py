@@ -236,6 +236,7 @@ def calculate_latent_demand(
 
     return {
         "parking_id": parking.get("id"),
+        "obra_actual": parking.get("obra_actual") or parking.get("obraActual"),
         "name": parking.get("name"),
         "district": parking.get("district", "Barcelona"),
         "address": parking.get("address", ""),
@@ -245,6 +246,8 @@ def calculate_latent_demand(
         "slope": slope,
         "lat": parking.get("lat", 41.388),
         "lon": parking.get("lon", 2.160),
+        "data_source": parking.get("data_source", "REAL_AUDITED" if parking.get("is_audited") else "ESTIMATED_SEEDED"),
+        "is_audited": bool(parking.get("is_audited") or parking.get("data_source") == "REAL_AUDITED"),
         "latent_demand_dl": d_latente_neta,
         "cruising_vehicles": q_agitacion,
         "surface_deficit": delta_deficit_sup,
@@ -409,9 +412,8 @@ def parse_parking_rows(rows: List[List[str]]) -> List[Dict[str, Any]]:
         for c in rows[0]
     ]
     is_header = any(
-        h in cell
+        re.search(r"\b(obra|nombre|parking|direccion|address|lat|latitud|latitude|lon|longitud|longitude)\b", cell)
         for cell in first_row_norm
-        for h in ("obra", "nombre", "parking", "direccion", "address", "lat", "lon")
     ) or ("x" in first_row_norm and "y" in first_row_norm)
 
     col_map: Dict[str, int] = {

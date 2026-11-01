@@ -1,423 +1,603 @@
-==============================================================================================================
+======================================================================================================================
     NN PARKINGS · GRUP NÚÑEZ I NAVARRO · BARCELONA
     SISTEMA DE INTELIGENCIA DE MOVILIDAD: INFORME DE DEMANDA LATENTE
-==============================================================================================================
-Fecha de emisión: 12/10/2026 11:51:42
-Archivo analizado: aparcamientos_analizar.txt
-Aparcamientos auditados: 20
---------------------------------------------------------------------------------------------------------------
+======================================================================================================================
+Fecha de emisión:        01/11/2026 14:00:31
+Archivo analizado:       aparcamientos_analizar.txt
+Aparcamientos auditados: 29 (29 de Cartera Oficial NN, 0 estimaciones deterministas)
+----------------------------------------------------------------------------------------------------------------------
 RESUMEN EJECUTIVO DE CARTERA:
-  • Demanda Latente Total (DL):     4.405 veh/h insatisfechos
-  • Tráfico en Agitación (Cruising):10.350 vehículos buscando en calzada
-  • Ingresos Potenciales No Captados:33.508 €/día (1.005.240 €/mes)
-  • Capacidad Física Auditada:       6.230 plazas en rotación
-==============================================================================================================
+  • Demanda Latente Total (DL):     6.087 veh/h insatisfechos
+  • Tráfico en Agitación (Cruising):14.528 vehículos buscando en calzada
+  • Ingresos Potenciales No Captados:45.594 €/día (1.367.820 €/mes)
+  • Capacidad Física Auditada:       7.984 plazas en rotación
+======================================================================================================================
 
-#   APARCAMIENTO                     DISTRITO           PLAZAS   D_L       CRUISING   DÉFICIT   INGR. NO CAPT.   PRIORIDAD 
---------------------------------------------------------------------------------------------------------------
-1   NN Illa Diagonal / Numància      Les Corts          610      417 v/h   722 v      26 v      3.131 €/d        ALTA      
-2   NN Pg. de Gràcia / Diputació     Eixample           520      374 v/h   769 v      22 v      3.145 €/d        ALTA      
-3   NN Hospital Clínic / Villarroe   Eixample           310      301 v/h   716 v      13 v      2.290 €/d        ALTA      
-4   NN Diagonal / Francesc Macià     Les Corts          450      280 v/h   555 v      19 v      2.158 €/d        ALTA      
-5   NN Gran Via / Urgell             Eixample           410      248 v/h   465 v      18 v      1.787 €/d        ALTA      
-6   NN Plaça Catalunya / Bergara     Ciutat Vella       310      224 v/h   534 v      13 v      1.839 €/d        ALTA      
-7   NN Plaça Catalunya / Bergara     Ciutat Vella       310      224 v/h   534 v      13 v      1.839 €/d        ALTA      
-8   NN Plaça Catalunya / Bergara     Ciutat Vella       310      224 v/h   534 v      13 v      1.839 €/d        ALTA      
-9   NN Paral·lel / Blai              Sants-Montjuïc     260      218 v/h   512 v      11 v      1.506 €/d        ALTA      
-10  NN 22@ Pallars                   Sant Martí / 22@   260      198 v/h   474 v      11 v      1.427 €/d        ALTA      
-11  NN Fontana / Gran de Gràcia      Gràcia             175      195 v/h   627 v      8 v       1.386 €/d        ALTA      
-12  NN Fontana / Gran de Gràcia      Gràcia             175      195 v/h   627 v      8 v       1.386 €/d        ALTA      
-13  NN Aragó / Rbla. Catalunya       Eixample           380      185 v/h   358 v      16 v      1.389 €/d        ALTA      
-14  NN Balmes / Diagonal             Sarrià-Sant Gerv   290      185 v/h   443 v      12 v      1.370 €/d        ALTA      
-15  NN Via Laietana / Catedral       Ciutat Vella       280      185 v/h   455 v      12 v      1.463 €/d        ALTA      
-16  NN Sarrià Major                  Sarrià-Sant Gerv   260      178 v/h   474 v      11 v      1.283 €/d        ALTA      
-17  NN Sagrada Família / Marina      Eixample           240      168 v/h   436 v      10 v      1.261 €/d        ALTA      
-18  NN Pau Claris / València         Eixample           220      144 v/h   400 v      9 v       1.095 €/d        ALTA      
-19  NN Travessera de Gràcia / Munt   Sarrià-Sant Gerv   210      134 v/h   382 v      9 v       979 €/d          ALTA      
-20  NN Via Augusta / Ganduxer        Sarrià-Sant Gerv   250      128 v/h   333 v      11 v      935 €/d          ALTA      
---------------------------------------------------------------------------------------------------------------
+#   APARCAMIENTO                   DISTRITO         PLAZAS   D_L      CRUISING   INGR. NO CAPT.   PRIORIDAD  FUENTE      
+----------------------------------------------------------------------------------------------------------------------
+1   NN ZONA FRANCA, 137-139        Sants-Montjuïc   430      410 v/h  783 v      2.955 €/d        ALTA       [AUDITADO]  
+2   PK. LLUIS PERICOT, 12 JOSEL,   Sarrià-Sant Ge   419      358 v/h  762 v      2.788 €/d        ALTA       [AUDITADO]  
+3   NN BONANOVA, 59 - ESCOLES PI   Sarrià-Sant Ge   419      356 v/h  762 v      2.772 €/d        ALTA       [AUDITADO]  
+4   NN VIA AUGUSTA,349-355 -AVIO   Sarrià-Sant Ge   419      353 v/h  762 v      2.749 €/d        ALTA       [AUDITADO]  
+5   NN VALENCIA, 307 - 313         Eixample         387      325 v/h  704 v      2.583 €/d        ALTA       [AUDITADO]  
+6   PK.BRUC, 103-113               Eixample         387      316 v/h  704 v      2.512 €/d        ALTA       [AUDITADO]  
+7   PK.SANTALO, 14-16              Sarrià-Sant Ge   331      282 v/h  602 v      1.925 €/d        ALTA       [AUDITADO]  
+8   NN ROSSELLO, 1 - 13            Eixample         335      269 v/h  610 v      2.073 €/d        ALTA       [AUDITADO]  
+9   NN HERCEGOVINA, 19 - 23        Sarrià-Sant Ge   328      259 v/h  597 v      1.960 €/d        ALTA       [AUDITADO]  
+10  NN VIA AUGUSTA, 281 - 285 -    Sarrià-Sant Ge   328      255 v/h  597 v      1.930 €/d        ALTA       [AUDITADO]  
+11  NN ESTEVE TERRADAS, 23-31 (U   Sarrià-Sant Ge   328      255 v/h  597 v      1.930 €/d        ALTA       [AUDITADO]  
+12  NN TRAV. DE GRACIA, 183 - 18   Gràcia           306      249 v/h  557 v      1.775 €/d        ALTA       [AUDITADO]  
+13  NN CORSEGA, 344 -352 (H)       Eixample         287      245 v/h  523 v      1.653 €/d        ALTA       [AUDITADO]  
+14  NN ESPRONCEDA, 254 - 274       Sant Martí       257      203 v/h  467 v      1.410 €/d        ALTA       [AUDITADO]  
+15  NN VALENCIA,511 - PGE.VILARE   Eixample         262      186 v/h  477 v      1.460 €/d        ALTA       [AUDITADO]  
+16  PK.VALENCIA,375-377            Eixample         262      186 v/h  477 v      1.460 €/d        ALTA       [AUDITADO]  
+17  PK.MORAGAS, 15                 Eixample         262      182 v/h  477 v      1.428 €/d        ALTA       [AUDITADO]  
+18  PK. ARAGO, 182                 Eixample         225      164 v/h  409 v      1.166 €/d        ALTA       [AUDITADO]  
+19  PK.URGELL,234-CORCEGA,171      Eixample         201      130 v/h  366 v      966 €/d          ALTA       [AUDITADO]  
+20  PK.BORRELL, 26-28              Eixample         183      119 v/h  333 v      841 €/d          ALTA       [AUDITADO]  
+21  PK. ROCAFORT, 64-SEPULVEDA,    Eixample         183      117 v/h  333 v      827 €/d          ALTA       [AUDITADO]  
+22  PK.URGELL, 154-156 (URGELL -   Sarrià-Sant Ge   182      117 v/h  331 v      825 €/d          ALTA       [AUDITADO]  
+23  NN CISTER, 2- 18 -24% IND      Sarrià-Sant Ge   182      115 v/h  331 v      810 €/d          ALTA       [AUDITADO]  
+24  PK. GRAN VIA, 641              Les Corts        198      114 v/h  360 v      931 €/d          ALTA       [AUDITADO]  
+25  NN SANT GERVASI, 51-53 - AV.   Sarrià-Sant Ge   182      111 v/h  331 v      782 €/d          ALTA       [AUDITADO]  
+26  PK.VALENCIA, 243-245 (VALENC   Sarrià-Sant Ge   182      110 v/h  331 v      775 €/d          ALTA       [AUDITADO]  
+27  PK. TARRAGONA, 141-157         Les Corts        173      102 v/h  315 v      782 €/d          ALTA       [AUDITADO]  
+28  NN DIAGONAL, 593 - 595         Les Corts        173      100 v/h  315 v      767 €/d          ALTA       [AUDITADO]  
+29  PK.M.SENTMENAT, 6              Les Corts        173      99 v/h   315 v      759 €/d          ALTA       [AUDITADO]  
+----------------------------------------------------------------------------------------------------------------------
 
-DESGLOSE EN CASCAADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
-==============================================================================================================
+DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
+======================================================================================================================
 
-[1] NN Illa Diagonal / Numància (Les Corts)
-    Dirección: Carrer de Numància, 150 | Cota: 46.0 msnm | Pendiente: 1.5%
-    Tarifa rotación: 3.75 €/h | Capacidad: 610 plazas
+[1] NN ZONA FRANCA, 137-139 (Sants-Montjuïc) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: ZONA FRANCA, 137-139 08004 BARCELONA | Cota: 24 msnm | Pendiente: 0.9%
+    Tarifa rotación: 3.60 €/h | Capacidad: 430 plazas
     Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    3129 veh/h
-      2. Tráfico Pasante Descontado:     -2333 veh/h (74.5%)
-      3. Tráfico Fin de Viaje Local:      796 veh/h
-      4. Agitación Activa (Cruising):    +722 veh/h
-      5. Déficit Calzada (>85% satur.):  +26 veh/h
-      6. Atractores Locales (POIs):      +39 veh/h
-      7. Fricción Tobler (Pendiente):    -61 veh/h (-7.7%)
-      => DEMANDA LATENTE NETA (D_L):      417 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de Numància | 717.590 veh/año (Año Anterior: 688.666 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer de Numància: 13.259 v/m (hace 1 año) ➔ 15.646 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 7.221 v/m (hace 1 año) ➔ 9.249 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de Numància: 15.490 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 9.168 v/m (38% cuota)
-    Impacto Económico: 3.131 €/día (21.291 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (417 veh/h, +68% de rotación potencial). Se aconseja elevar tarifa a 4.15 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[2] NN Pg. de Gràcia / Diputació (Eixample)
-    Dirección: Passeig de Gràcia, 32 | Cota: 45.0 msnm | Pendiente: 1.8%
-    Tarifa rotación: 4.20 €/h | Capacidad: 520 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    2668 veh/h
-      2. Tráfico Pasante Descontado:     -1821 veh/h (68.3%)
-      3. Tráfico Fin de Viaje Local:      847 veh/h
-      4. Agitación Activa (Cruising):    +769 veh/h
-      5. Déficit Calzada (>85% satur.):  +22 veh/h
-      6. Atractores Locales (POIs):      +50 veh/h
-      7. Fricción Tobler (Pendiente):    -69 veh/h (-8.2%)
-      => DEMANDA LATENTE NETA (D_L):      374 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Passeig de Gràcia | 611.715 veh/año (Año Anterior: 587.059 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Passeig de Gràcia: 11.303 v/m (hace 1 año) ➔ 13.338 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 6.155 v/m (hace 1 año) ➔ 7.884 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Passeig de Gràcia: 13.205 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 7.815 v/m (38% cuota)
-    Impacto Económico: 3.145 €/día (21.386 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (374 veh/h, +72% de rotación potencial). Se aconseja elevar tarifa a 4.60 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[3] NN Hospital Clínic / Villarroel (Eixample)
-    Dirección: Carrer de Villarroel, 168 | Cota: 32.0 msnm | Pendiente: 1.2%
-    Tarifa rotación: 3.80 €/h | Capacidad: 310 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1590 veh/h
-      2. Tráfico Pasante Descontado:     -801 veh/h (50.4%)
-      3. Tráfico Fin de Viaje Local:      789 veh/h
-      4. Agitación Activa (Cruising):    +716 veh/h
-      5. Déficit Calzada (>85% satur.):  +13 veh/h
-      6. Atractores Locales (POIs):      +32 veh/h
-      7. Fricción Tobler (Pendiente):    -54 veh/h (-7.2%)
-      => DEMANDA LATENTE NETA (D_L):      301 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de Villarroel | 364.677 veh/año (Año Anterior: 349.978 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer de Villarroel: 6.738 v/m (hace 1 año) ➔ 7.951 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.669 v/m (hace 1 año) ➔ 4.700 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de Villarroel: 7.871 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.659 v/m (38% cuota)
-    Impacto Económico: 2.290 €/día (15.572 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (301 veh/h, +97% de rotación potencial). Se aconseja elevar tarifa a 4.20 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[4] NN Diagonal / Francesc Macià (Les Corts)
-    Dirección: Avinguda Diagonal, 538 | Cota: 55.0 msnm | Pendiente: 2.2%
-    Tarifa rotación: 3.85 €/h | Capacidad: 450 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    2308 veh/h
-      2. Tráfico Pasante Descontado:     -1696 veh/h (73.5%)
-      3. Tráfico Fin de Viaje Local:      612 veh/h
-      4. Agitación Activa (Cruising):    +555 veh/h
-      5. Déficit Calzada (>85% satur.):  +19 veh/h
-      6. Atractores Locales (POIs):      +42 veh/h
-      7. Fricción Tobler (Pendiente):    -55 veh/h (-9.0%)
-      => DEMANDA LATENTE NETA (D_L):      280 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Avinguda Diagonal | 529.369 veh/año (Año Anterior: 508.032 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Avinguda Diagonal: 9.781 v/m (hace 1 año) ➔ 11.542 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 5.327 v/m (hace 1 año) ➔ 6.823 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Avinguda Diagonal: 11.427 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 6.763 v/m (38% cuota)
-    Impacto Económico: 2.158 €/día (14.674 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (280 veh/h, +62% de rotación potencial). Se aconseja elevar tarifa a 4.25 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[5] NN Gran Via / Urgell (Eixample)
-    Dirección: Gran Via de les Corts Catalanes, 512 | Cota: 28.0 msnm | Pendiente: 1.0%
-    Tarifa rotación: 3.60 €/h | Capacidad: 410 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    2103 veh/h
-      2. Tráfico Pasante Descontado:     -1590 veh/h (75.6%)
-      3. Tráfico Fin de Viaje Local:      513 veh/h
-      4. Agitación Activa (Cruising):    +465 veh/h
+      1. Aforo Viario Bruto (Q_total):    2206 veh/h
+      2. Tráfico Pasante Descontado:     -1343 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      863 veh/h
+      4. Agitación Activa (Cruising):    +783 veh/h
       5. Déficit Calzada (>85% satur.):  +18 veh/h
-      6. Atractores Locales (POIs):      +37 veh/h
-      7. Fricción Tobler (Pendiente):    -35 veh/h (-6.8%)
-      => DEMANDA LATENTE NETA (D_L):      248 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Gran Via de les Corts Catalanes | 482.315 veh/año (Año Anterior: 462.874 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Gran Via de les Corts Catalanes: 8.912 v/m (hace 1 año) ➔ 10.516 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 4.853 v/m (hace 1 año) ➔ 6.216 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Gran Via de les Corts Catalanes: 10.411 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 6.162 v/m (38% cuota)
-    Impacto Económico: 1.787 €/día (12.152 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (248 veh/h, +60% de rotación potencial). Se aconseja elevar tarifa a 4.00 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[6] NN Plaça Catalunya / Bergara (Ciutat Vella)
-    Dirección: Carrer de Bergara, 9 | Cota: 18.0 msnm | Pendiente: 0.8%
-    Tarifa rotación: 4.10 €/h | Capacidad: 310 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1590 veh/h
-      2. Tráfico Pasante Descontado:     -1002 veh/h (63.0%)
-      3. Tráfico Fin de Viaje Local:      588 veh/h
-      4. Agitación Activa (Cruising):    +534 veh/h
-      5. Déficit Calzada (>85% satur.):  +13 veh/h
-      6. Atractores Locales (POIs):      +59 veh/h
-      7. Fricción Tobler (Pendiente):    -39 veh/h (-6.4%)
-      => DEMANDA LATENTE NETA (D_L):      224 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de Bergara | 343.678 veh/año (Año Anterior: 349.978 veh. ▼ Decreció -1.8%)
-    Puntos de Entrada: Entrada Principal · Carrer de Bergara: 6.738 v/m (hace 1 año) ➔ 7.951 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.669 v/m (hace 1 año) ➔ 4.700 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de Bergara: 7.871 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.659 v/m (38% cuota)
-    Impacto Económico: 1.839 €/día (12.505 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (224 veh/h, +72% de rotación potencial). Se aconseja elevar tarifa a 4.50 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[7] NN Plaça Catalunya / Bergara (Ciutat Vella)
-    Dirección: Carrer de Bergara, 9 | Cota: 18.0 msnm | Pendiente: 0.8%
-    Tarifa rotación: 4.10 €/h | Capacidad: 310 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1590 veh/h
-      2. Tráfico Pasante Descontado:     -1002 veh/h (63.0%)
-      3. Tráfico Fin de Viaje Local:      588 veh/h
-      4. Agitación Activa (Cruising):    +534 veh/h
-      5. Déficit Calzada (>85% satur.):  +13 veh/h
-      6. Atractores Locales (POIs):      +59 veh/h
-      7. Fricción Tobler (Pendiente):    -39 veh/h (-6.4%)
-      => DEMANDA LATENTE NETA (D_L):      224 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de Bergara | 343.678 veh/año (Año Anterior: 349.978 veh. ▼ Decreció -1.8%)
-    Puntos de Entrada: Entrada Principal · Carrer de Bergara: 6.738 v/m (hace 1 año) ➔ 7.951 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.669 v/m (hace 1 año) ➔ 4.700 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de Bergara: 7.871 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.659 v/m (38% cuota)
-    Impacto Económico: 1.839 €/día (12.505 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (224 veh/h, +72% de rotación potencial). Se aconseja elevar tarifa a 4.50 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[8] NN Plaça Catalunya / Bergara (Ciutat Vella)
-    Dirección: Carrer de Bergara, 9 | Cota: 18.0 msnm | Pendiente: 0.8%
-    Tarifa rotación: 4.10 €/h | Capacidad: 310 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1590 veh/h
-      2. Tráfico Pasante Descontado:     -1002 veh/h (63.0%)
-      3. Tráfico Fin de Viaje Local:      588 veh/h
-      4. Agitación Activa (Cruising):    +534 veh/h
-      5. Déficit Calzada (>85% satur.):  +13 veh/h
-      6. Atractores Locales (POIs):      +59 veh/h
-      7. Fricción Tobler (Pendiente):    -39 veh/h (-6.4%)
-      => DEMANDA LATENTE NETA (D_L):      224 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de Bergara | 343.678 veh/año (Año Anterior: 349.978 veh. ▼ Decreció -1.8%)
-    Puntos de Entrada: Entrada Principal · Carrer de Bergara: 6.738 v/m (hace 1 año) ➔ 7.951 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.669 v/m (hace 1 año) ➔ 4.700 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de Bergara: 7.871 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.659 v/m (38% cuota)
-    Impacto Económico: 1.839 €/día (12.505 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (224 veh/h, +72% de rotación potencial). Se aconseja elevar tarifa a 4.50 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[9] NN Paral·lel / Blai (Sants-Montjuïc)
-    Dirección: Avinguda del Paral·lel, 114 | Cota: 12.0 msnm | Pendiente: 0.9%
-    Tarifa rotación: 3.45 €/h | Capacidad: 260 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1334 veh/h
-      2. Tráfico Pasante Descontado:     -770 veh/h (57.8%)
-      3. Tráfico Fin de Viaje Local:      564 veh/h
-      4. Agitación Activa (Cruising):    +512 veh/h
-      5. Déficit Calzada (>85% satur.):  +11 veh/h
-      6. Atractores Locales (POIs):      +31 veh/h
-      7. Fricción Tobler (Pendiente):    -37 veh/h (-6.6%)
-      => DEMANDA LATENTE NETA (D_L):      218 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Avinguda del Paral·lel | 305.858 veh/año (Año Anterior: 293.530 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Avinguda del Paral·lel: 5.651 v/m (hace 1 año) ➔ 6.668 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.078 v/m (hace 1 año) ➔ 3.942 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Avinguda del Paral·lel: 6.601 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.908 v/m (38% cuota)
-    Impacto Económico: 1.506 €/día (10.241 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (218 veh/h, +84% de rotación potencial). Se aconseja elevar tarifa a 3.85 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[10] NN 22@ Pallars (Sant Martí / 22@)
-    Dirección: NN 22@ Pallars | Cota: 10.0 msnm | Pendiente: 0.5%
-    Tarifa rotación: 3.60 €/h | Capacidad: 260 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1334 veh/h
-      2. Tráfico Pasante Descontado:     -812 veh/h (60.9%)
-      3. Tráfico Fin de Viaje Local:      522 veh/h
-      4. Agitación Activa (Cruising):    +474 veh/h
-      5. Déficit Calzada (>85% satur.):  +11 veh/h
-      6. Atractores Locales (POIs):      +32 veh/h
-      7. Fricción Tobler (Pendiente):    -31 veh/h (-5.9%)
-      => DEMANDA LATENTE NETA (D_L):      198 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · NN 22@ Pallars | 305.858 veh/año (Año Anterior: 293.530 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · NN 22@ Pallars: 5.651 v/m (hace 1 año) ➔ 6.668 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.078 v/m (hace 1 año) ➔ 3.942 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia NN 22@ Pallars: 6.601 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.908 v/m (38% cuota)
-    Impacto Económico: 1.427 €/día (9.704 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (198 veh/h, +76% de rotación potencial). Se aconseja elevar tarifa a 4.00 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[11] NN Fontana / Gran de Gràcia (Gràcia)
-    Dirección: Carrer Gran de Gràcia, 84 | Cota: 64.0 msnm | Pendiente: 3.2%
-    Tarifa rotación: 3.55 €/h | Capacidad: 175 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    898 veh/h
-      2. Tráfico Pasante Descontado:     -207 veh/h (23.1%)
-      3. Tráfico Fin de Viaje Local:      691 veh/h
-      4. Agitación Activa (Cruising):    +627 veh/h
-      5. Déficit Calzada (>85% satur.):  +8 veh/h
-      6. Atractores Locales (POIs):      +37 veh/h
-      7. Fricción Tobler (Pendiente):    -72 veh/h (-10.8%)
-      => DEMANDA LATENTE NETA (D_L):      195 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer Gran de Gràcia | 205.866 veh/año (Año Anterior: 197.568 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer Gran de Gràcia: 3.804 v/m (hace 1 año) ➔ 4.489 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.071 v/m (hace 1 año) ➔ 2.653 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer Gran de Gràcia: 4.444 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.630 v/m (38% cuota)
-    Impacto Económico: 1.386 €/día (9.425 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (195 veh/h, +111% de rotación potencial). Se aconseja elevar tarifa a 3.95 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[12] NN Fontana / Gran de Gràcia (Gràcia)
-    Dirección: Carrer Gran de Gràcia, 84 | Cota: 64.0 msnm | Pendiente: 3.2%
-    Tarifa rotación: 3.55 €/h | Capacidad: 175 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    898 veh/h
-      2. Tráfico Pasante Descontado:     -207 veh/h (23.1%)
-      3. Tráfico Fin de Viaje Local:      691 veh/h
-      4. Agitación Activa (Cruising):    +627 veh/h
-      5. Déficit Calzada (>85% satur.):  +8 veh/h
-      6. Atractores Locales (POIs):      +37 veh/h
-      7. Fricción Tobler (Pendiente):    -72 veh/h (-10.8%)
-      => DEMANDA LATENTE NETA (D_L):      195 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer Gran de Gràcia | 205.866 veh/año (Año Anterior: 197.568 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer Gran de Gràcia: 3.804 v/m (hace 1 año) ➔ 4.489 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.071 v/m (hace 1 año) ➔ 2.653 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer Gran de Gràcia: 4.444 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.630 v/m (38% cuota)
-    Impacto Económico: 1.386 €/día (9.425 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (195 veh/h, +111% de rotación potencial). Se aconseja elevar tarifa a 3.95 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[13] NN Aragó / Rbla. Catalunya (Eixample)
-    Dirección: Carrer d'Aragó, 235 | Cota: 32.0 msnm | Pendiente: 1.1%
-    Tarifa rotación: 3.75 €/h | Capacidad: 380 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1949 veh/h
-      2. Tráfico Pasante Descontado:     -1555 veh/h (79.8%)
-      3. Tráfico Fin de Viaje Local:      394 veh/h
-      4. Agitación Activa (Cruising):    +358 veh/h
-      5. Déficit Calzada (>85% satur.):  +16 veh/h
-      6. Atractores Locales (POIs):      +44 veh/h
-      7. Fricción Tobler (Pendiente):    -29 veh/h (-7.0%)
-      => DEMANDA LATENTE NETA (D_L):      185 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer d'Aragó | 447.023 veh/año (Año Anterior: 429.005 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer d'Aragó: 8.260 v/m (hace 1 año) ➔ 9.747 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 4.498 v/m (hace 1 año) ➔ 5.762 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer d'Aragó: 9.650 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 5.711 v/m (38% cuota)
-    Impacto Económico: 1.389 €/día (9.445 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (185 veh/h, +49% de rotación potencial). Se aconseja elevar tarifa a 4.15 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[14] NN Balmes / Diagonal (Sarrià-Sant Gervasi)
-    Dirección: Carrer de Balmes, 182 | Cota: 48.0 msnm | Pendiente: 2.6%
-    Tarifa rotación: 3.70 €/h | Capacidad: 290 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1488 veh/h
-      2. Tráfico Pasante Descontado:     -1000 veh/h (67.2%)
-      3. Tráfico Fin de Viaje Local:      488 veh/h
-      4. Agitación Activa (Cruising):    +443 veh/h
-      5. Déficit Calzada (>85% satur.):  +12 veh/h
-      6. Atractores Locales (POIs):      +31 veh/h
-      7. Fricción Tobler (Pendiente):    -47 veh/h (-9.7%)
-      => DEMANDA LATENTE NETA (D_L):      185 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de Balmes | 341.149 veh/año (Año Anterior: 327.398 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer de Balmes: 6.303 v/m (hace 1 año) ➔ 7.438 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.433 v/m (hace 1 año) ➔ 4.397 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de Balmes: 7.364 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.358 v/m (38% cuota)
-    Impacto Económico: 1.370 €/día (9.316 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (185 veh/h, +64% de rotación potencial). Se aconseja elevar tarifa a 4.10 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[15] NN Via Laietana / Catedral (Ciutat Vella)
-    Dirección: Via Laietana, 39 | Cota: 14.0 msnm | Pendiente: 1.2%
-    Tarifa rotación: 3.95 €/h | Capacidad: 280 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1436 veh/h
-      2. Tráfico Pasante Descontado:     -935 veh/h (65.1%)
-      3. Tráfico Fin de Viaje Local:      501 veh/h
-      4. Agitación Activa (Cruising):    +455 veh/h
-      5. Déficit Calzada (>85% satur.):  +12 veh/h
-      6. Atractores Locales (POIs):      +47 veh/h
-      7. Fricción Tobler (Pendiente):    -37 veh/h (-7.2%)
-      => DEMANDA LATENTE NETA (D_L):      185 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Via Laietana | 310.419 veh/año (Año Anterior: 316.109 veh. ▼ Decreció -1.8%)
-    Puntos de Entrada: Entrada Principal · Via Laietana: 6.086 v/m (hace 1 año) ➔ 7.181 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.314 v/m (hace 1 año) ➔ 4.245 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Via Laietana: 7.109 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.208 v/m (38% cuota)
-    Impacto Económico: 1.463 €/día (9.948 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (185 veh/h, +66% de rotación potencial). Se aconseja elevar tarifa a 4.35 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[16] NN Sarrià Major (Sarrià-Sant Gervasi)
-    Dirección: NN Sarrià Major | Cota: 92.0 msnm | Pendiente: 5.8%
-    Tarifa rotación: 3.60 €/h | Capacidad: 260 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1334 veh/h
-      2. Tráfico Pasante Descontado:     -812 veh/h (60.9%)
-      3. Tráfico Fin de Viaje Local:      522 veh/h
-      4. Agitación Activa (Cruising):    +474 veh/h
-      5. Déficit Calzada (>85% satur.):  +11 veh/h
-      6. Atractores Locales (POIs):      +32 veh/h
-      7. Fricción Tobler (Pendiente):    -80 veh/h (-15.4%)
-      => DEMANDA LATENTE NETA (D_L):      178 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · NN Sarrià Major | 305.858 veh/año (Año Anterior: 293.530 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · NN Sarrià Major: 5.651 v/m (hace 1 año) ➔ 6.668 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.078 v/m (hace 1 año) ➔ 3.942 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia NN Sarrià Major: 6.601 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.908 v/m (38% cuota)
-    Impacto Económico: 1.283 €/día (8.724 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (178 veh/h, +68% de rotación potencial). Se aconseja elevar tarifa a 4.00 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
-
-[17] NN Sagrada Família / Marina (Eixample)
-    Dirección: Carrer de la Marina, 240 | Cota: 38.0 msnm | Pendiente: 2.0%
-    Tarifa rotación: 3.75 €/h | Capacidad: 240 plazas
-    Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1231 veh/h
-      2. Tráfico Pasante Descontado:     -750 veh/h (60.9%)
-      3. Tráfico Fin de Viaje Local:      481 veh/h
-      4. Agitación Activa (Cruising):    +436 veh/h
-      5. Déficit Calzada (>85% satur.):  +10 veh/h
       6. Atractores Locales (POIs):      +43 veh/h
-      7. Fricción Tobler (Pendiente):    -42 veh/h (-8.6%)
-      => DEMANDA LATENTE NETA (D_L):      168 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de la Marina | 282.330 veh/año (Año Anterior: 270.950 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer de la Marina: 5.217 v/m (hace 1 año) ➔ 6.156 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.841 v/m (hace 1 año) ➔ 3.639 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de la Marina: 6.094 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.607 v/m (38% cuota)
-    Impacto Económico: 1.261 €/día (8.575 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (168 veh/h, +70% de rotación potencial). Se aconseja elevar tarifa a 4.15 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
+      7. Fricción Tobler (Pendiente):    -56 veh/h (-6.6%)
+      => DEMANDA LATENTE NETA (D_L):      410 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · ZONA FRANCA | 505.842 veh/año (Año Anterior: 485.453 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · ZONA FRANCA: 9.346 v/m (hace 1 año) ➔ 11.028 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 5.090 v/m (hace 1 año) ➔ 6.520 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia ZONA FRANCA: 10.918 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 6.462 v/m (38% cuota)
+    Impacto Económico: 2.955 €/día (20.094 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (410 veh/h, +95% de rotación potencial). Se aconseja elevar tarifa a 4.00 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
 
-[18] NN Pau Claris / València (Eixample)
-    Dirección: Carrer de Pau Claris, 145 | Cota: 38.0 msnm | Pendiente: 1.5%
-    Tarifa rotación: 3.80 €/h | Capacidad: 220 plazas
+[2] PK. LLUIS PERICOT, 12 JOSEL, S.L. (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.89 €/h | Capacidad: 419 plazas
     Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1129 veh/h
-      2. Tráfico Pasante Descontado:     -688 veh/h (60.9%)
-      3. Tráfico Fin de Viaje Local:      441 veh/h
-      4. Agitación Activa (Cruising):    +400 veh/h
-      5. Déficit Calzada (>85% satur.):  +9 veh/h
+      1. Aforo Viario Bruto (Q_total):    2149 veh/h
+      2. Tráfico Pasante Descontado:     -1309 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      840 veh/h
+      4. Agitación Activa (Cruising):    +762 veh/h
+      5. Déficit Calzada (>85% satur.):  +18 veh/h
+      6. Atractores Locales (POIs):      +48 veh/h
+      7. Fricción Tobler (Pendiente):    -83 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      358 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · BONANOVA | 492.922 veh/año (Año Anterior: 473.054 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · BONANOVA: 9.107 v/m (hace 1 año) ➔ 10.746 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 4.960 v/m (hace 1 año) ➔ 6.353 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia BONANOVA: 10.639 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 6.297 v/m (38% cuota)
+    Impacto Económico: 2.788 €/día (18.958 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (358 veh/h, +85% de rotación potencial). Se aconseja elevar tarifa a 4.29 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[3] NN BONANOVA, 59 - ESCOLES PIES (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.89 €/h | Capacidad: 419 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    2149 veh/h
+      2. Tráfico Pasante Descontado:     -1309 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      840 veh/h
+      4. Agitación Activa (Cruising):    +762 veh/h
+      5. Déficit Calzada (>85% satur.):  +18 veh/h
+      6. Atractores Locales (POIs):      +43 veh/h
+      7. Fricción Tobler (Pendiente):    -83 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      356 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · BONANOVA | 492.922 veh/año (Año Anterior: 473.054 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · BONANOVA: 9.107 v/m (hace 1 año) ➔ 10.746 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 4.960 v/m (hace 1 año) ➔ 6.353 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia BONANOVA: 10.639 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 6.297 v/m (38% cuota)
+    Impacto Económico: 2.772 €/día (18.850 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (356 veh/h, +85% de rotación potencial). Se aconseja elevar tarifa a 4.29 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[4] NN VIA AUGUSTA,349-355 -AVION PLUS- MONSERDA (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.89 €/h | Capacidad: 419 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    2149 veh/h
+      2. Tráfico Pasante Descontado:     -1309 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      840 veh/h
+      4. Agitación Activa (Cruising):    +762 veh/h
+      5. Déficit Calzada (>85% satur.):  +18 veh/h
+      6. Atractores Locales (POIs):      +38 veh/h
+      7. Fricción Tobler (Pendiente):    -82 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      353 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · BONANOVA | 492.922 veh/año (Año Anterior: 473.054 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · BONANOVA: 9.107 v/m (hace 1 año) ➔ 10.746 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 4.960 v/m (hace 1 año) ➔ 6.353 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia BONANOVA: 10.639 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 6.297 v/m (38% cuota)
+    Impacto Económico: 2.749 €/día (18.693 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (353 veh/h, +84% de rotación potencial). Se aconseja elevar tarifa a 4.29 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[5] NN VALENCIA, 307 - 313 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: VALENCIA, 307 08009 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.97 €/h | Capacidad: 387 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1985 veh/h
+      2. Tráfico Pasante Descontado:     -1209 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      776 veh/h
+      4. Agitación Activa (Cruising):    +704 veh/h
+      5. Déficit Calzada (>85% satur.):  +17 veh/h
+      6. Atractores Locales (POIs):      +49 veh/h
+      7. Fricción Tobler (Pendiente):    -55 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      325 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · VALENCIA | 455.215 veh/año (Año Anterior: 436.867 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · VALENCIA: 8.412 v/m (hace 1 año) ➔ 9.926 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 4.581 v/m (hace 1 año) ➔ 5.868 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia VALENCIA: 9.827 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 5.816 v/m (38% cuota)
+    Impacto Económico: 2.583 €/día (17.564 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (325 veh/h, +84% de rotación potencial). Se aconseja elevar tarifa a 4.37 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[6] PK.BRUC, 103-113 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: VALENCIA, 307 08009 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.97 €/h | Capacidad: 387 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1985 veh/h
+      2. Tráfico Pasante Descontado:     -1209 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      776 veh/h
+      4. Agitación Activa (Cruising):    +704 veh/h
+      5. Déficit Calzada (>85% satur.):  +17 veh/h
+      6. Atractores Locales (POIs):      +28 veh/h
+      7. Fricción Tobler (Pendiente):    -54 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      316 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · VALENCIA | 455.215 veh/año (Año Anterior: 436.867 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · VALENCIA: 8.412 v/m (hace 1 año) ➔ 9.926 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 4.581 v/m (hace 1 año) ➔ 5.868 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia VALENCIA: 9.827 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 5.816 v/m (38% cuota)
+    Impacto Económico: 2.512 €/día (17.082 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (316 veh/h, +82% de rotación potencial). Se aconseja elevar tarifa a 4.37 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[7] PK.SANTALO, 14-16 (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: SANTALO 14, 08021 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.41 €/h | Capacidad: 331 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1698 veh/h
+      2. Tráfico Pasante Descontado:     -1034 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      664 veh/h
+      4. Agitación Activa (Cruising):    +602 veh/h
+      5. Déficit Calzada (>85% satur.):  +14 veh/h
       6. Atractores Locales (POIs):      +34 veh/h
-      7. Fricción Tobler (Pendiente):    -34 veh/h (-7.7%)
-      => DEMANDA LATENTE NETA (D_L):      144 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Carrer de Pau Claris | 258.803 veh/año (Año Anterior: 248.371 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Carrer de Pau Claris: 4.782 v/m (hace 1 año) ➔ 5.643 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.604 v/m (hace 1 año) ➔ 3.336 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Carrer de Pau Claris: 5.587 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.306 v/m (38% cuota)
-    Impacto Económico: 1.095 €/día (7.446 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (144 veh/h, +65% de rotación potencial). Se aconseja elevar tarifa a 4.20 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
+      7. Fricción Tobler (Pendiente):    -65 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      282 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · SANTALO 14 | 389.360 veh/año (Año Anterior: 373.666 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · SANTALO 14: 7.195 v/m (hace 1 año) ➔ 8.490 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.918 v/m (hace 1 año) ➔ 5.019 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia SANTALO 14: 8.405 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.975 v/m (38% cuota)
+    Impacto Económico: 1.925 €/día (13.090 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (282 veh/h, +85% de rotación potencial). Se aconseja elevar tarifa a 3.81 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
 
-[19] NN Travessera de Gràcia / Muntaner (Sarrià-Sant Gervasi)
-    Dirección: Travessera de Gràcia, 45 | Cota: 52.0 msnm | Pendiente: 2.9%
-    Tarifa rotación: 3.65 €/h | Capacidad: 210 plazas
+[8] NN ROSSELLO, 1 - 13 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: C/ Rosselló 13, 08029, Barcelona | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.85 €/h | Capacidad: 335 plazas
     Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1077 veh/h
-      2. Tráfico Pasante Descontado:     -656 veh/h (60.9%)
-      3. Tráfico Fin de Viaje Local:      421 veh/h
-      4. Agitación Activa (Cruising):    +382 veh/h
+      1. Aforo Viario Bruto (Q_total):    1719 veh/h
+      2. Tráfico Pasante Descontado:     -1047 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      672 veh/h
+      4. Agitación Activa (Cruising):    +610 veh/h
+      5. Déficit Calzada (>85% satur.):  +14 veh/h
+      6. Atractores Locales (POIs):      +38 veh/h
+      7. Fricción Tobler (Pendiente):    -47 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      269 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · C/ Rosselló 13 | 394.086 veh/año (Año Anterior: 378.202 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · C/ Rosselló 13: 7.282 v/m (hace 1 año) ➔ 8.593 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.965 v/m (hace 1 año) ➔ 5.079 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia C/ Rosselló 13: 8.507 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 5.035 v/m (38% cuota)
+    Impacto Económico: 2.073 €/día (14.096 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (269 veh/h, +80% de rotación potencial). Se aconseja elevar tarifa a 4.25 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[9] NN HERCEGOVINA, 19 - 23 (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.78 €/h | Capacidad: 328 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1683 veh/h
+      2. Tráfico Pasante Descontado:     -1025 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      658 veh/h
+      4. Agitación Activa (Cruising):    +597 veh/h
+      5. Déficit Calzada (>85% satur.):  +14 veh/h
+      6. Atractores Locales (POIs):      +43 veh/h
+      7. Fricción Tobler (Pendiente):    -66 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      259 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · HERCEGOVINA | 385.893 veh/año (Año Anterior: 370.339 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · HERCEGOVINA: 7.129 v/m (hace 1 año) ➔ 8.412 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.883 v/m (hace 1 año) ➔ 4.973 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia HERCEGOVINA: 8.328 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.930 v/m (38% cuota)
+    Impacto Económico: 1.960 €/día (13.328 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (259 veh/h, +79% de rotación potencial). Se aconseja elevar tarifa a 4.18 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[10] NN VIA AUGUSTA, 281 - 285 - DR. ROUX (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.78 €/h | Capacidad: 328 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1683 veh/h
+      2. Tráfico Pasante Descontado:     -1025 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      658 veh/h
+      4. Agitación Activa (Cruising):    +597 veh/h
+      5. Déficit Calzada (>85% satur.):  +14 veh/h
+      6. Atractores Locales (POIs):      +31 veh/h
+      7. Fricción Tobler (Pendiente):    -64 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      255 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · HERCEGOVINA | 385.893 veh/año (Año Anterior: 370.339 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · HERCEGOVINA: 7.129 v/m (hace 1 año) ➔ 8.412 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.883 v/m (hace 1 año) ➔ 4.973 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia HERCEGOVINA: 8.328 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.930 v/m (38% cuota)
+    Impacto Económico: 1.930 €/día (13.124 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (255 veh/h, +78% de rotación potencial). Se aconseja elevar tarifa a 4.18 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[11] NN ESTEVE TERRADAS, 23-31 (UA4) (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.78 €/h | Capacidad: 328 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1683 veh/h
+      2. Tráfico Pasante Descontado:     -1025 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      658 veh/h
+      4. Agitación Activa (Cruising):    +597 veh/h
+      5. Déficit Calzada (>85% satur.):  +14 veh/h
+      6. Atractores Locales (POIs):      +32 veh/h
+      7. Fricción Tobler (Pendiente):    -65 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      255 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · HERCEGOVINA | 385.893 veh/año (Año Anterior: 370.339 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · HERCEGOVINA: 7.129 v/m (hace 1 año) ➔ 8.412 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.883 v/m (hace 1 año) ➔ 4.973 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia HERCEGOVINA: 8.328 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.930 v/m (38% cuota)
+    Impacto Económico: 1.930 €/día (13.124 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (255 veh/h, +78% de rotación potencial). Se aconseja elevar tarifa a 4.18 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[12] NN TRAV. DE GRACIA, 183 - 185 (Gràcia) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: Travessera de Gràcia 183, 08012, Barcelona | Cota: 68 msnm | Pendiente: 2.1%
+    Tarifa rotación: 3.56 €/h | Capacidad: 306 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1570 veh/h
+      2. Tráfico Pasante Descontado:     -956 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      614 veh/h
+      4. Agitación Activa (Cruising):    +557 veh/h
+      5. Déficit Calzada (>85% satur.):  +13 veh/h
+      6. Atractores Locales (POIs):      +40 veh/h
+      7. Fricción Tobler (Pendiente):    -54 veh/h (-8.8%)
+      => DEMANDA LATENTE NETA (D_L):      249 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · Travessera de Gràcia 183 | 359.951 veh/año (Año Anterior: 345.442 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · Travessera de Gràcia 183: 6.651 v/m (hace 1 año) ➔ 7.848 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.622 v/m (hace 1 año) ➔ 4.640 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia Travessera de Gràcia 183: 7.770 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.599 v/m (38% cuota)
+    Impacto Económico: 1.775 €/día (12.070 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (249 veh/h, +81% de rotación potencial). Se aconseja elevar tarifa a 3.96 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[13] NN CORSEGA, 344 -352 (H) (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: Calle Córcega, 344, 08037 Barcelona | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.37 €/h | Capacidad: 287 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1472 veh/h
+      2. Tráfico Pasante Descontado:     -896 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      576 veh/h
+      4. Agitación Activa (Cruising):    +523 veh/h
+      5. Déficit Calzada (>85% satur.):  +12 veh/h
+      6. Atractores Locales (POIs):      +48 veh/h
+      7. Fricción Tobler (Pendiente):    -42 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      245 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · Calle Córcega | 337.578 veh/año (Año Anterior: 323.971 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · Calle Córcega: 6.238 v/m (hace 1 año) ➔ 7.361 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.397 v/m (hace 1 año) ➔ 4.351 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia Calle Córcega: 7.287 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 4.313 v/m (38% cuota)
+    Impacto Económico: 1.653 €/día (11.240 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (245 veh/h, +85% de rotación potencial). Se aconseja elevar tarifa a 3.77 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[14] NN ESPRONCEDA, 254 - 274 (Sant Martí) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: ESPRONCEDA, 254 - 274 08018 BARCELONA | Cota: 14 msnm | Pendiente: 0.5%
+    Tarifa rotación: 3.47 €/h | Capacidad: 257 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1318 veh/h
+      2. Tráfico Pasante Descontado:     -803 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      515 veh/h
+      4. Agitación Activa (Cruising):    +467 veh/h
+      5. Déficit Calzada (>85% satur.):  +11 veh/h
+      6. Atractores Locales (POIs):      +38 veh/h
+      7. Fricción Tobler (Pendiente):    -30 veh/h (-5.9%)
+      => DEMANDA LATENTE NETA (D_L):      203 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · ESPRONCEDA | 302.286 veh/año (Año Anterior: 290.102 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · ESPRONCEDA: 5.586 v/m (hace 1 año) ➔ 6.591 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.042 v/m (hace 1 año) ➔ 3.897 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia ESPRONCEDA: 6.525 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.862 v/m (38% cuota)
+    Impacto Económico: 1.410 €/día (9.588 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (203 veh/h, +79% de rotación potencial). Se aconseja elevar tarifa a 3.87 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[15] NN VALENCIA,511 - PGE.VILARET,11-15 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.92 €/h | Capacidad: 262 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1344 veh/h
+      2. Tráfico Pasante Descontado:     -818 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      526 veh/h
+      4. Agitación Activa (Cruising):    +477 veh/h
+      5. Déficit Calzada (>85% satur.):  +11 veh/h
+      6. Atractores Locales (POIs):      +40 veh/h
+      7. Fricción Tobler (Pendiente):    -38 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      186 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · VALENCIA | 308.168 veh/año (Año Anterior: 295.747 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · VALENCIA: 5.695 v/m (hace 1 año) ➔ 6.720 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.101 v/m (hace 1 año) ➔ 3.972 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia VALENCIA: 6.653 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.938 v/m (38% cuota)
+    Impacto Económico: 1.460 €/día (9.928 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (186 veh/h, +71% de rotación potencial). Se aconseja elevar tarifa a 4.32 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[16] PK.VALENCIA,375-377 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.92 €/h | Capacidad: 262 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1344 veh/h
+      2. Tráfico Pasante Descontado:     -818 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      526 veh/h
+      4. Agitación Activa (Cruising):    +477 veh/h
+      5. Déficit Calzada (>85% satur.):  +11 veh/h
+      6. Atractores Locales (POIs):      +40 veh/h
+      7. Fricción Tobler (Pendiente):    -38 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      186 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · VALENCIA | 308.168 veh/año (Año Anterior: 295.747 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · VALENCIA: 5.695 v/m (hace 1 año) ➔ 6.720 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.101 v/m (hace 1 año) ➔ 3.972 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia VALENCIA: 6.653 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.938 v/m (38% cuota)
+    Impacto Económico: 1.460 €/día (9.928 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (186 veh/h, +71% de rotación potencial). Se aconseja elevar tarifa a 4.32 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[17] PK.MORAGAS, 15 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.92 €/h | Capacidad: 262 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1344 veh/h
+      2. Tráfico Pasante Descontado:     -818 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      526 veh/h
+      4. Agitación Activa (Cruising):    +477 veh/h
+      5. Déficit Calzada (>85% satur.):  +11 veh/h
+      6. Atractores Locales (POIs):      +30 veh/h
+      7. Fricción Tobler (Pendiente):    -37 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      182 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · VALENCIA | 308.168 veh/año (Año Anterior: 295.747 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · VALENCIA: 5.695 v/m (hace 1 año) ➔ 6.720 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 3.101 v/m (hace 1 año) ➔ 3.972 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia VALENCIA: 6.653 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.938 v/m (38% cuota)
+    Impacto Económico: 1.428 €/día (9.710 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (182 veh/h, +69% de rotación potencial). Se aconseja elevar tarifa a 4.32 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[18] PK. ARAGO, 182 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: C/ Aragó 182, 08011, Barcelona | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.55 €/h | Capacidad: 225 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1154 veh/h
+      2. Tráfico Pasante Descontado:     -703 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      451 veh/h
+      4. Agitación Activa (Cruising):    +409 veh/h
+      5. Déficit Calzada (>85% satur.):  +10 veh/h
+      6. Atractores Locales (POIs):      +47 veh/h
+      7. Fricción Tobler (Pendiente):    -33 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      164 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · C/ Aragó 182 | 264.685 veh/año (Año Anterior: 254.016 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · C/ Aragó 182: 4.891 v/m (hace 1 año) ➔ 5.771 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.663 v/m (hace 1 año) ➔ 3.411 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia C/ Aragó 182: 5.713 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.382 v/m (38% cuota)
+    Impacto Económico: 1.166 €/día (7.929 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (164 veh/h, +73% de rotación potencial). Se aconseja elevar tarifa a 3.95 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[19] PK.URGELL,234-CORCEGA,171 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: COMTE URGELL 234, 08036 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.71 €/h | Capacidad: 201 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1031 veh/h
+      2. Tráfico Pasante Descontado:     -628 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      403 veh/h
+      4. Agitación Activa (Cruising):    +366 veh/h
       5. Déficit Calzada (>85% satur.):  +9 veh/h
-      6. Atractores Locales (POIs):      +29 veh/h
-      7. Fricción Tobler (Pendiente):    -43 veh/h (-10.2%)
-      => DEMANDA LATENTE NETA (D_L):      134 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Travessera de Gràcia | 247.039 veh/año (Año Anterior: 237.082 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Travessera de Gràcia: 4.565 v/m (hace 1 año) ➔ 5.387 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.486 v/m (hace 1 año) ➔ 3.184 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Travessera de Gràcia: 5.333 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.156 v/m (38% cuota)
-    Impacto Económico: 979 €/día (6.657 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (134 veh/h, +64% de rotación potencial). Se aconseja elevar tarifa a 4.05 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
+      6. Atractores Locales (POIs):      +36 veh/h
+      7. Fricción Tobler (Pendiente):    -29 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      130 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · COMTE URGELL 234 | 236.431 veh/año (Año Anterior: 226.901 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · COMTE URGELL 234: 4.369 v/m (hace 1 año) ➔ 5.155 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.379 v/m (hace 1 año) ➔ 3.048 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia COMTE URGELL 234: 5.103 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.021 v/m (38% cuota)
+    Impacto Económico: 966 €/día (6.569 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (130 veh/h, +65% de rotación potencial). Se aconseja elevar tarifa a 4.11 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
 
-[20] NN Via Augusta / Ganduxer (Sarrià-Sant Gervasi)
-    Dirección: Via Augusta, 214 | Cota: 78.0 msnm | Pendiente: 3.8%
-    Tarifa rotación: 3.65 €/h | Capacidad: 250 plazas
+[20] PK.BORRELL, 26-28 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: ROCAFORT, 64 08015 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.53 €/h | Capacidad: 183 plazas
     Cascada de Flujo:
-      1. Aforo Viario Bruto (Q_total):    1282 veh/h
-      2. Tráfico Pasante Descontado:     -915 veh/h (71.4%)
+      1. Aforo Viario Bruto (Q_total):    939 veh/h
+      2. Tráfico Pasante Descontado:     -572 veh/h (60.9%)
       3. Tráfico Fin de Viaje Local:      367 veh/h
       4. Agitación Activa (Cruising):    +333 veh/h
-      5. Déficit Calzada (>85% satur.):  +11 veh/h
-      6. Atractores Locales (POIs):      +22 veh/h
-      7. Fricción Tobler (Pendiente):    -43 veh/h (-11.8%)
-      => DEMANDA LATENTE NETA (D_L):      128 veh/h
-    Puntos de Paso Exterior: Aforo Viario Principal · Via Augusta | 294.094 veh/año (Año Anterior: 282.240 veh. ▲ Creció 4.2%)
-    Puntos de Entrada: Entrada Principal · Via Augusta: 5.434 v/m (hace 1 año) ➔ 6.412 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.959 v/m (hace 1 año) ➔ 3.790 v/m (+14.5%)
-    Puntos de Salida:  Salida Principal hacia Via Augusta: 6.348 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 3.757 v/m (38% cuota)
-    Impacto Económico: 935 €/día (6.358 €/semana)
-    Yield Advice (ALTA): Presión crítica de demanda latente (128 veh/h, +51% de rotación potencial). Se aconseja elevar tarifa a 4.05 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
---------------------------------------------------------------------------------
+      5. Déficit Calzada (>85% satur.):  +8 veh/h
+      6. Atractores Locales (POIs):      +42 veh/h
+      7. Fricción Tobler (Pendiente):    -27 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      119 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · ROCAFORT | 215.319 veh/año (Año Anterior: 206.640 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · ROCAFORT: 3.978 v/m (hace 1 año) ➔ 4.694 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.166 v/m (hace 1 año) ➔ 2.775 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia ROCAFORT: 4.647 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.750 v/m (38% cuota)
+    Impacto Económico: 841 €/día (5.719 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (119 veh/h, +65% de rotación potencial). Se aconseja elevar tarifa a 3.93 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[21] PK. ROCAFORT, 64-SEPULVEDA, 61 (Eixample) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: ROCAFORT, 64 08015 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Tarifa rotación: 3.53 €/h | Capacidad: 183 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    939 veh/h
+      2. Tráfico Pasante Descontado:     -572 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      367 veh/h
+      4. Agitación Activa (Cruising):    +333 veh/h
+      5. Déficit Calzada (>85% satur.):  +8 veh/h
+      6. Atractores Locales (POIs):      +32 veh/h
+      7. Fricción Tobler (Pendiente):    -27 veh/h (-7.2%)
+      => DEMANDA LATENTE NETA (D_L):      117 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · ROCAFORT | 215.319 veh/año (Año Anterior: 206.640 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · ROCAFORT: 3.978 v/m (hace 1 año) ➔ 4.694 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.166 v/m (hace 1 año) ➔ 2.775 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia ROCAFORT: 4.647 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.750 v/m (38% cuota)
+    Impacto Económico: 827 €/día (5.624 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (117 veh/h, +64% de rotación potencial). Se aconseja elevar tarifa a 3.93 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[22] PK.URGELL, 154-156 (URGELL - 2) (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.52 €/h | Capacidad: 182 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    934 veh/h
+      2. Tráfico Pasante Descontado:     -569 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      365 veh/h
+      4. Agitación Activa (Cruising):    +331 veh/h
+      5. Déficit Calzada (>85% satur.):  +8 veh/h
+      6. Atractores Locales (POIs):      +47 veh/h
+      7. Fricción Tobler (Pendiente):    -39 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      117 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · CISTER | 214.058 veh/año (Año Anterior: 205.430 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · CISTER: 3.956 v/m (hace 1 año) ➔ 4.668 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.154 v/m (hace 1 año) ➔ 2.759 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia CISTER: 4.621 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.735 v/m (38% cuota)
+    Impacto Económico: 825 €/día (5.610 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (117 veh/h, +64% de rotación potencial). Se aconseja elevar tarifa a 3.92 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[23] NN CISTER, 2- 18 -24% IND (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.52 €/h | Capacidad: 182 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    934 veh/h
+      2. Tráfico Pasante Descontado:     -569 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      365 veh/h
+      4. Agitación Activa (Cruising):    +331 veh/h
+      5. Déficit Calzada (>85% satur.):  +8 veh/h
+      6. Atractores Locales (POIs):      +42 veh/h
+      7. Fricción Tobler (Pendiente):    -38 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      115 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · CISTER | 214.058 veh/año (Año Anterior: 205.430 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · CISTER: 3.956 v/m (hace 1 año) ➔ 4.668 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.154 v/m (hace 1 año) ➔ 2.759 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia CISTER: 4.621 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.735 v/m (38% cuota)
+    Impacto Económico: 810 €/día (5.508 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (115 veh/h, +63% de rotación potencial). Se aconseja elevar tarifa a 3.92 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[24] PK. GRAN VIA, 641 (Les Corts) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: Gran Via de les Corts Catalanes 641, 08010, Barcelona | Cota: 54 msnm | Pendiente: 1.4%
+    Tarifa rotación: 4.08 €/h | Capacidad: 198 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    1016 veh/h
+      2. Tráfico Pasante Descontado:     -619 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      397 veh/h
+      4. Agitación Activa (Cruising):    +360 veh/h
+      5. Déficit Calzada (>85% satur.):  +8 veh/h
+      6. Atractores Locales (POIs):      +32 veh/h
+      7. Fricción Tobler (Pendiente):    -30 veh/h (-7.5%)
+      => DEMANDA LATENTE NETA (D_L):      114 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · Gran Via de les Corts Catalanes 641 | 232.964 veh/año (Año Anterior: 223.574 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · Gran Via de les Corts Catalanes 641: 4.304 v/m (hace 1 año) ➔ 5.079 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.344 v/m (hace 1 año) ➔ 3.002 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia Gran Via de les Corts Catalanes 641: 5.028 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.976 v/m (38% cuota)
+    Impacto Económico: 931 €/día (6.331 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (114 veh/h, +58% de rotación potencial). Se aconseja elevar tarifa a 4.48 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[25] NN SANT GERVASI, 51-53 - AV.TIBIDABO (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.52 €/h | Capacidad: 182 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    934 veh/h
+      2. Tráfico Pasante Descontado:     -569 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      365 veh/h
+      4. Agitación Activa (Cruising):    +331 veh/h
+      5. Déficit Calzada (>85% satur.):  +8 veh/h
+      6. Atractores Locales (POIs):      +30 veh/h
+      7. Fricción Tobler (Pendiente):    -37 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      111 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · CISTER | 214.058 veh/año (Año Anterior: 205.430 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · CISTER: 3.956 v/m (hace 1 año) ➔ 4.668 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.154 v/m (hace 1 año) ➔ 2.759 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia CISTER: 4.621 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.735 v/m (38% cuota)
+    Impacto Económico: 782 €/día (5.318 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (111 veh/h, +61% de rotación potencial). Se aconseja elevar tarifa a 3.92 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[26] PK.VALENCIA, 243-245 (VALENCIA - 2) (Sarrià-Sant Gervasi) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Tarifa rotación: 3.52 €/h | Capacidad: 182 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    934 veh/h
+      2. Tráfico Pasante Descontado:     -569 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      365 veh/h
+      4. Agitación Activa (Cruising):    +331 veh/h
+      5. Déficit Calzada (>85% satur.):  +8 veh/h
+      6. Atractores Locales (POIs):      +27 veh/h
+      7. Fricción Tobler (Pendiente):    -37 veh/h (-10.0%)
+      => DEMANDA LATENTE NETA (D_L):      110 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · CISTER | 214.058 veh/año (Año Anterior: 205.430 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · CISTER: 3.956 v/m (hace 1 año) ➔ 4.668 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.154 v/m (hace 1 año) ➔ 2.759 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia CISTER: 4.621 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.735 v/m (38% cuota)
+    Impacto Económico: 775 €/día (5.270 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (110 veh/h, +60% de rotación potencial). Se aconseja elevar tarifa a 3.92 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[27] PK. TARRAGONA, 141-157 (Les Corts) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 54 msnm | Pendiente: 1.4%
+    Tarifa rotación: 3.83 €/h | Capacidad: 173 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    887 veh/h
+      2. Tráfico Pasante Descontado:     -540 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      347 veh/h
+      4. Agitación Activa (Cruising):    +315 veh/h
+      5. Déficit Calzada (>85% satur.):  +7 veh/h
+      6. Atractores Locales (POIs):      +43 veh/h
+      7. Fricción Tobler (Pendiente):    -27 veh/h (-7.5%)
+      => DEMANDA LATENTE NETA (D_L):      102 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · DIAGONAL | 203.555 veh/año (Año Anterior: 195.350 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · DIAGONAL: 3.760 v/m (hace 1 año) ➔ 4.437 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.048 v/m (hace 1 año) ➔ 2.623 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia DIAGONAL: 4.393 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.600 v/m (38% cuota)
+    Impacto Económico: 782 €/día (5.318 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (102 veh/h, +59% de rotación potencial). Se aconseja elevar tarifa a 4.23 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[28] NN DIAGONAL, 593 - 595 (Les Corts) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 54 msnm | Pendiente: 1.4%
+    Tarifa rotación: 3.83 €/h | Capacidad: 173 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    887 veh/h
+      2. Tráfico Pasante Descontado:     -540 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      347 veh/h
+      4. Agitación Activa (Cruising):    +315 veh/h
+      5. Déficit Calzada (>85% satur.):  +7 veh/h
+      6. Atractores Locales (POIs):      +35 veh/h
+      7. Fricción Tobler (Pendiente):    -27 veh/h (-7.5%)
+      => DEMANDA LATENTE NETA (D_L):      100 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · DIAGONAL | 203.555 veh/año (Año Anterior: 195.350 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · DIAGONAL: 3.760 v/m (hace 1 año) ➔ 4.437 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.048 v/m (hace 1 año) ➔ 2.623 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia DIAGONAL: 4.393 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.600 v/m (38% cuota)
+    Impacto Económico: 767 €/día (5.216 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (100 veh/h, +58% de rotación potencial). Se aconseja elevar tarifa a 4.23 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
+
+[29] PK.M.SENTMENAT, 6 (Les Corts) — Origen: REAL AUDITADO (Cartera Oficial NN)
+    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 54 msnm | Pendiente: 1.4%
+    Tarifa rotación: 3.83 €/h | Capacidad: 173 plazas
+    Cascada de Flujo:
+      1. Aforo Viario Bruto (Q_total):    887 veh/h
+      2. Tráfico Pasante Descontado:     -540 veh/h (60.9%)
+      3. Tráfico Fin de Viaje Local:      347 veh/h
+      4. Agitación Activa (Cruising):    +315 veh/h
+      5. Déficit Calzada (>85% satur.):  +7 veh/h
+      6. Atractores Locales (POIs):      +31 veh/h
+      7. Fricción Tobler (Pendiente):    -27 veh/h (-7.5%)
+      => DEMANDA LATENTE NETA (D_L):      99 veh/h
+    Puntos de Paso Exterior: Aforo Viario Principal · DIAGONAL | 203.555 veh/año (Año Anterior: 195.350 veh. ▲ Creció 4.2%)
+    Puntos de Entrada: Entrada Principal · DIAGONAL: 3.760 v/m (hace 1 año) ➔ 4.437 v/m (+18.0%) | Entrada Secundaria · Chaflán Cerdà: 2.048 v/m (hace 1 año) ➔ 2.623 v/m (+14.5%)
+    Puntos de Salida:  Salida Principal hacia DIAGONAL: 4.393 v/m (62% cuota) | Salida Posterior hacia Calle Transversal: 2.600 v/m (38% cuota)
+    Impacto Económico: 759 €/día (5.161 €/semana)
+    Yield Advice (ALTA): Presión crítica de demanda latente (99 veh/h, +57% de rotación potencial). Se aconseja elevar tarifa a 4.23 €/h en hora pico y cerrar venta de abonos diurnos para maximizar margen.
+----------------------------------------------------------------------------------------
 
 Fin del informe técnico.

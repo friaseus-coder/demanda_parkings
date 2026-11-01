@@ -49,6 +49,7 @@ class NNApp {
     this.chartZoneSevenDaysTraffic = null;
     this.chartIntradayTraffic = null;
     this.chartGlobalMonthlyDL = null;
+    this.radarChart = null;
     this.currentZoneForecastDays = [];
     this.selectedIntradayDayIdx = 0;
 
@@ -57,6 +58,7 @@ class NNApp {
   }
 
   init() {
+    this.loadPersistedState();
     this.recalcAllParkings();
     this.renderTabsBar();
     this.initLeafletMaps();
@@ -69,6 +71,142 @@ class NNApp {
     if (window.lucide) {
       lucide.createIcons();
     }
+  }
+
+  // ===========================================================================
+  // PERSISTENCIA Y GESTIÓN INTELIGENTE DE CARTERA (LOCALSTORAGE + SHEETJS)
+  // ===========================================================================
+
+  loadPersistedState() {
+    try {
+      const stored = localStorage.getItem("nn_parkings_state");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && Array.isArray(parsed.parkings) && parsed.parkings.length > 0) {
+          this.parkings = parsed.parkings;
+          if (parsed.sliders) {
+            this.sliders = { ...this.sliders, ...parsed.sliders };
+          }
+          if (parsed.selectedAssetId) {
+            this.selectedAssetId = parsed.selectedAssetId;
+          }
+          console.log(`[Persistencia] Cartera restaurada desde localStorage (${this.parkings.length} aparcamientos).`);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("[Persistencia] Error al leer nn_parkings_state desde localStorage:", e);
+    }
+
+    // Si no hay datos en localStorage, cargar PARKINGS_PORTFOLIO predeterminado
+    if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO) && PARKINGS_PORTFOLIO.length > 0) {
+      const cloned = JSON.parse(JSON.stringify(PARKINGS_PORTFOLIO));
+      this.parkings = cloned.map((p, idx) => (typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(p, idx) : p));
+      if (this.parkings.length > 0 && !this.selectedAssetId) {
+        this.selectedAssetId = this.parkings[0].id;
+      }
+      console.log(`[Cartera Base] Cargados ${this.parkings.length} aparcamientos auditados desde PARKINGS_PORTFOLIO.`);
+    }
+  }
+
+  savePersistedState() {
+    try {
+      const state = {
+        parkings: this.parkings,
+        sliders: this.sliders,
+        selectedAssetId: this.selectedAssetId,
+        lastUpdated: new Date().toISOString()
+      };
+      localStorage.setItem("nn_parkings_state", JSON.stringify(state));
+    } catch (e) {
+      console.warn("[Persistencia] Error al guardar nn_parkings_state en localStorage:", e);
+    }
+  }
+
+  restoreOriginalData() {
+    try {
+      localStorage.removeItem("nn_parkings_state");
+      this.sliders = {
+        rain: 0.0,
+        sat: 92,
+        event: "none",
+        tariff: 3.75
+      };
+
+      if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) {
+        const cloned = JSON.parse(JSON.stringify(PARKINGS_PORTFOLIO));
+        this.parkings = cloned.map((p, idx) => (typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(p, idx) : p));
+        this.selectedAssetId = this.parkings[0]?.id || null;
+      } else {
+        this.parkings = [];
+        this.selectedAssetId = null;
+      }
+
+      this.currentDistrict = "all";
+      this.recalcAllParkings();
+      this.renderTabsBar();
+      this.renderTable();
+      this.renderGlobalMapMarkers();
+      this.updateGlobalKPIs();
+      this.updateSimulationControlsDisplay();
+      this.switchState("A");
+
+      if (this.chartGlobalMonthlyDL) {
+        const { curMonthly, prevMonthly } = this.calculatePortfolioSensorsTrafficMonthly();
+        this.chartGlobalMonthlyDL.data.datasets[0].data = curMonthly;
+        this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
+        this.chartGlobalMonthlyDL.update();
+      }
+
+      alert("Cartera original restaurada con éxito (29 aparcamientos auditados). Se han limpiado las personalizaciones y restablecido los simuladores.");
+    } catch (err) {
+      alert(`Error al restaurar los datos: ${err.message || err}`);
+    }
+  }
+
+  mergeWithKnownPortfolio(incomingList) {
+    const baseMap = new Map();
+    if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) {
+      PARKINGS_PORTFOLIO.forEach(p => {
+        if (p.id) baseMap.set(String(p.id), p);
+        if (p.obraActual) baseMap.set(String(p.obraActual), p);
+        if (p.name) baseMap.set(p.name.toLowerCase().trim(), p);
+      });
+    }
+
+    const hashStr = (s) => {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+      return Math.abs(h);
+    };
+
+    return incomingList.map((item, idx) => {
+      const idKey = String(item.id || item.obraActual || '');
+      const nameKey = (item.name || '').toLowerCase().trim();
+      const existing = baseMap.get(idKey) || baseMap.get(nameKey);
+
+      const merged = { ...(existing || {}), ...item };
+      const seed = hashStr(`${item.obraActual || item.id || idx}_${item.name || ''}`);
+
+      if (merged.occ_base === undefined) merged.occ_base = 78 + (seed % 16);
+      if (merged.search_index === undefined) merged.search_index = +(1.05 + ((seed % 25) * 0.01)).toFixed(2);
+      if (merged.elasticity === undefined) merged.elasticity = +(-0.40 - ((seed % 15) * 0.01)).toFixed(2);
+      if (merged.competition === undefined) merged.competition = +(1.0 + ((seed % 30) * 0.01)).toFixed(2);
+      if (merged.saturation === undefined) merged.saturation = 86 + (seed % 10);
+      if (merged.rotacion === undefined) merged.rotacion = +(2.8 + ((seed % 18) * 0.1)).toFixed(1);
+      if (!merged.pois) merged.pois = 95 + (seed % 110);
+      if (!merged.tariff) merged.tariff = +(3.30 + ((seed % 80) * 0.01)).toFixed(2);
+      if (!merged.capacity) merged.capacity = 160 + (seed % 280);
+
+      return typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(merged, idx) : merged;
+    });
+  }
+
+  async handleDirectFileUpload(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await this.processUploadedFile(file);
+    event.target.value = "";
   }
 
   async fetchLiveWeatherForBarcelona(lat = 41.3888, lon = 2.1590) {
@@ -647,6 +785,10 @@ class NNApp {
 
     // 7. Cascada Waterfall y Auditoría Matemática de Tráfico Pasante
     this.updateWaterfall(enriched);
+
+    // 8. Simulador Dinámico What-If y Gráfico Radar Multiaxial
+    this.updateSimulationControlsDisplay();
+    this.updateRadarChart(enriched);
 
     if (window.lucide) {
       lucide.createIcons();
@@ -1397,6 +1539,157 @@ class NNApp {
           }
         }
       });
+    }
+
+    // 7. Gráfico Radar Multiaxial de Demanda y Competitividad (Sandbox What-If)
+    const elRadar = document.getElementById('radarChart');
+    if (elRadar) {
+      const existing = Chart.getChart(elRadar);
+      if (existing) existing.destroy();
+
+      this.radarChart = new Chart(elRadar.getContext('2d'), {
+        type: 'radar',
+        data: {
+          labels: [
+            'Aforo Viario',
+            'Atractores (POIs)',
+            'Déficit Calzada',
+            'Cruising / Agitación',
+            'Facilidad Topográfica',
+            'Atracción Huff'
+          ],
+          datasets: [{
+            label: 'Índice de Presión (0-100)',
+            data: [75, 80, 85, 90, 70, 82],
+            backgroundColor: 'rgba(0, 75, 87, 0.20)',
+            borderColor: '#004B57',
+            pointBackgroundColor: '#10B981',
+            pointBorderColor: '#FFFFFF',
+            pointHoverBackgroundColor: '#FFFFFF',
+            pointHoverBorderColor: '#10B981',
+            borderWidth: 2,
+            pointRadius: 3.5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0D2730',
+              cornerRadius: 8,
+              padding: 8,
+              callbacks: {
+                label: (ctx) => `${ctx.label}: ${Math.round(ctx.raw)} / 100`
+              }
+            }
+          },
+          scales: {
+            r: {
+              angleLines: { color: '#E2E8F0' },
+              grid: { color: '#F1F5F9' },
+              suggestedMin: 15,
+              suggestedMax: 100,
+              ticks: { display: false },
+              pointLabels: {
+                font: { family: 'Inter', size: 9, weight: '600' },
+                color: '#475569'
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  updateRadarChart(p) {
+    if (!this.radarChart || !p) return;
+    const calc = p.calc || DemandEngine.calculate(p, this.sliders);
+
+    // Índices calibrados 0-100 para los 6 ejes multiaxiales
+    const grossFlow = calc.waterfall?.gross_flow || (p.capacity * 3.8) || 1000;
+    const aforoIdx = Math.max(15, Math.min(100, Math.round((grossFlow / 2200) * 100)));
+    const poisIdx = Math.max(20, Math.min(100, Math.round(((p.pois || 100) / 200) * 100)));
+    const deficitIdx = Math.max(15, Math.min(100, Math.round(((calc.waterfall?.surface_deficit_added || 35) / 120) * 100)));
+    const cruisingIdx = Math.max(20, Math.min(100, Math.round(((calc.cruising || 45) / 150) * 100)));
+    const topoEaseIdx = Math.max(20, Math.min(100, Math.round(100 - (p.slope || 1.4) * 20)));
+    const huffIdx = Math.max(20, Math.min(100, Math.round(((p.dl || 90) / 200) * 100)));
+
+    this.radarChart.data.datasets[0].data = [
+      aforoIdx,
+      poisIdx,
+      deficitIdx,
+      cruisingIdx,
+      topoEaseIdx,
+      huffIdx
+    ];
+    this.radarChart.update();
+  }
+
+  updateSimulationSlider(key, val) {
+    this.sliders[key] = val;
+    this.updateSimulationControlsDisplay();
+    this.recalcAllParkings();
+    this.savePersistedState();
+
+    const current = this.parkings.find(p => p.id === this.selectedAssetId) || this.parkings[0];
+    if (current && this.currentState === "B") {
+      this.updateWaterfall(current);
+      this.updateRadarChart(current);
+      const dlEl = document.getElementById("assetKpiDL");
+      if (dlEl) dlEl.innerText = current.dl || 0;
+    }
+  }
+
+  updateSimulationControlsDisplay() {
+    const elRain = document.getElementById("sliderRainVal");
+    const elSat = document.getElementById("sliderSatVal");
+    const elEvent = document.getElementById("sliderEventVal");
+    const elTariff = document.getElementById("sliderTariffVal");
+
+    if (elRain) elRain.innerText = `${(this.sliders.rain || 0).toFixed(1)} mm/h`;
+    if (elSat) elSat.innerText = `${Math.round(this.sliders.sat || 92)}%`;
+    if (elEvent) {
+      const eventNames = {
+        none: "Normal (Día Ordinario)",
+        concert: "Concierto Complex Olímpic (+60%)",
+        fcb: "Partido FC Barcelona (+55%)",
+        mwc: "Fira / Congreso (+45%)",
+        festivo: "Campaña Festiva (+35%)"
+      };
+      elEvent.innerText = eventNames[this.sliders.event] || "Personalizado";
+    }
+    if (elTariff) elTariff.innerText = `${(this.sliders.tariff || 3.75).toFixed(2)} €/h`;
+
+    const inpRain = document.getElementById("sliderRain");
+    const inpSat = document.getElementById("sliderSat");
+    const inpEvent = document.getElementById("sliderEvent");
+    const inpTariff = document.getElementById("sliderTariff");
+
+    if (inpRain && inpRain.value !== String(this.sliders.rain)) inpRain.value = this.sliders.rain;
+    if (inpSat && inpSat.value !== String(this.sliders.sat)) inpSat.value = this.sliders.sat;
+    if (inpEvent && inpEvent.value !== String(this.sliders.event)) inpEvent.value = this.sliders.event;
+    if (inpTariff && inpTariff.value !== String(this.sliders.tariff)) inpTariff.value = this.sliders.tariff;
+  }
+
+  resetSliders() {
+    const current = this.parkings.find(p => p.id === this.selectedAssetId);
+    this.sliders = {
+      rain: 0.0,
+      sat: 92,
+      event: "none",
+      tariff: current ? current.tariff : 3.75
+    };
+    this.updateSimulationControlsDisplay();
+    this.recalcAllParkings();
+    this.savePersistedState();
+
+    if (current && this.currentState === "B") {
+      this.updateWaterfall(current);
+      this.updateRadarChart(current);
+      const dlEl = document.getElementById("assetKpiDL");
+      if (dlEl) dlEl.innerText = current.dl || 0;
     }
   }
 
@@ -2574,22 +2867,31 @@ class NNApp {
       const isZipSignature = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04;
       const isOleSignature = bytes.length >= 4 && bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0;
 
-      if (isExcelExt || isZipSignature || isOleSignature) {
-        try {
-          const parsedParkings = await DemandEngine.parseExcelBuffer(buffer);
-          this.applyLoadedParkings(parsedParkings);
-          this.closeModal("uploadModal");
-        } catch (err) {
-          alert(`Error al leer el archivo Excel: ${err.message || err}`);
+      try {
+        let parsedParkings = [];
+        if (isExcelExt || isZipSignature || isOleSignature) {
+          if (typeof XLSX !== "undefined") {
+            const workbook = XLSX.read(bytes, { type: "array" });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "", raw: false });
+            parsedParkings = DemandEngine.parseRows(rows);
+          } else {
+            parsedParkings = await DemandEngine.parseExcelBuffer(buffer);
+          }
+        } else {
+          // Decodificar como texto UTF-8 (o Windows-1252 si proviene de Excel en español con acentos ANSI)
+          let text = new TextDecoder("utf-8").decode(buffer);
+          if (text.includes("\uFFFD")) {
+            text = new TextDecoder("windows-1252").decode(buffer);
+          }
+          parsedParkings = DemandEngine.parseInputText(text);
         }
-      } else {
-        // Decodificar como texto UTF-8 (o Windows-1252 si proviene de Excel en español con acentos ANSI)
-        let text = new TextDecoder("utf-8").decode(buffer);
-        if (text.includes("\uFFFD")) {
-          text = new TextDecoder("windows-1252").decode(buffer);
-        }
-        this.processUploadedText(text);
+
+        const merged = this.mergeWithKnownPortfolio(parsedParkings);
+        this.applyLoadedParkings(merged);
         this.closeModal("uploadModal");
+      } catch (err) {
+        alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -2603,8 +2905,9 @@ class NNApp {
   }
 
   processUploadedText(content) {
-    const newParkings = DemandEngine.parseInputText(content);
-    this.applyLoadedParkings(newParkings);
+    const rawParkings = DemandEngine.parseInputText(content);
+    const merged = this.mergeWithKnownPortfolio(rawParkings);
+    this.applyLoadedParkings(merged);
   }
 
   applyLoadedParkings(newParkings) {
@@ -2617,6 +2920,7 @@ class NNApp {
       this.renderTable();
       this.renderGlobalMapMarkers();
       this.updateGlobalKPIs();
+      this.savePersistedState();
       this.switchState("A");
     } else {
       alert("No se pudieron identificar aparcamientos válidos en el archivo. Verifica que incluya las columnas (Obra Anterior, Obra Actual, Nombre de la Obra, X, Y...).");

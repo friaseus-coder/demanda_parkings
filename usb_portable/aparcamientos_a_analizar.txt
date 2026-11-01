@@ -1,29 +1,39 @@
 # =============================================================================
 # APARCAMIENTOS A AUDITAR · UNIDAD USB PORTABLE
 # Identidad NN Parkings (Grup Núñez i Navarro, Barcelona)
+# 29 Aparcamientos Reales Auditados de Cartera
 # =============================================================================
-# Instrucciones:
-# Escribe aquí los aparcamientos que deseas auditar.
-# Puedes poner nombres simples, direcciones o líneas detalladas.
+# Formato soportado:
+# 1. Obra | Nombre | Dirección
+# 2. Nombre del aparcamiento o calle
 # =============================================================================
 
-NN Urgell 230
-NN Pg. de Gràcia / Diputació
-NN Francesc Macià
-NN València Aribau
-NN Rambla Catalunya 72
-NN Sarrià Major
-NN 22@ Pallars
-NN Rosselló Clínic
-NN Gran Via Rocafort
-NN Via Augusta Ganduxer
-NN Paral·lel Nou
-NN Sagrada Família / Marina
-Carrer d'Aragó 235
-Avinguda Diagonal 490
-Plaça de Lesseps 12
-Carrer de Balmes 182
-Gran de Gràcia 84
-Travessera de les Corts 112
-Plaça Catalunya / Bergara
-Via Laietana / Catedral
+51 | VALENCIA, 307 - 313 | VALENCIA, 307 08009 BARCELONA
+260 | VALENCIA,511 - PGE.VILARET,11-15 | VALENCIA,511  08013 BARCELONA
+304 | DIAGONAL, 593 - 595 | DIAGONAL, 593 - 595  08014 BARCELONA
+412 | HERCEGOVINA, 19 - 23 | HERCEGOVINA, 19 - 23 08006 BARCELONA
+424 | CISTER, 2- 18 -24% IND | CISTER, 2 08022 BARCELONA
+427 | BONANOVA, 59 - ESCOLES PIES | BONANOVA, 59  08017 BARCELONA
+566 | PK. GRAN VIA, 641 | Gran Via de les Corts Catalanes 641, 08010, Barcelona
+567 | PK. ARAGO, 182 | C/ Aragó 182, 08011, Barcelona
+626 | VIA AUGUSTA, 281 - 285 - DR. ROUX | VIA AUGUSTA, 281 - 285  08006 BARCELONA
+653 | PK.URGELL,234-CORCEGA,171 | C/ Urgell 234, 08036, Barcelona
+655 | PK. ROCAFORT, 64-SEPULVEDA, 61 | C/ Rocafort 64, 08015, Barcelona
+656 | PK.SANTALO, 14-16 | C/ Santaló 14, 08021, Barcelona
+657 | PK.VALENCIA,375-377 | C/ València 375, 08013, Barcelona
+667 | PK.BRUC, 103-113 | C/ Bruc 103, 08009, Barcelona
+670 | PK.VALENCIA, 243-245 (VALENCIA - 2) | C/ València 243, 08007, Barcelona
+674 | PK.URGELL, 154-156 (URGELL - 2) | C/ Urgell 154, 08036, Barcelona
+675 | PK.BORRELL, 26-28 | C/ Comte Borrell 26, 08015, Barcelona
+799 | ZONA FRANCA, 137-139 | Carrer A Zona Franca 137, 08040, Barcelona
+974 | PK.MORAGAS, 15 | C/ Moragas 15, 08022, Barcelona
+977 | PK.M.SENTMENAT, 6 | Marqués de Sentmenat 6, 08014 BARCELONA
+1202 | ESPRONCEDA, 254 - 274 | C/ Espronceda 254, 08018, Barcelona
+1335 | CORSEGA, 344 -352 (H) | C/ Còrsega 344, 08037, Barcelona
+1340 | VIA AUGUSTA,349-355 -AVION PLUS- MONSERDA | Via Augusta 349, 08017, Barcelona
+1424 | SANT GERVASI, 51-53 - AV.TIBIDABO | Pg. Sant Gervasi 51, 08022, Barcelona
+1460 | ESTEVE TERRADAS, 23-31 (UA4) | C/ Esteve Terradas 23, 08023, Barcelona
+2001 | ROSSELLO, 1 - 13 | C/ Rosselló 1, 08029, Barcelona
+2002 | TRAV. DE GRACIA, 183 - 185 | Travessera de Gràcia 183, 08012, Barcelona
+2003 | PK. TARRAGONA, 141-157 | C/ Tarragona 141, 08014, Barcelona
+2004 | PK. LLUIS PERICOT, 12 JOSEL, S.L. | C/ Lluís Pericot 12, 08017, Barcelona
