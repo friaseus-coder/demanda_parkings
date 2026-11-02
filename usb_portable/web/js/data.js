@@ -15,9 +15,34 @@ const PORTFOLIO_REFERENCE_CATALOG = [];
 // La aplicación inicia sin aparcamientos precargados (cartera vacía al inicio)
 const PARKINGS_PORTFOLIO = [];
 
-// Meses oficiales de los datasets de Aforamientos de Open Data Ajuntament de Barcelona (2025 vs. 2024)
-const MONTHS_LABELS = ['Ene 25', 'Feb 25', 'Mar 25', 'Abr 25', 'May 25', 'Jun 25', 'Jul 25', 'Ago 25', 'Sep 25', 'Oct 25', 'Nov 25', 'Dic 25'];
-const MONTHS_PREV_LABELS = ['Ene 24', 'Feb 24', 'Mar 24', 'Abr 24', 'May 24', 'Jun 24', 'Jul 24', 'Ago 24', 'Sep 24', 'Oct 24', 'Nov 24', 'Dic 24'];
+// Configuración temporal dinámica de años oficiales
+// Se autocalibra dinámicamente si Open Data Barcelona publica 2026 en el futuro
+let ACTIVE_DATA_YEARS = {
+  prev2Year: 2024,
+  prevYear: 2025,
+  estYear: 2026,
+  isEstYearReal: false
+};
+
+function buildTripleYearMonthLabels(yPrev2 = 2024, yPrev = 2025, yEst = 2026) {
+  const shortNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const sP2 = String(yPrev2).slice(-2);
+  const sP = String(yPrev).slice(-2);
+  const sE = String(yEst).slice(-2);
+
+  const prev2Labels = shortNames.map(m => `${m} ${sP2}`);
+  const prevLabels = shortNames.map(m => `${m} ${sP}`);
+  const estLabels = shortNames.map(m => `${m} ${sE}`);
+  const baseLabels = shortNames.map(m => `${m} ${sE}`);
+
+  return { prev2Labels, prevLabels, estLabels, baseLabels };
+}
+
+let _YEAR_LABELS = buildTripleYearMonthLabels(2024, 2025, 2026);
+let MONTHS_LABELS = _YEAR_LABELS.baseLabels;
+let MONTHS_PREV_LABELS = _YEAR_LABELS.prevLabels;
+let MONTHS_PREV2_LABELS = _YEAR_LABELS.prev2Labels;
+let MONTHS_EST_LABELS = _YEAR_LABELS.estLabels;
 const MONTHS_INDEXES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
 // Factores estacionales puestos a 0 cuando no existen lecturas reales de sensores
@@ -175,18 +200,22 @@ function enrichParkingWithPoints(p, index) {
 
   // Series mensuales de sensores viarios: estrictamente 0 salvo que el archivo Excel traiga lecturas reales
   const empty12Months = new Array(12).fill(0);
-  const tp1PrevMonthly = (isFromExcel && Array.isArray(p.tp1PrevMonthly) && p.tp1PrevMonthly.length === 12) ? p.tp1PrevMonthly : [...empty12Months];
-  const tp1CurMonthly  = (isFromExcel && Array.isArray(p.tp1CurMonthly) && p.tp1CurMonthly.length === 12) ? p.tp1CurMonthly : [...empty12Months];
-  const tp2PrevMonthly = (isFromExcel && Array.isArray(p.tp2PrevMonthly) && p.tp2PrevMonthly.length === 12) ? p.tp2PrevMonthly : [...empty12Months];
-  const tp2CurMonthly  = (isFromExcel && Array.isArray(p.tp2CurMonthly) && p.tp2CurMonthly.length === 12) ? p.tp2CurMonthly : [...empty12Months];
+  const tp1Prev2Monthly = (isFromExcel && Array.isArray(p.tp1Prev2Monthly) && p.tp1Prev2Monthly.length === 12) ? p.tp1Prev2Monthly : [...empty12Months];
+  const tp1PrevMonthly  = (isFromExcel && Array.isArray(p.tp1PrevMonthly) && p.tp1PrevMonthly.length === 12) ? p.tp1PrevMonthly : [...empty12Months];
+  const tp1CurMonthly   = (isFromExcel && Array.isArray(p.tp1CurMonthly) && p.tp1CurMonthly.length === 12) ? p.tp1CurMonthly : [...empty12Months];
+  const tp2Prev2Monthly = (isFromExcel && Array.isArray(p.tp2Prev2Monthly) && p.tp2Prev2Monthly.length === 12) ? p.tp2Prev2Monthly : [...empty12Months];
+  const tp2PrevMonthly  = (isFromExcel && Array.isArray(p.tp2PrevMonthly) && p.tp2PrevMonthly.length === 12) ? p.tp2PrevMonthly : [...empty12Months];
+  const tp2CurMonthly   = (isFromExcel && Array.isArray(p.tp2CurMonthly) && p.tp2CurMonthly.length === 12) ? p.tp2CurMonthly : [...empty12Months];
 
-  const tp1AnnualPrev = tp1PrevMonthly.reduce((a, b) => a + b, 0);
-  const tp1AnnualCur  = tp1CurMonthly.reduce((a, b) => a + b, 0);
-  const tp1Yoy        = tp1AnnualPrev > 0 ? +(((tp1AnnualCur - tp1AnnualPrev) / tp1AnnualPrev) * 100).toFixed(1) : 0;
+  const tp1AnnualPrev2 = tp1Prev2Monthly.reduce((a, b) => a + b, 0);
+  const tp1AnnualPrev  = tp1PrevMonthly.reduce((a, b) => a + b, 0);
+  const tp1AnnualCur   = tp1CurMonthly.reduce((a, b) => a + b, 0);
+  const tp1Yoy         = tp1AnnualPrev > 0 ? +(((tp1AnnualCur - tp1AnnualPrev) / tp1AnnualPrev) * 100).toFixed(1) : 0;
 
-  const tp2AnnualPrev = tp2PrevMonthly.reduce((a, b) => a + b, 0);
-  const tp2AnnualCur  = tp2CurMonthly.reduce((a, b) => a + b, 0);
-  const tp2Yoy        = tp2AnnualPrev > 0 ? +(((tp2AnnualCur - tp2AnnualPrev) / tp2AnnualPrev) * 100).toFixed(1) : 0;
+  const tp2AnnualPrev2 = tp2Prev2Monthly.reduce((a, b) => a + b, 0);
+  const tp2AnnualPrev  = tp2PrevMonthly.reduce((a, b) => a + b, 0);
+  const tp2AnnualCur   = tp2CurMonthly.reduce((a, b) => a + b, 0);
+  const tp2Yoy         = tp2AnnualPrev > 0 ? +(((tp2AnnualCur - tp2AnnualPrev) / tp2AnnualPrev) * 100).toFixed(1) : 0;
 
   // Si el archivo no trae sensores de aforo reales, los puntos de aforo se registran con lecturas a 0
   const trafficPoints = [
@@ -200,9 +229,11 @@ function enrichParkingWithPoints(p, index) {
       lanes: 0,
       direction: "Sin datos",
       speedLimit: 0,
+      annualCarsPrev2Year: tp1AnnualPrev2,
       annualCarsPrevYear: tp1AnnualPrev,
       annualCarsCurrentYear: tp1AnnualCur,
       yoyGrowthPct: tp1Yoy,
+      monthlyPrev2Year: tp1Prev2Monthly,
       monthlyPrevYear: tp1PrevMonthly,
       monthlyCurrentYear: tp1CurMonthly
     },
@@ -216,9 +247,11 @@ function enrichParkingWithPoints(p, index) {
       lanes: 0,
       direction: "Sin datos",
       speedLimit: 0,
+      annualCarsPrev2Year: tp2AnnualPrev2,
       annualCarsPrevYear: tp2AnnualPrev,
       annualCarsCurrentYear: tp2AnnualCur,
       yoyGrowthPct: tp2Yoy,
+      monthlyPrev2Year: tp2Prev2Monthly,
       monthlyPrevYear: tp2PrevMonthly,
       monthlyCurrentYear: tp2CurMonthly
     }
@@ -245,8 +278,9 @@ function enrichParkingWithPoints(p, index) {
     };
   }
 
-  const totalCurTraffic  = tp1AnnualCur + tp2AnnualCur;
-  const totalPrevTraffic = tp1AnnualPrev + tp2AnnualPrev;
+  const totalCurTraffic   = tp1AnnualCur + tp2AnnualCur;
+  const totalPrevTraffic  = tp1AnnualPrev + tp2AnnualPrev;
+  const totalPrev2Traffic = tp1AnnualPrev2 + tp2AnnualPrev2;
   const overallTrafficYoy = totalPrevTraffic > 0 ? +(((totalCurTraffic - totalPrevTraffic) / totalPrevTraffic) * 100).toFixed(1) : 0;
   const yoyTrafficUnits   = totalCurTraffic - totalPrevTraffic;
 
@@ -280,6 +314,7 @@ function enrichParkingWithPoints(p, index) {
     demandHistory,
     totalAnnualTrafficCurrentYear: totalCurTraffic,
     totalAnnualTrafficPrevYear: totalPrevTraffic,
+    totalAnnualTrafficPrev2Year: totalPrev2Traffic,
     trafficYoyGrowthPct: overallTrafficYoy,
     trafficYoyGrowthUnits: yoyTrafficUnits,
     zoneInflow,

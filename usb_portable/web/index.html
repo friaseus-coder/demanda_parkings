@@ -1,1759 +1,3534 @@
 <!DOCTYPE html>
+
 <html lang="es" class="h-full">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>NN Parkings · Latent Demand Pulse · Barcelona</title>
+
   <!-- Tailwind CSS CDN -->
+
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Google Fonts: Inter & JetBrains Mono -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- Lucide Icons -->
+
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <!-- Chart.js -->
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <!-- Leaflet CSS & JS for Real Maps -->
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <!-- SheetJS (xlsx) oficial para ingesta directa de Excel (.xlsx / .xls) y CSV en el cliente -->
+
   <!-- SheetJS (xlsx) con copia local garantizada para funcionamiento 100% offline y fallback a CDN -->
+
   <script src="js/vendor/xlsx.full.min.js"></script>
-  <script>
-    if (typeof XLSX === "undefined") {
-      document.write('<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"><\/script>');
-    }
-  </script>
 
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            nn: {
-              petrol: '#164250',
-              'petrol-hover': '#0F323D',
-              'petrol-dark': '#0D2730',
-              'petrol-headline': '#1A4B5B',
-              'ice-pill': '#E6EFF3',
-              'ice-border': '#C8DFE8',
-              canvas: '#F8FAFB',
-              card: '#FFFFFF',
-              border: '#DFEAF0',
-              emerald: '#10B981',
-              amber: '#D97706',
-              sky: '#0284C7',
-              orange: '#F97316',
-              red: '#DC2626',
-            }
-          }
-        }
-      }
+
+    if (typeof XLSX === "undefined") {
+
+      document.write('<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"><\/script>');
+
     }
+
   </script>
+
+
+
+  <script>
+
+    tailwind.config = {
+
+      theme: {
+
+        extend: {
+
+          fontFamily: {
+
+            sans: ['Inter', 'sans-serif'],
+
+            mono: ['JetBrains Mono', 'monospace'],
+
+          },
+
+          colors: {
+
+            nn: {
+
+              petrol: '#164250',
+
+              'petrol-hover': '#0F323D',
+
+              'petrol-dark': '#0D2730',
+
+              'petrol-headline': '#1A4B5B',
+
+              'ice-pill': '#E6EFF3',
+
+              'ice-border': '#C8DFE8',
+
+              canvas: '#F8FAFB',
+
+              card: '#FFFFFF',
+
+              border: '#DFEAF0',
+
+              emerald: '#10B981',
+
+              amber: '#D97706',
+
+              sky: '#0284C7',
+
+              orange: '#F97316',
+
+              red: '#DC2626',
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  </script>
+
   <style>
+
     body {
+
       font-family: 'Inter', sans-serif;
+
       background-color: #F8FAFB;
+
       color: #123742;
+
       -webkit-font-smoothing: antialiased;
+
     }
+
     .font-mono-num {
+
       font-family: 'JetBrains Mono', monospace;
+
       font-feature-settings: 'tnum' on, 'zero' on;
+
     }
+
     ::-webkit-scrollbar {
+
       width: 6px;
+
       height: 6px;
+
     }
+
     ::-webkit-scrollbar-track {
+
       background: #F1F5F7;
+
     }
+
     ::-webkit-scrollbar-thumb {
+
       background: #CBDCE3;
+
       border-radius: 4px;
+
     }
+
     ::-webkit-scrollbar-thumb:hover {
+
       background: #9FB8C4;
+
     }
+
     .pulsing-dot {
+
       animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
     }
+
     @keyframes pulse-ring {
+
       0%, 100% { opacity: 1; transform: scale(1); }
+
       50% { opacity: 0.4; transform: scale(1.25); }
+
     }
+
     .slider-thumb::-webkit-slider-thumb {
+
       appearance: none;
+
       height: 16px;
+
       width: 16px;
+
       border-radius: 9999px;
+
       background: #164250;
+
       cursor: pointer;
+
       border: 2px solid #FFFFFF;
+
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+
     }
+
     .leaflet-popup-content-wrapper {
+
       border-radius: 1rem;
+
       box-shadow: 0 12px 24px -4px rgba(22, 66, 80, 0.12);
+
       border: 1px solid #DFEAF0;
+
       padding: 4px;
+
     }
+
     .leaflet-popup-content {
+
       font-family: 'Inter', sans-serif;
+
       margin: 8px 12px;
+
       line-height: 1.4;
+
     }
+
     .hide-scrollbar::-webkit-scrollbar {
+
       display: none;
+
     }
+
     .hide-scrollbar {
+
       -ms-overflow-style: none;
+
       scrollbar-width: none;
+
     }
+
   </style>
+
 </head>
+
 <body class="h-full flex flex-col min-h-screen text-slate-800 antialiased selection:bg-[#E6EFF3] selection:text-[#164250]">
 
+
+
   <!-- =============================================================================
+
        HEADER PRINCIPAL CORPORATIVO
+
        ============================================================================= -->
+
   <header class="sticky top-0 z-50 bg-white border-b border-[#DFEAF0] shadow-[0_2px_8px_rgba(22,66,80,0.03)]">
+
     <div class="max-w-[1780px] mx-auto px-4 lg:px-7 h-16 flex items-center justify-between">
+
       
+
       <!-- Brand & Title -->
+
       <div class="flex items-center space-x-4">
+
         <a href="javascript:void(0)" onclick="app.switchState('A')" class="flex items-center space-x-3 group">
+
           <div class="w-10 h-10 rounded-full bg-[#0D2730] flex items-center justify-center text-white font-extrabold text-sm tracking-wider shadow-sm transition-transform group-hover:scale-105">
+
             NN
+
           </div>
+
           <div class="flex flex-col">
+
             <div class="flex items-center space-x-2">
+
               <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Grup Núñez i Navarro</span>
+
               <span class="text-xs text-[#164250] font-bold">_parkings</span>
+
             </div>
+
             <div class="flex items-center gap-2 flex-wrap">
+
               <h1 class="text-base font-bold text-[#1A4B5B] tracking-tight">
+
                 Latent Demand Pulse
+
               </h1>
+
               <button type="button" onclick="app.openModal('apiDiagnosticModal')" id="openDataHeaderBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8] transition-all cursor-pointer hover:bg-[#D5E6ED]" title="Abrir Panel de Control de APIs y Verificación de Datos">
+
                 <span id="openDataStatusDot" class="w-1.5 h-1.5 rounded-full bg-[#10B981] pulsing-dot"></span>
+
                 <span id="openDataStatusText">SISTEMA VIVO · BCN</span>
+
                 <span id="openDataLatency" class="font-mono text-[9px] text-[#0284C7] font-bold hidden sm:inline"></span>
+
               </button>
+
             </div>
+
           </div>
+
         </a>
+
       </div>
+
+
 
       <!-- Center Live System Status: Panel de Control de APIs y Monitor de Salud de Datos en el Encabezado -->
+
       <div class="hidden lg:flex items-center gap-2.5 text-xs">
+
         <!-- API 1: Open Data Barcelona -->
+
         <button type="button" onclick="app.openModal('apiDiagnosticModal')" id="centerOpenDataCard" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#F8FAFB] hover:bg-[#E6EFF3] border border-[#DFEAF0] text-slate-600 transition-all cursor-pointer" title="Estado en vivo de la API Open Data Ajuntament de Barcelona (Haz clic para ver diagnóstico)">
+
           <i data-lucide="database" class="w-3.5 h-3.5 text-[#164250]"></i>
+
           <span class="font-medium">Open Data BCN:</span>
+
           <span id="centerOpenDataStatus" class="font-mono-num font-bold text-[#10B981]">Conectado OK</span>
+
           <span id="centerOpenDataPing" class="font-mono text-[10px] text-slate-400 font-semibold"></span>
+
         </button>
+
+
 
         <!-- API 2: Open-Meteo Clima Barcelona -->
+
         <button type="button" onclick="app.openModal('apiDiagnosticModal')" id="centerMeteoCard" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#F8FAFB] hover:bg-[#E6EFF3] border border-[#DFEAF0] text-slate-600 transition-all cursor-pointer" title="Estado en vivo de la API Open-Meteo Barcelona (Haz clic para ver diagnóstico)">
+
           <i data-lucide="cloud-sun" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
           <span class="font-medium">API Clima:</span>
+
           <span id="centerMeteoStatus" class="font-mono-num font-bold text-[#10B981]">Conectado OK</span>
+
         </button>
+
+
 
         <!-- Monitor de Integridad de Sensores y Datos (Alerta si hay datos en 0) -->
+
         <button type="button" onclick="app.openModal('apiDiagnosticModal')" id="centerDataHealthCard" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200 text-slate-700 transition-all cursor-pointer" title="Monitor de Integridad: Verifica que ningún sensor ni gráfico tenga datos a 0">
+
           <span id="dataHealthDot" class="w-2 h-2 rounded-full bg-[#10B981] pulsing-dot"></span>
+
           <span class="font-medium">Sensores:</span>
+
           <span id="centerDataHealthStatus" class="font-mono-num font-bold text-emerald-700">Verificando...</span>
+
         </button>
+
+
 
         <!-- Botón de Reconexión y Diagnóstico de APIs en Encabezado -->
+
         <button id="btnReconnectOpenData" type="button" onclick="app.checkAllApisAndDataHealth(true)" class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#164250] text-[#164250] hover:text-white border border-[#C8DFE8] transition-all flex items-center gap-1.5 text-[11px] font-bold shadow-2xs cursor-pointer" title="Volver a comprobar las APIs en vivo y auditar que todos los sensores recopilen datos">
+
           <i data-lucide="refresh-cw" id="reconnectIcon" class="w-3.5 h-3.5"></i>
+
           <span>Reconectar / Auditar APIs</span>
+
         </button>
+
       </div>
+
+
 
       <!-- Right Header Actions: Ingesta directa de Excel/CSV y Restauración -->
+
       <div class="flex items-center gap-2 sm:gap-3">
+
         <!-- Input de archivo oculto para SheetJS -->
+
         <input type="file" id="directExcelFileInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="app.handleDirectFileUpload(event)">
 
+
+
         <!-- Botón Cargar Excel/CSV (con label nativo para activación garantizada al 100%) -->
+
         <label for="directExcelFileInput" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('directExcelFileInput').click()}" class="px-3.5 py-2 rounded-xl bg-[#004B57] hover:bg-[#0D2730] text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ring-1 ring-white/20 select-none" title="Cargar directamente un archivo Excel (.xlsx/.xls) o CSV">
+
           <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-300"></i>
+
           <span class="hidden sm:inline">Cargar Excel/CSV</span>
+
           <span class="sm:hidden">Excel</span>
+
         </label>
 
+
+
         <!-- Botón Limpiar Cartera / Restablecer -->
+
         <button onclick="app.restoreOriginalData()" class="px-3 py-2 rounded-xl bg-white hover:bg-[#E6EFF3] text-[#164250] border border-[#DFEAF0] font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer" title="Limpiar cartera y restablecer a 0 aparcamientos">
+
           <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-slate-500"></i>
+
           <span class="hidden md:inline">Limpiar Cartera (0)</span>
+
         </button>
+
+
 
         <!-- Botón Avanzado / Modal Trigger -->
+
         <button onclick="app.openModal('uploadModal')" class="p-2 rounded-xl bg-[#F0F5F8] hover:bg-[#E6EFF3] text-[#164250] border border-[#DFEAF0] text-xs font-medium transition-all flex items-center gap-1" title="Pegar texto manual o ver opciones avanzadas">
+
           <i data-lucide="upload" class="w-4 h-4 text-slate-500"></i>
+
         </button>
+
+
 
         <!-- Director Avatar -->
+
         <div class="flex items-center pl-2 border-l border-[#DFEAF0] gap-2">
+
           <div class="w-8 h-8 rounded-full bg-[#164250]/10 border border-[#C8DFE8] flex items-center justify-center text-[#164250] font-bold text-xs" title="Director de Aparcamientos">
+
             DIR
+
           </div>
+
         </div>
+
       </div>
+
     </div>
 
+
+
     <!-- =========================================================================
+
          BARRA DE NAVEGACIÓN POR PESTAÑAS (GLOBAL + INDIVIDUAL POR APARCAMIENTO)
+
          ========================================================================= -->
+
     <div class="bg-[#F8FAFB] border-t border-[#DFEAF0] px-4 lg:px-7 py-2.5">
+
       <div class="max-w-[1780px] mx-auto flex items-center justify-between gap-3">
+
         
+
         <!-- Pestaña Global (Torre de Control) -->
+
         <button id="tabGlobalBtn" onclick="app.switchState('A')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#164250] text-white shadow-sm flex items-center gap-2 shrink-0 ring-2 ring-[#10B981]">
+
           <i data-lucide="layout-grid" class="w-4 h-4"></i>
+
           <span>Visión Global (0 Aparcamientos)</span>
+
         </button>
 
+
+
         <!-- Pestaña ¿Cómo se calcula? (Metodología y Formulación) -->
+
         <button id="tabMethodologyBtn" onclick="app.switchState('C')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] border border-[#C8DFE8] flex items-center gap-2 shrink-0">
+
           <i data-lucide="calculator" class="w-4 h-4 text-[#0284C7]"></i>
+
           <span>¿Cómo se calcula? (Metodología)</span>
+
         </button>
+
+
 
         <div class="h-6 w-px bg-[#DFEAF0] shrink-0 hidden md:block"></div>
 
+
+
         <!-- Barra Deslizante de Pestañas Individuales de Aparcamientos -->
+
         <div class="relative flex items-center flex-1 min-w-0 overflow-hidden">
+
           <button onclick="app.scrollTabs(-1)" class="p-1 rounded-lg bg-white border border-[#DFEAF0] text-slate-500 hover:text-[#164250] hover:bg-slate-50 shrink-0 z-10 shadow-xs mr-1" title="Desplazar a la izquierda">
+
             <i data-lucide="chevron-left" class="w-4 h-4"></i>
+
           </button>
+
+
 
           <div id="parkingTabsContainer" class="flex items-center gap-2 overflow-x-auto hide-scrollbar scroll-smooth py-1 px-1 flex-1">
+
             <!-- Pestañas generadas dinámicamente por JavaScript -->
+
           </div>
+
+
 
           <button onclick="app.scrollTabs(1)" class="p-1 rounded-lg bg-white border border-[#DFEAF0] text-slate-500 hover:text-[#164250] hover:bg-slate-50 shrink-0 z-10 shadow-xs ml-1" title="Desplazar a la derecha">
+
             <i data-lucide="chevron-right" class="w-4 h-4"></i>
+
           </button>
+
         </div>
+
+
 
         <!-- Desplegable Rápido y Controles Siguiente/Anterior -->
+
         <div class="hidden lg:flex items-center gap-2 shrink-0">
+
           <select id="quickParkingSelect" onchange="app.selectParking(parseInt(this.value))" class="text-xs py-1.5 px-3 bg-white border border-[#DFEAF0] rounded-xl font-medium text-slate-700 focus:outline-none focus:border-[#164250] max-w-[240px]">
+
             <!-- Opciones generadas dinámicamente -->
+
           </select>
+
           <div class="flex items-center border border-[#DFEAF0] rounded-xl bg-white overflow-hidden shadow-xs">
+
             <button onclick="app.navigateParking(-1)" class="p-1.5 hover:bg-[#F0F5F8] text-slate-600 transition-colors" title="Aparcamiento anterior">
+
               <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+
             </button>
+
             <div class="w-px h-4 bg-[#DFEAF0]"></div>
+
             <button onclick="app.navigateParking(1)" class="p-1.5 hover:bg-[#F0F5F8] text-slate-600 transition-colors" title="Aparcamiento siguiente">
+
               <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+
             </button>
+
           </div>
+
         </div>
 
+
+
       </div>
+
     </div>
+
   </header>
 
+
+
   <!-- =============================================================================
+
        CONTENEDOR PRINCIPAL
+
        ============================================================================= -->
+
   <main class="flex-1 max-w-[1780px] w-full mx-auto p-4 lg:p-7 space-y-6">
 
+
+
     <!-- BANNER AUTOMÁTICO DE ALERTA DE SALUD DE DATOS Y APIS (Se activa solo si detecta datos a 0 o caída de API) -->
+
     <div id="dataHealthWarningBanner" class="hidden rounded-2xl p-4 bg-amber-50 border-2 border-amber-300 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+
       <div class="flex items-start gap-3">
+
         <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+
           <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+
         </div>
+
         <div>
+
           <h4 id="dataHealthBannerTitle" class="text-xs font-extrabold text-amber-950 uppercase tracking-wide">
+
             Aviso del Monitor de Telemetría y APIs
+
           </h4>
+
           <p id="dataHealthBannerDesc" class="text-xs text-amber-800 mt-0.5 leading-relaxed">
+
             Se han detectado sensores con lectura 0 o falta de sincronización en memoria local.
+
           </p>
+
         </div>
+
       </div>
+
       <div class="flex items-center gap-2 shrink-0">
+
         <button type="button" onclick="app.repairZeroDataAndResync()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+
           <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+
           <span>Reparar y Recalcular Datos Ahora</span>
+
         </button>
+
         <button type="button" onclick="app.openModal('apiDiagnosticModal')" class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 font-semibold text-xs transition-all cursor-pointer">
+
           Ver Diagnóstico
+
         </button>
+
       </div>
+
     </div>
 
+
+
     <!-- =========================================================================
+
          PESTAÑA GLOBAL: TORRE DE CONTROL (VISIÓN MACRO DE CARTERA)
+
          ========================================================================= -->
+
     <div id="stateAView" class="space-y-6 transition-opacity duration-200">
+
       
+
       <!-- Top Title & Subtitle for Portfolio -->
+
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+
         <div>
+
           <div class="flex items-center gap-2 text-xs font-semibold text-[#164250] uppercase tracking-wider mb-1">
+
             <span>Visión Macro Global</span>
+
             <span>•</span>
+
             <span id="portfolioCountSubtitle">0 Activos Cargados en Barcelona</span>
+
           </div>
+
           <h2 class="text-2xl font-extrabold text-[#1A4B5B] tracking-tight">
+
             Torre de Control · Red Metropolitana de Barcelona
+
           </h2>
+
           <p class="text-xs text-slate-500 mt-0.5">
+
             Detección de vehículos en rotación insatisfecha en calzada y análisis de fricción espacial en la red de parkings.
+
           </p>
+
         </div>
+
         <div class="flex items-center gap-3">
+
           <span class="text-xs text-slate-500">Haz clic en cualquier aparcamiento para abrir su</span>
+
           <span class="text-xs font-bold text-[#164250] bg-[#E6EFF3] px-3 py-1 rounded-lg border border-[#C8DFE8]">Pestaña Individual Dedicada</span>
+
         </div>
+
       </div>
+
+
 
       <!-- 3 Top Executive KPI Cards (Demanda Latente, Agitación en Calzada, Capacidad Física) -->
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
         <!-- KPI 1: Demanda Latente Cartera -->
+
         <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm relative group hover:border-[#164250]/30 transition-all">
+
           <div class="flex items-start justify-between">
+
             <div class="flex items-center gap-1.5">
+
               <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Demanda Latente Cartera</span>
+
               <span class="text-slate-400 hover:text-[#164250] cursor-help transition-colors" title="Demanda Latente Cartera: Volumen horario estimado de vehículos en calzada que tienen como destino el entorno de nuestros 30 aparcamientos y buscan estacionar, pero no logran acceder de inmediato debido a la saturación de superficie, visibilidad de accesos o fricción peatonal. Se calcula deduciendo el tráfico pasante estructural al aforo viario exterior y aplicando la cuota de captura gravitatoria de cada activo.">
+
                 <i data-lucide="info" class="w-3.5 h-3.5"></i>
+
               </span>
+
             </div>
+
             <div class="p-2 rounded-xl bg-emerald-50 text-[#10B981] border border-emerald-100">
+
               <i data-lucide="trending-up" class="w-4 h-4"></i>
+
             </div>
+
           </div>
+
           <div class="mt-3 flex items-baseline gap-2">
+
             <span id="kpiTotalLatent" class="text-3xl font-extrabold font-mono-num text-[#1A4B5B]">0</span>
+
             <span class="text-xs font-semibold text-slate-500">veh/h</span>
+
           </div>
+
           <div class="mt-2 text-[11px] text-slate-500 border-t border-slate-100 pt-2.5 flex justify-between">
+
             <span id="kpiLatentSubtitle">Pendiente de plazas en archivo</span>
+
             <span class="font-mono-num text-slate-400 font-semibold">—</span>
+
           </div>
+
         </div>
+
+
 
         <!-- KPI 2: Agitación en Calzada (Cruising) -->
+
         <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm relative group hover:border-amber-500/30 transition-all">
+
           <div class="flex items-start justify-between">
+
             <div class="flex items-center gap-1.5">
+
               <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Agitación en Calzada (Cruising)</span>
+
               <span class="text-slate-400 hover:text-[#D97706] cursor-help transition-colors" title="Agitación en Calzada (Cruising for Parking): Vehículos que circulan a baja velocidad buscando una plaza libre de aparcamiento en la vía pública (Àrea Blava / Verda). Se calcula mediante un modelo logístico basado en la pérdida de velocidad de circulación en el tramo, la tasa de saturación de plazas en calle (>85%) y la ocupación de zonas de carga y descarga DUM.">
+
                 <i data-lucide="info" class="w-3.5 h-3.5"></i>
+
               </span>
+
             </div>
+
             <div class="p-2 rounded-xl bg-amber-50 text-[#D97706] border border-amber-100">
+
               <i data-lucide="compass" class="w-4 h-4"></i>
+
             </div>
+
           </div>
+
           <div class="mt-3 flex items-baseline gap-2">
+
             <span id="kpiTotalCruising" class="text-3xl font-extrabold font-mono-num text-[#D97706]">0</span>
+
             <span class="text-xs font-semibold text-slate-500">vehículos</span>
+
           </div>
+
           <div class="mt-2 text-[11px] text-slate-500 border-t border-slate-100 pt-2.5 flex justify-between">
+
             <span id="kpiCruisingSubtitle">Sin telemetría de aforo en archivo</span>
+
             <span class="font-mono-num text-slate-400 font-semibold">—</span>
+
           </div>
+
         </div>
+
+
 
         <!-- KPI 3: Capacidad Física Total -->
+
         <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm relative group hover:border-[#164250]/30 transition-all">
+
           <div class="flex items-start justify-between">
+
             <div class="flex items-center gap-1.5">
+
               <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Capacidad Física Total</span>
+
               <span class="text-slate-400 hover:text-[#164250] cursor-help transition-colors" title="Capacidad Física Total: Suma de todas las plazas nominales y operativas disponibles en los aparcamientos de Núñez i Navarro en Barcelona. Representa el límite físico máximo de captación de la cartera y determina la fuerza de atracción gravitatoria (Modelo Huff) de cada parking frente a la competencia vecina.">
+
                 <i data-lucide="info" class="w-3.5 h-3.5"></i>
+
               </span>
+
             </div>
+
             <div class="p-2 rounded-xl bg-slate-50 text-[#164250] border border-slate-200">
+
               <i data-lucide="building-2" class="w-4 h-4"></i>
+
             </div>
+
           </div>
+
           <div class="mt-3 flex items-baseline gap-2">
+
             <span id="kpiTotalCapacity" class="text-3xl font-extrabold font-mono-num text-slate-800">0</span>
+
             <span class="text-xs font-semibold text-slate-500">plazas</span>
+
           </div>
+
           <div class="mt-2 text-[11px] text-slate-500 border-t border-slate-100 pt-2.5 flex justify-between">
+
             <span id="kpiCapSubtitle">No informada en archivo</span>
+
             <span id="portfolioCountKpi" class="font-mono-num text-slate-600 font-semibold">0 activos</span>
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <!-- Gráfico Agregado Mes a Mes de Demanda Latente de Toda la Cartera -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-[#DFEAF0]">
+
           <div>
+
             <div class="flex items-center gap-2">
+
               <span class="p-1.5 rounded-lg bg-[#E6EFF3] text-[#164250]">
+
                 <i data-lucide="line-chart" class="w-4 h-4"></i>
+
               </span>
+
               <h3 class="text-base font-extrabold text-[#1A4B5B]">
+
                 Tráfico Mensual Agregado de la Red de Sensores · <span id="chartPortfolioCountTitle">Toda la Cartera (0 Aparcamientos)</span>
+
               </h3>
+
             </div>
+
             <p class="text-xs text-slate-500 mt-1">
-              Coches por mes de la suma de todas las estaciones y sensores de aforo de los aparcamientos individuales (Año Actual vs. Año Anterior)
+
+              Coches por mes de la suma de todas las estaciones de aforo de la cartera (Comparativa Trianual: 2024 Real vs. 2025 Real vs. 2026 Estimado · Adaptación Dinámica Open Data BCN)
+
             </p>
+
           </div>
+
+
 
           <!-- Badges de Resumen Agregado -->
+
           <div class="flex items-center flex-wrap gap-2 text-xs">
+
             <div class="px-3 py-1.5 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex items-center gap-1.5 font-medium">
+
               <span class="text-slate-500">Pico Máximo Sensores:</span>
+
               <span class="font-bold text-[#10B981] font-mono-num" id="globalPeakBadge">Sin datos</span>
+
             </div>
+
             <div class="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[#10B981] font-bold flex items-center gap-1.5">
+
               <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+
               <span id="globalYoyBadge">Esperando carga de aparcamientos</span>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <!-- Canvas del Gráfico Agregado Mes a Mes -->
+
         <div class="relative w-full h-[290px]">
+
           <canvas id="chartGlobalMonthlyDL"></canvas>
+
         </div>
+
+
 
         <!-- Desglose Mensual: Crecimiento o Decrecimiento en Unidades y en % Cada Mes -->
+
         <div class="pt-2.5 pb-1 border-t border-slate-100 space-y-2">
+
           <div class="flex items-center justify-between text-xs">
+
             <span class="font-bold text-[#1A4B5B] flex items-center gap-1.5">
+
               <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
               Variación Interanual Mes a Mes (Unidades y %)
+
             </span>
-            <span class="text-[10px] text-slate-400 font-mono">Diferencia Neta: Año Actual (t) vs. Año Anterior (t-1)</span>
+
+            <span class="text-[10px] text-slate-400 font-mono">Comparativa Trianual: 2024 Real (t-2) | 2025 Real (t-1) | 2026 Estimado (t)</span>
+
           </div>
+
           <div id="globalMonthlyDiffGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2">
+
             <!-- Rellenado dinámicamente con los 12 meses -->
+
           </div>
+
         </div>
+
+
 
         <!-- Pie descriptivo con leyenda técnica -->
+
         <div class="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-slate-100 gap-2">
-          <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1.5 text-slate-700 font-medium">
-              <span class="w-3 h-1 bg-[#164250] rounded-full inline-block"></span> Suma de Sensores Año Actual (t)
+
+          <div class="flex items-center gap-3 flex-wrap">
+
+            <span class="flex items-center gap-1.5 text-slate-500 text-[10.5px]">
+
+              <span class="w-2.5 h-1 bg-slate-400 border-dashed border-t inline-block"></span> 2024 Real (t-2)
+
             </span>
-            <span class="flex items-center gap-1.5 text-slate-500">
-              <span class="w-3 h-1 bg-slate-400 border-dashed border-t inline-block"></span> Suma de Sensores Año Anterior (t-1)
+
+            <span class="flex items-center gap-1.5 text-emerald-700 font-medium text-[10.5px]">
+
+              <span class="w-2.5 h-1 bg-[#10B981] rounded-full inline-block"></span> 2025 Real (t-1)
+
             </span>
+
+            <span class="flex items-center gap-1.5 text-[#164250] font-bold text-[10.5px]">
+
+              <span class="w-2.5 h-1 bg-[#164250] rounded-full inline-block"></span> 2026 Estimado (t)
+
+            </span>
+
           </div>
+
           <div class="flex items-center gap-1 text-slate-500">
+
             <i data-lucide="info" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
             <span id="chartPortfolioCountFooter">Suma consolidada de sensores de aforo en Barcelona (12 meses móviles)</span>
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <!-- Mapa Global y Tabla de Cartera -->
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
         
+
         <!-- Mapa Leaflet Principal (7 cols) -->
+
         <div class="lg:col-span-7 bg-white rounded-3xl p-5 border border-[#DFEAF0] shadow-sm space-y-3">
+
           <div class="flex items-center justify-between">
+
             <div>
+
               <h3 class="text-sm font-bold text-[#1A4B5B]">Mapa Geoespacial de Demanda Latente</h3>
+
               <p class="text-[11px] text-slate-400">Distribución de activos NN y áreas de captación en Barcelona</p>
+
             </div>
+
             <div class="flex items-center gap-2">
+
               <span class="text-xs font-mono-num px-2.5 py-1 rounded-lg bg-[#E6EFF3] text-[#164250] font-semibold">
+
                 <span id="mapCount">0</span> Activos Visibles
+
               </span>
+
             </div>
+
           </div>
+
+
 
           <div class="relative w-full h-[540px] rounded-2xl overflow-hidden border border-[#DFEAF0]">
+
             <div id="leafletMap" class="w-full h-full z-10"></div>
+
           </div>
+
+
 
           <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+
             <div class="flex items-center gap-4">
+
               <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span> Alta Demanda Latente (&ge;90 v/h)</span>
+
               <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#D97706]"></span> Demanda Moderada (&lt;90 v/h)</span>
+
             </div>
+
             <span class="italic">Haz clic en un marcador para abrir su pestaña individual</span>
+
           </div>
+
         </div>
+
+
 
         <!-- Tabla / Ranking de Aparcamientos (5 cols) -->
+
         <div class="lg:col-span-5 bg-white rounded-3xl p-5 border border-[#DFEAF0] shadow-sm space-y-3 flex flex-col">
+
           <div class="flex items-center justify-between">
+
             <div>
+
               <h3 class="text-sm font-bold text-[#1A4B5B]">Ranking de Movimiento Viario por Aparcamiento</h3>
+
               <p class="text-[11px] text-slate-400">Variación y aforos vehiculares en la zona (sensores de calzada)</p>
+
             </div>
+
           </div>
+
+
 
           <!-- Selector de Ordenación (Ordenar por) -->
+
           <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar text-[11px] py-1 border-b border-slate-100 pb-2">
+
             <span class="text-slate-400 font-bold shrink-0 flex items-center gap-1">
+
               <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i> Ordenar:
+
             </span>
+
             <button onclick="app.setRankingSort('growth_pct')" data-sort="growth_pct" class="ranking-sort-pill px-2.5 py-1 rounded-xl text-xs font-semibold transition-all bg-[#164250] text-white shadow-xs shrink-0">
+
               ▲ % Crecimiento
+
             </button>
+
             <button onclick="app.setRankingSort('growth_units')" data-sort="growth_units" class="ranking-sort-pill px-2.5 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">
+
               Δ Variación (Coches)
+
             </button>
+
             <button onclick="app.setRankingSort('inflow')" data-sort="inflow" class="ranking-sort-pill px-2.5 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">
+
               Entran Zona
+
             </button>
+
             <button onclick="app.setRankingSort('outflow')" data-sort="outflow" class="ranking-sort-pill px-2.5 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">
+
               Salen Zona
+
             </button>
+
             <button onclick="app.setRankingSort('net_diff')" data-sort="net_diff" class="ranking-sort-pill px-2.5 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">
+
               Diferencia (Entran - Salen)
+
             </button>
+
           </div>
+
+
 
           <!-- Filtro de Distritos y Búsqueda -->
+
           <div class="space-y-2">
+
             <div class="relative">
+
               <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+
               <input type="text" oninput="app.handleSearch(this.value)" placeholder="Buscar por nombre, calle o distrito..." class="w-full pl-9 pr-3 py-2 bg-[#F8FAFB] border border-[#DFEAF0] rounded-xl text-xs focus:outline-none focus:border-[#164250]">
+
             </div>
+
+
 
             <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar py-1">
+
               <button onclick="app.setDistrictFilter('all')" data-district="all" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#164250] text-white shadow-xs shrink-0">Todos</button>
+
               <button onclick="app.setDistrictFilter('Eixample')" data-district="Eixample" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">Eixample</button>
+
               <button onclick="app.setDistrictFilter('Sarrià')" data-district="Sarrià" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">Sarrià</button>
+
               <button onclick="app.setDistrictFilter('Les Corts')" data-district="Les Corts" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">Les Corts</button>
+
               <button onclick="app.setDistrictFilter('Gràcia')" data-district="Gràcia" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">Gràcia</button>
+
               <button onclick="app.setDistrictFilter('Sants-Montjuïc')" data-district="Sants-Montjuïc" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">Sants-Montjuïc</button>
+
               <button onclick="app.setDistrictFilter('Ciutat Vella')" data-district="Ciutat Vella" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">Ciutat Vella</button>
+
               <button onclick="app.setDistrictFilter('Sant Martí')" data-district="Sant Martí" class="district-pill px-3 py-1 rounded-xl text-xs font-semibold transition-all bg-[#F0F5F8] text-[#164250] hover:bg-[#E6EFF3] shrink-0">Sant Martí</button>
+
             </div>
+
           </div>
+
+
 
           <!-- Filas del Ranking -->
+
           <div id="tableRowsContainer" class="flex-1 overflow-y-auto space-y-1.5 max-h-[460px] pr-1">
+
             <!-- Renderizado dinámicamente -->
+
           </div>
+
         </div>
+
+
 
       </div>
 
+
+
     </div>
 
+
+
     <!-- =========================================================================
+
          PESTAÑA INDIVIDUAL POR CADA APARCAMIENTO (ESTADO B)
+
          REDISEÑO QUIRÚRGICO COMPLETO
+
          ========================================================================= -->
+
     <div id="stateBView" class="hidden space-y-6 transition-opacity duration-200">
+
       
+
       <!-- 1. BARRA DE IDENTIDAD DEL APARCAMIENTO -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
         <div>
+
           <div class="flex items-center gap-2 mb-1.5">
+
             <button onclick="app.switchState('A')" class="px-2.5 py-1 rounded-lg bg-[#F0F5F8] hover:bg-[#E6EFF3] text-[#164250] font-semibold text-xs transition-colors flex items-center gap-1">
+
               <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+
               <span>Volver a Visión Global</span>
+
             </button>
+
             <span class="text-xs text-slate-400">•</span>
+
             <span id="detailRoadType" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+
               Arterial Primaria
+
             </span>
+
           </div>
+
+
 
           <h2 id="detailTitle" class="text-3xl font-black text-[#1A4B5B] tracking-tight">
+
             NN Aragó / Rbla. Catalunya
+
           </h2>
+
           <p id="detailAddress" class="text-xs text-slate-500 mt-1">
+
             Carrer d'Aragó, 235, 08007 Barcelona • Eixample
+
           </p>
+
         </div>
+
+
 
         <!-- Métricas Topográficas y de Entorno con Explicación Clara debajo de cada Dato (Figura 3) -->
+
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs shrink-0 lg:max-w-3xl">
+
           <!-- Tarjeta 1: Cota ICGC -->
+
           <div class="bg-[#F8FAFB] p-3.5 rounded-2xl border border-[#DFEAF0] flex flex-col justify-between">
+
             <div class="text-center">
+
               <span class="text-slate-500 block font-bold uppercase tracking-wider text-[10px]">Cota ICGC</span>
+
               <span id="detailElevation" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">0 m</span>
+
               <span class="text-[10px] font-semibold text-[#0284C7] block">sobre el nivel del mar</span>
+
             </div>
+
             <p id="detailElevationDesc" class="text-[10.5px] text-slate-600 mt-2.5 pt-2 border-t border-slate-200/80 leading-snug text-left">
+
               <strong>¿Qué significa?:</strong> Altitud sobre el nivel del mar (ICGC). <strong>Actualmente a 0 m</strong> porque este dato no figura en el Excel de coordenadas subido (0 datos inferidos).
+
             </p>
+
           </div>
+
+
 
           <!-- Tarjeta 2: Pendiente Media -->
+
           <div class="bg-[#F8FAFB] p-3.5 rounded-2xl border border-[#DFEAF0] flex flex-col justify-between">
+
             <div class="text-center">
+
               <span class="text-slate-500 block font-bold uppercase tracking-wider text-[10px]">Pendiente Media</span>
+
               <span id="detailSlope" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">0 %</span>
+
               <span id="detailSlopeTag" class="text-[10px] font-semibold text-slate-500 block">Sin datos en archivo (0%)</span>
+
             </div>
+
             <p id="detailSlopeDesc" class="text-[10.5px] text-slate-600 mt-2.5 pt-2 border-t border-slate-200/80 leading-snug text-left">
+
               <strong>¿Qué significa?:</strong> Inclinación de la calle (metros que sube por cada 100 m) para calcular el esfuerzo de caminar (Ley de Tobler). <strong>Puesto a 0 %</strong> por no venir en el Excel cargado.
+
             </p>
+
           </div>
+
+
 
           <!-- Tarjeta 3: Atractores (5m) -->
+
           <div class="bg-[#F8FAFB] p-3.5 rounded-2xl border border-[#DFEAF0] flex flex-col justify-between">
+
             <div class="text-center">
+
               <span class="text-slate-500 block font-bold uppercase tracking-wider text-[10px]">Atractores (5m)</span>
+
               <span id="detailPois" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">0</span>
+
               <span class="text-[10px] font-semibold text-[#164250] block">locales y centros (a 5 min)</span>
+
             </div>
+
             <p id="detailPoisDesc" class="text-[10.5px] text-slate-600 mt-2.5 pt-2 border-t border-slate-200/80 leading-snug text-left">
+
               <strong>¿Qué significa?:</strong> Comercios, oficinas, clínicas y restaurantes a menos de 5 min a pie (~300 m). <strong>Puesto a 0</strong> porque el Excel subido no incluye recuento de locales.
+
             </p>
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <!-- 2. CUATRO TARJETAS EJECUTIVAS INTERANUALES DEL APARCAMIENTO CON DESPLEGABLES EXPLICATIVOS Y FECHA -->
+
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
         
+
         <!-- KPI 1: Total Coches que Pasan (Aforos Exteriores) -->
+
         <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm space-y-2 flex flex-col justify-between">
+
           <div class="space-y-2">
+
             <div class="flex items-start justify-between">
+
               <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Tráfico Exterior (Coches que Pasan)</span>
+
               <div class="p-1.5 rounded-lg bg-sky-50 text-[#0284C7] border border-sky-200">
+
                 <i data-lucide="gauge" class="w-4 h-4"></i>
+
               </div>
+
             </div>
+
             <div class="flex items-baseline gap-2">
+
               <span id="kpiAnnualTrafficCurrent" class="text-2xl font-black font-mono-num text-[#1A4B5B]">0</span>
+
               <span class="text-xs font-semibold text-slate-500">veh/año</span>
+
             </div>
+
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+
               <span id="kpiTrafficGrowthBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#10B981] border border-emerald-200">
+
                 ▲ +0.0% Crecimiento
+
               </span>
+
               <span class="text-[11px] text-slate-400 font-mono-num" id="kpiAnnualTrafficPrev">0 veh</span>
+
             </div>
+
           </div>
 
+
+
           <!-- Desplegable Explicativo & Fecha de Actualización -->
+
           <div class="pt-2 border-t border-slate-100">
+
             <button type="button" onclick="app.toggleCardExplanation('explainKpi1')" class="w-full flex items-center justify-between text-[11px] font-semibold text-[#0284C7] hover:text-[#0369A1] transition-colors py-0.5 focus:outline-none">
+
               <span class="flex items-center gap-1">
+
                 <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+
                 ¿Cómo se calcula?
+
               </span>
+
               <i id="iconExplainKpi1" data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+
             </button>
+
             <div id="explainKpi1" class="hidden mt-2 p-2.5 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] text-[10.5px] text-slate-600 space-y-1.5 leading-relaxed">
+
               <div class="font-bold text-[#164250] flex items-center justify-between">
+
                 <span>Fuente & Formulación:</span>
+
                 <span class="text-[9.5px] px-1.5 py-0.2 rounded bg-sky-50 text-[#0284C7] font-mono border border-sky-200">Aforos Oficiales BCN</span>
+
               </div>
+
               <p>
+
                 Mide el caudal vehicular bruto que circula por la vía exterior adyacente. Se obtiene agregando los 12 meses móviles de lazos de inducción y estaciones de aforo del <em>Ajuntament de Barcelona</em> en el tramo viario.
+
               </p>
+
               <div class="pt-1 border-t border-slate-200 text-[9.5px] text-slate-400 font-mono flex items-center justify-between">
+
                 <span>Última actualización:</span>
+
                 <span id="kpi1UpdateDate" class="font-bold text-slate-600">31/10/2026 18:35</span>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <!-- KPI 2: Demanda Latente Neta -->
+
         <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm space-y-2 flex flex-col justify-between">
+
           <div class="space-y-2">
+
             <div class="flex items-start justify-between">
+
               <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Demanda Latente Neta</span>
+
               <div class="p-1.5 rounded-lg bg-emerald-50 text-[#10B981] border border-emerald-200">
+
                 <i data-lucide="trending-up" class="w-4 h-4"></i>
+
               </div>
+
             </div>
+
             <div class="flex items-baseline gap-2">
+
               <span id="assetKpiDL" class="text-2xl font-black font-mono-num text-[#10B981]">0</span>
+
               <span class="text-xs font-semibold text-slate-500">veh/h insatisfechos</span>
+
             </div>
+
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+
               <span id="kpiDemandGrowthBadge" class="text-[11px] font-semibold text-[#10B981]">
+
                 ▲ +0.0% interanual
+
               </span>
+
               <span class="text-[11px] text-slate-500 font-mono-num" id="kpiMonthlyDemand">0 veh/mes</span>
+
             </div>
+
           </div>
 
+
+
           <!-- Desplegable Explicativo & Fecha de Actualización -->
+
           <div class="pt-2 border-t border-slate-100">
+
             <button type="button" onclick="app.toggleCardExplanation('explainKpi2')" class="w-full flex items-center justify-between text-[11px] font-semibold text-[#10B981] hover:text-emerald-700 transition-colors py-0.5 focus:outline-none">
+
               <span class="flex items-center gap-1">
+
                 <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+
                 ¿Cómo se calcula?
+
               </span>
+
               <i id="iconExplainKpi2" data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+
             </button>
+
             <div id="explainKpi2" class="hidden mt-2 p-2.5 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] text-[10.5px] text-slate-600 space-y-1.5 leading-relaxed">
+
               <div class="font-bold text-[#164250] flex items-center justify-between">
+
                 <span>Modelo Matemático:</span>
+
                 <span class="text-[9.5px] px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 font-mono border border-emerald-200">Huff + Tobler + Cruising</span>
+
               </div>
+
               <p>
+
                 Calcula los conductores que buscan estacionamiento y no logran acceder de inmediato. Descuenta el tráfico pasante (<span class="font-mono">1 - &kappa;</span>) al aforo exterior, suma la agitación por saturación en calzada (<span class="font-mono">&gt;85%</span>), equipamientos de la zona y aplica la fricción peatonal de Tobler.
+
               </p>
+
               <div class="pt-1 border-t border-slate-200 text-[9.5px] text-slate-400 font-mono flex items-center justify-between">
+
                 <span>Última actualización:</span>
+
                 <span id="kpi2UpdateDate" class="font-bold text-slate-600">31/10/2026 18:35</span>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <!-- KPI 3: Puntos de Entrada Identificados -->
+
         <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm space-y-2 flex flex-col justify-between">
+
           <div class="space-y-2">
+
             <div class="flex items-start justify-between">
+
               <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Puntos de Entrada Identificados</span>
+
               <div class="p-1.5 rounded-lg bg-emerald-50 text-[#10B981] border border-emerald-200">
+
                 <i data-lucide="log-in" class="w-4 h-4"></i>
+
               </div>
+
             </div>
+
             <div class="flex items-baseline gap-2">
+
               <span id="kpiEntryCount" class="text-2xl font-black font-mono-num text-slate-800">—</span>
+
               <span class="text-xs font-semibold text-slate-500">accesos activos</span>
+
             </div>
+
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+
               <span class="text-slate-500">Inicio hace 1 año: <strong id="kpiEntryStart1Year" class="text-slate-700 font-mono-num">Sin datos</strong></span>
+
               <span class="text-slate-400 font-mono-num font-bold" id="kpiEntryCurrent">—</span>
+
             </div>
+
           </div>
 
+
+
           <!-- Desplegable Explicativo & Fecha de Actualización -->
+
           <div class="pt-2 border-t border-slate-100">
+
             <button type="button" onclick="app.toggleCardExplanation('explainKpi3')" class="w-full flex items-center justify-between text-[11px] font-semibold text-slate-600 hover:text-slate-900 transition-colors py-0.5 focus:outline-none">
+
               <span class="flex items-center gap-1">
+
                 <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+
                 ¿Cómo se calcula?
+
               </span>
+
               <i id="iconExplainKpi3" data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+
             </button>
+
             <div id="explainKpi3" class="hidden mt-2 p-2.5 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] text-[10.5px] text-slate-600 space-y-1.5 leading-relaxed">
+
               <div class="font-bold text-[#164250] flex items-center justify-between">
+
                 <span>Fuente de Telemetría:</span>
+
                 <span class="text-[9.5px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-mono border border-slate-200">Software Control Accesos</span>
+
               </div>
+
               <p>
+
                 Mide el conteo físico de lazos y barreras de entrada por cada rampa. Al no existir archivo de barreras en la carga actual, la casilla <strong>se mantiene en blanco / 0</strong> cumpliendo la regla de veracidad de datos reales.
+
               </p>
+
               <div class="pt-1 border-t border-slate-200 text-[9.5px] text-slate-400 font-mono flex items-center justify-between">
+
                 <span>Última actualización:</span>
+
                 <span id="kpi3UpdateDate" class="font-bold text-slate-600">31/10/2026 18:35</span>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <!-- KPI 4: Puntos de Salida & Evacuación -->
+
         <div class="bg-white rounded-2xl p-5 border border-[#DFEAF0] shadow-sm space-y-2 flex flex-col justify-between">
+
           <div class="space-y-2">
+
             <div class="flex items-start justify-between">
+
               <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Puntos de Salida & Rotación</span>
+
               <div class="p-1.5 rounded-lg bg-orange-50 text-[#F97316] border border-orange-200">
+
                 <i data-lucide="log-out" class="w-4 h-4"></i>
+
               </div>
+
             </div>
+
             <div class="flex items-baseline gap-2">
+
               <span id="kpiExitCount" class="text-2xl font-black font-mono-num text-slate-800">—</span>
+
               <span class="text-xs font-semibold text-slate-500">viales de egreso</span>
+
             </div>
+
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+
               <span class="text-slate-500">Salidas mes: <strong id="kpiExitMonthly" class="text-slate-700 font-mono-num">Sin datos</strong></span>
+
               <span class="text-slate-400 font-mono-num font-bold" id="kpiNetBalance">—</span>
+
             </div>
+
           </div>
+
+
 
           <!-- Desplegable Explicativo & Fecha de Actualización -->
+
           <div class="pt-2 border-t border-slate-100">
+
             <button type="button" onclick="app.toggleCardExplanation('explainKpi4')" class="w-full flex items-center justify-between text-[11px] font-semibold text-[#F97316] hover:text-orange-700 transition-colors py-0.5 focus:outline-none">
+
               <span class="flex items-center gap-1">
+
                 <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+
                 ¿Cómo se calcula?
+
               </span>
+
               <i id="iconExplainKpi4" data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+
             </button>
+
             <div id="explainKpi4" class="hidden mt-2 p-2.5 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] text-[10.5px] text-slate-600 space-y-1.5 leading-relaxed">
+
               <div class="font-bold text-[#164250] flex items-center justify-between">
+
                 <span>Fuente de Telemetría:</span>
+
                 <span class="text-[9.5px] px-1.5 py-0.2 rounded bg-orange-50 text-orange-800 font-mono border border-orange-200">Viales de Evacuación</span>
+
               </div>
+
               <p>
+
                 Registra la validación de tickets y lecturas de matrícula en viales de salida. Sin archivo de explotación cargado, <strong>se mantiene en blanco</strong> indicando la necesidad de telemetría de barrera para este cálculo.
+
               </p>
+
               <div class="pt-1 border-t border-slate-200 text-[9.5px] text-slate-400 font-mono flex items-center justify-between">
+
                 <span>Última actualización:</span>
+
                 <span id="kpi4UpdateDate" class="font-bold text-slate-600">31/10/2026 18:35</span>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
       </div>
 
+
+
       <!-- =======================================================================
+
            BLOQUE A: IDENTIFICACIÓN ESPACIAL DE PUNTOS DONDE PASAN COCHES,
+
            PUNTOS DE ENTRADA Y PUNTOS DE SALIDA
+
            ======================================================================= -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-5">
+
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+
           <div>
+
             <h3 class="text-base font-extrabold text-[#1A4B5B] flex items-center gap-2">
+
               <i data-lucide="map-pin" class="w-4 h-4 text-[#0284C7]"></i>
+
               Identificación de Puntos de Aforo Viario, Entradas y Salidas del Aparcamiento
+
             </h3>
+
             <p class="text-xs text-slate-400 mt-0.5">
+
               Georreferenciación exacta de sensores de tráfico en calzada, rampas de acceso vehicular y viales de evacuación.
+
             </p>
+
           </div>
+
           <div class="flex flex-wrap items-center gap-3 text-xs">
+
             <span class="flex items-center gap-1.5 font-medium"><span class="w-3 h-3 rounded-full bg-[#0284C7]"></span> Aforo Asignado</span>
+
             <span class="flex items-center gap-1.5 font-medium"><span class="w-3 h-3 rounded-full bg-[#7C3AED] ring-2 ring-purple-200"></span> Otros Sensores Cercanos</span>
+
             <span class="flex items-center gap-1.5 font-medium"><span class="w-3 h-3 rounded-full bg-[#10B981]"></span> Entradas Parking</span>
+
             <span class="flex items-center gap-1.5 font-medium"><span class="w-3 h-3 rounded-full bg-[#F97316]"></span> Salidas Parking</span>
+
           </div>
+
         </div>
+
+
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
           
+
           <!-- Micro-Mapa Quirúrgico de Leaflet (7 cols) -->
+
           <div class="lg:col-span-7 space-y-2">
+
             <div class="relative w-full h-[380px] rounded-2xl overflow-hidden border border-[#DFEAF0] shadow-inner">
+
               <div id="detailLeafletMap" class="w-full h-full z-10"></div>
+
             </div>
+
             <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+
               <span>Isocronas peatonales Tobler activas (3, 5 y 8 min a pie)</span>
+
               <label class="flex items-center gap-1.5 text-[11px] font-semibold text-purple-700 cursor-pointer select-none bg-purple-50 hover:bg-purple-100 px-2.5 py-0.5 rounded-lg border border-purple-200 transition-colors">
+
                 <input type="checkbox" id="toggleNearbySensorsCheck" checked onchange="window.app.toggleNearbySensors(this.checked)" class="rounded text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 cursor-pointer">
+
                 <span>Ver otros sensores cercanos de la red</span>
+
               </label>
+
             </div>
+
           </div>
+
+
 
           <!-- Fichas de los Puntos Identificados (5 cols) -->
+
           <div class="lg:col-span-5 space-y-4">
+
             
+
             <!-- Puntos de Tráfico de Paso Exterior -->
+
             <div class="space-y-2">
+
               <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+
                 <span class="flex items-center gap-1.5 text-[#0284C7]">
+
                   <i data-lucide="git-commit" class="w-3.5 h-3.5"></i>
+
                   Puntos donde pasan coches en la calle:
+
                 </span>
+
                 <span class="text-[10px] bg-sky-50 text-[#0284C7] px-2 py-0.5 rounded-full border border-sky-200">Aforos Oficiales</span>
+
               </div>
+
               <div id="trafficPointsList" class="space-y-2 max-h-[120px] overflow-y-auto pr-1">
+
                 <!-- Generado dinámicamente -->
+
               </div>
+
             </div>
+
+
 
             <!-- Puntos de Entrada -->
+
             <div class="space-y-2">
+
               <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+
                 <span class="flex items-center gap-1.5 text-[#10B981]">
+
                   <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+
                   Puntos de Entrada al Parking:
+
                 </span>
+
                 <span class="text-[10px] bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">Inicios hace 1 año</span>
+
               </div>
+
               <div id="entryPointsList" class="space-y-2 max-h-[120px] overflow-y-auto pr-1">
+
                 <!-- Generado dinámicamente -->
+
               </div>
+
             </div>
+
+
 
             <!-- Puntos de Salida -->
+
             <div class="space-y-2">
+
               <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+
                 <span class="flex items-center gap-1.5 text-[#F97316]">
+
                   <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+
                   Puntos de Salida del Parking:
+
                 </span>
+
                 <span class="text-[10px] bg-orange-50 text-orange-800 px-2 py-0.5 rounded-full border border-orange-200">Evacuación y Viales</span>
+
               </div>
+
               <div id="exitPointsList" class="space-y-2 max-h-[120px] overflow-y-auto pr-1">
+
                 <!-- Generado dinámicamente -->
+
               </div>
+
             </div>
+
+
 
             <!-- Otros Sensores Detectados en el Entorno Viario -->
+
             <div class="space-y-2 pt-2 border-t border-slate-100">
+
               <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+
                 <span class="flex items-center gap-1.5 text-purple-700">
+
                   <i data-lucide="radio" class="w-3.5 h-3.5"></i>
+
                   Otros Sensores Cercanos en la Red:
+
                 </span>
+
                 <span id="nearbySensorsBadgeCount" class="text-[10px] bg-purple-50 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-200">0 detectados</span>
+
               </div>
+
               <div id="nearbySensorsList" class="space-y-2 max-h-[130px] overflow-y-auto pr-1">
+
                 <!-- Generado dinámicamente -->
+
               </div>
+
             </div>
+
+
 
           </div>
 
+
+
         </div>
+
       </div>
 
+
+
       <!-- =======================================================================
+
            BLOQUE B: LOS DOS GRÁFICOS ESPECIALIZADOS
+
            1. Total de coches que pasan en el año anterior (si creció o decreció)
+
            2. Balance de accesos: Entradas vs. Salidas y Diferencia Neta (12 Meses)
+
            ======================================================================= -->
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
+
+
         <!-- GRÁFICO 1: TOTAL DE COCHES QUE PASAN · COMPARATIVA INTERANUAL -->
+
         <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+
             <div>
+
               <div class="flex items-center gap-2">
+
                 <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-[#0284C7] font-mono">GRÁFICO 1</span>
+
                 <h3 class="text-sm font-extrabold text-[#1A4B5B]">Total de Coches que Pasan · Comparativa Interanual</h3>
+
               </div>
+
               <p class="text-[11px] text-slate-400 mt-0.5">
-                ¿El tráfico pasante exterior ha crecido o decrecido en el último año respecto al año anterior?
+
+                Comparativa Trianual de Tráfico de Paso: 2024 Real vs. 2025 Real vs. 2026 Estimado (Fórmula Visible y Auditable)
+
               </p>
+
             </div>
+
             <div id="trafficStatusBadge" class="self-start sm:self-auto">
+
               <!-- Badge dinámico de Crecimiento / Decrecimiento -->
+
             </div>
+
           </div>
+
+
 
           <!-- Selector de Escala y Unidad de Visualización: Promedio Día (IMD), Promedio Hora, Total Mes -->
+
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs py-1 px-3 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0]">
+
             <span class="text-slate-600 font-semibold flex items-center gap-1.5 text-[11px]">
+
               <i data-lucide="layers" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
               <span>Unidad del Aforo Viario:</span>
+
             </span>
+
             <div class="flex items-center gap-1 bg-white p-0.5 rounded-xl border border-[#DFEAF0] shadow-2xs">
+
               <button type="button" onclick="app.setChart1Unit('day')" id="btnUnitDay" data-unit="day" class="chart1-unit-btn px-2.5 py-1 rounded-lg font-bold text-[10.5px] bg-[#164250] text-white shadow-xs transition-all">
+
                 Promedio Día (veh/día · IMD)
+
               </button>
+
               <button type="button" onclick="app.setChart1Unit('hour')" id="btnUnitHour" data-unit="hour" class="chart1-unit-btn px-2.5 py-1 rounded-lg font-medium text-[10.5px] text-slate-600 hover:text-slate-900 transition-all">
+
                 Promedio Hora (veh/h)
+
               </button>
+
               <button type="button" onclick="app.setChart1Unit('month')" id="btnUnitMonth" data-unit="month" class="chart1-unit-btn px-2.5 py-1 rounded-lg font-medium text-[10.5px] text-slate-600 hover:text-slate-900 transition-all">
+
                 Total Mes (veh/mes)
+
               </button>
+
             </div>
+
           </div>
+
+
 
           <!-- Pestañas de Días de la Semana (Visible exclusivamente en modo Promedio Hora) -->
+
           <div id="chart1DayTabsContainer" class="hidden p-3 rounded-2xl bg-[#F0F6F8] border border-[#CDE0E8] space-y-2.5 transition-all">
+
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+
               <div class="flex items-center gap-1.5 text-xs text-[#164250] font-bold">
+
                 <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
                 <span>Pestañas de Días de la Semana:</span>
+
                 <span id="chart1SelectedDaysLabel" class="text-[11px] font-semibold text-[#0284C7] bg-white px-2 py-0.5 rounded-md border border-[#CDE0E8]">
+
                   Toda la Semana (7 días)
+
                 </span>
+
               </div>
+
               <div class="flex items-center gap-1 text-[10.5px]">
+
                 <button type="button" onclick="app.setChart1DaysPreset('all')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-[#E6EFF3] text-[#164250] font-bold border border-[#CDE0E8] shadow-2xs transition-all cursor-pointer">
+
                   Toda la Semana
+
                 </button>
+
                 <button type="button" onclick="app.setChart1DaysPreset('weekdays')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-[#E6EFF3] text-[#164250] font-bold border border-[#CDE0E8] shadow-2xs transition-all cursor-pointer">
+
                   L-V (Laborables)
+
                 </button>
+
                 <button type="button" onclick="app.setChart1DaysPreset('weekend')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-[#E6EFF3] text-[#164250] font-bold border border-[#CDE0E8] shadow-2xs transition-all cursor-pointer">
+
                   S-D (Fin de Semana)
+
                 </button>
+
               </div>
+
             </div>
+
+
 
             <!-- Botones interactivos de Lunes a Domingo (Selección Múltiple) -->
+
             <div id="chart1DayButtons" class="flex flex-wrap items-center gap-1.5">
+
               <!-- Renderizado dinámicamente con app.renderChart1DayButtons() -->
+
             </div>
+
             
+
             <p class="text-[10.5px] text-slate-500 leading-tight">
+
               Selecciona 1, 2 o los días que desees. La curva horaria de 24 horas y la tabla inferior mostrarán el aforo acumulado/promediado hora a hora para los días activos, comparado contra el mismo periodo del año anterior.
+
             </p>
+
           </div>
 
+
+
           <div class="h-72 w-full">
+
             <canvas id="chartTrafficPassing"></canvas>
+
           </div>
+
+
 
           <!-- Desglose: Crecimiento o Decrecimiento en Unidades y en % (Meses o 24 Horas) -->
+
           <div class="pt-2.5 pb-1 border-t border-slate-100 space-y-2">
+
             <div class="flex items-center justify-between text-xs">
+
               <span class="font-bold text-[#1A4B5B] flex items-center gap-1.5">
+
                 <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
                 <span id="chart1GridTitle">Variación Interanual Mes a Mes (Unidades y %)</span>
+
               </span>
+
               <span id="chart1GridSubtitle" class="text-[10px] text-slate-400 font-mono">Año Actual (t) vs. Año Anterior (t-1)</span>
+
             </div>
+
             <div id="chart1MonthlyDiffGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5">
+
               <!-- Rellenado dinámicamente con los 12 meses o las 24 horas -->
+
             </div>
+
           </div>
 
-          <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] text-xs space-y-1">
-            <div class="font-bold text-slate-700">Diagnóstico del Flujo Viario Circundante:</div>
-            <p id="trafficStatusExplanation" class="text-slate-600 leading-relaxed">
-              Calculando evolución interanual...
-            </p>
+
+
+          <!-- PANEL DE FÓRMULA TRANSPARENTE, AUDITABLE Y VISIBLE -->
+
+          <div id="chart1FormulaContainer" class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs space-y-2">
+
+            <!-- Rellenado dinámicamente con app.renderChart1FormulaCard(p) -->
+
           </div>
+
+
+
+          <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] text-xs space-y-1">
+
+            <div class="font-bold text-slate-700">Diagnóstico del Flujo Viario Circundante:</div>
+
+            <p id="trafficStatusExplanation" class="text-slate-600 leading-relaxed">
+
+              Calculando evolución interanual...
+
+            </p>
+
+          </div>
+
+
 
           <!-- UBICACIÓN EXACTA DE LOS SENSORES DE AFORO REVISADOS -->
+
           <div class="p-3.5 rounded-2xl bg-[#F0F7FB] border border-[#BAE6FD] text-xs space-y-2.5">
+
             <div class="flex items-center justify-between">
+
               <div class="flex items-center gap-1.5 font-bold text-[#0369A1]">
+
                 <i data-lucide="radio" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
                 <span>Ubicación de Estaciones y Sensores de Aforo Viario:</span>
+
               </div>
+
               <span class="text-[10px] font-semibold bg-white text-[#0284C7] px-2 py-0.5 rounded-full border border-[#BAE6FD] shadow-xs">
+
                 Red Ajuntament de Barcelona
+
               </span>
+
             </div>
+
             <p class="text-[11px] text-slate-600 leading-relaxed">
+
               Puntos exactos y espiras electromagnéticas en calzada que alimentan esta serie temporal:
+
             </p>
+
             <div id="chart1SensorsContainer" class="space-y-2">
+
               <!-- Renderizado dinámicamente con los sensores del parking actual -->
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <!-- GRÁFICO 2: BALANCE DE ACCESOS · ENTRADAS VS. SALIDAS Y DIFERENCIA NETA -->
+
         <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#DFEAF0]">
+
             <div>
+
               <div class="flex items-center gap-2">
+
                 <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono">GRÁFICO 2</span>
+
                 <h3 class="text-sm font-extrabold text-[#1A4B5B]">Balance de Accesos · Entradas vs. Salidas y Diferencia Neta</h3>
+
               </div>
+
               <p class="text-[11px] text-slate-400 mt-0.5">
+
                 Evolución de entradas, salidas y diferencia neta mensual (Entradas - Salidas) desde hace 1 año.
+
               </p>
+
             </div>
+
             <div id="balanceStatusBadge" class="self-start sm:self-auto">
+
               <!-- Badge dinámico de Balance de Rotación -->
+
             </div>
+
           </div>
+
+
 
           <div class="h-72 w-full">
+
             <canvas id="chartInOutBalance"></canvas>
+
           </div>
+
+
 
           <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] text-xs space-y-1">
+
             <div class="font-bold text-slate-700">Diagnóstico de Renovación y Balance de Plazas:</div>
+
             <p id="balanceStatusExplanation" class="text-slate-600 leading-relaxed">
+
               Calculando balance y flujo diferencial mensual...
+
             </p>
+
           </div>
+
+
 
           <!-- AGENDA DE GRANDES EVENTOS A 7 DÍAS VISTA (IMPACTO VIAL EN EL APARCAMIENTO) -->
+
           <div class="p-4 rounded-2xl bg-[#F0F7FB] border border-[#BAE6FD] space-y-3">
+
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#BAE6FD]/60">
+
               <div>
+
                 <div class="flex items-center gap-1.5 font-bold text-xs text-[#0369A1]">
+
                   <i data-lucide="ticket" class="w-4 h-4 text-[#0284C7]"></i>
+
                   <span>Grandes Eventos en Barcelona (Próximos 7 Días)</span>
+
                 </div>
+
                 <p class="text-[10.5px] text-slate-600 mt-0.5">
+
                   Complex Olímpic, FC Barcelona y macroeventos ordenados de más crítico a menos crítico según proximidad.
+
                 </p>
+
               </div>
+
               <span id="eventsActiveDistrictBadge" class="text-[10px] font-bold bg-white text-[#0284C7] px-2.5 py-0.5 rounded-full border border-[#BAE6FD] shadow-xs self-start sm:self-auto flex items-center gap-1">
+
                 <i data-lucide="radar" class="w-3 h-3 text-[#0284C7]"></i>
+
                 <span id="eventsBadgeDistText">Impacto por distancia</span>
+
               </span>
+
             </div>
+
+
 
             <!-- Filtros de Categoría de Eventos -->
+
             <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar text-[11px] py-0.5">
+
               <button type="button" onclick="app.setEventFilter('all')" data-event-filter="all" class="event-filter-pill px-2.5 py-1 rounded-xl font-bold bg-[#164250] text-white shadow-2xs transition-all shrink-0">
+
                 Todos los Eventos
+
               </button>
+
               <button type="button" onclick="app.setEventFilter('olimpic')" data-event-filter="olimpic" class="event-filter-pill px-2.5 py-1 rounded-xl font-medium bg-white text-[#164250] hover:bg-[#E6EFF3] border border-[#DFEAF0] transition-all shrink-0">
+
                 Complex Olímpic
+
               </button>
+
               <button type="button" onclick="app.setEventFilter('fcb')" data-event-filter="fcb" class="event-filter-pill px-2.5 py-1 rounded-xl font-medium bg-white text-[#164250] hover:bg-[#E6EFF3] border border-[#DFEAF0] transition-all shrink-0">
+
                 FC Barcelona
+
               </button>
+
               <button type="button" onclick="app.setEventFilter('fira')" data-event-filter="fira" class="event-filter-pill px-2.5 py-1 rounded-xl font-medium bg-white text-[#164250] hover:bg-[#E6EFF3] border border-[#DFEAF0] transition-all shrink-0">
+
                 Fira / Festivales
+
               </button>
+
             </div>
+
+
 
             <!-- Lista de Tarjetas de Eventos a 7 Días -->
+
             <div id="events7DaysContainer" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+
               <!-- Renderizado dinámicamente con cálculo de impacto según distancia -->
+
             </div>
+
           </div>
+
         </div>
+
+
 
       </div>
 
+
+
       <!-- =======================================================================
+
            BLOQUE C: CASCADA WATERFALL, SIMULADOR Y YIELD MANAGEMENT
+
            ======================================================================= -->
+
       <!-- =======================================================================
+
            BLOQUE C: PROYECCIÓN DE TRÁFICO EN LA ZONA (PRÓXIMOS 7 DÍAS)
+
            CON PROGRESIÓN LINEAL Y DESGLOSE INTRADIARIO 24H (CUÁNDO PASAN MÁS Y MENOS)
+
            ======================================================================= -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-6">
+
         
+
         <!-- Cabecera de la Proyección de Tráfico de la Zona -->
+
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#DFEAF0]">
+
           <div>
+
             <div class="flex items-center gap-2">
+
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-[#0284C7] border border-sky-200 uppercase tracking-wide">
+
                 Tráfico de la Zona
+
               </span>
+
               <h3 class="text-base font-extrabold text-[#1A4B5B] flex items-center gap-2">
+
                 <i data-lucide="calendar-days" class="w-4 h-4 text-[#0284C7]"></i>
+
                 Tráfico de la Zona Día a Día (Próximos 7 Días)
+
               </h3>
+
             </div>
+
             <p class="text-xs text-slate-500 mt-1">
+
               Caudal diario de coches pasantes en la calzada día a día, según la pauta semanal (laborales vs. fin de semana) y meteorología en tiempo real.
+
             </p>
+
           </div>
+
           <div id="zoneTrafficTrendBadge" class="self-start sm:self-auto">
+
             <!-- Badge dinámico de tendencia viaria semanal -->
+
           </div>
+
         </div>
+
+
 
         <!-- Gráfico de los 7 Días: Tráfico Real Día a Día de la Zona -->
+
         <div class="space-y-1">
+
           <div class="flex items-center justify-between text-xs font-semibold text-slate-700 px-1">
+
             <span>Coches que pasarán por la zona (Previsión Día a Día)</span>
+
             <span class="text-[11px] text-slate-400 font-mono" id="zoneAvgDailyTraffic">Calculando flujo...</span>
+
           </div>
+
           <div class="h-64 w-full">
+
             <canvas id="chartZoneSevenDaysTraffic"></canvas>
+
           </div>
+
         </div>
+
+
 
         <!-- Tarjetas de los 7 Días para Seleccionar y Desplegar el Movimiento Intradiario -->
+
         <div class="space-y-2">
+
           <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+
             <span class="flex items-center gap-1.5 text-[#164250]">
+
               <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+
               Haz clic en cualquier día para desplegar cómo se mueven los coches hora a hora:
+
             </span>
+
             <span class="text-[10px] text-slate-400 font-mono">Desglose de 24 horas</span>
+
           </div>
+
+
 
           <div id="zoneSevenDaysCardsContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
+
             <!-- Renderizado dinámicamente con las 7 tarjetas clicables -->
+
           </div>
+
         </div>
+
+
 
         <!-- Panel Desplegable: Cómo se Mueven los Coches en el Mismo Día (Cuándo Pasan Más y Cuándo Pasan Menos) -->
+
         <div id="intradayTrafficPanel" class="p-5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] space-y-4">
+
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+
             <div>
+
               <div class="flex items-center gap-2">
+
                 <span class="w-2.5 h-2.5 rounded-full bg-[#0284C7]"></span>
+
                 <h4 class="text-xs font-bold text-[#1A4B5B] uppercase tracking-wider">
+
                   Movimiento de Coches en el Mismo Día · <span id="intradaySelectedDayLabel" class="text-[#0284C7] font-extrabold">--</span>
+
                 </h4>
+
               </div>
+
               <p class="text-[11px] text-slate-500 mt-0.5">
+
                 Caudal horario de paso por la calzada. Identificación de horas con mayor y menor afluencia vehicular.
+
               </p>
+
             </div>
+
             <!-- Indicadores de Pico y Valle -->
+
             <div class="flex items-center flex-wrap gap-2 text-xs">
+
               <div class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
+
                 <span class="text-slate-400 block text-[9px] uppercase font-bold">Total del Día:</span>
+
                 <span id="intradayTotalCars" class="font-bold font-mono text-slate-800">-- veh</span>
+
               </div>
+
               <div class="px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 shadow-2xs">
+
                 <span class="text-rose-500 block text-[9px] uppercase font-bold">Pasan Más Coches (Pico):</span>
+
                 <span id="intradayPeakHour" class="font-bold font-mono">--</span>
+
               </div>
+
               <div class="px-3 py-1.5 rounded-xl bg-sky-50 border border-sky-200 text-[#0369A1] shadow-2xs">
+
                 <span class="text-sky-500 block text-[9px] uppercase font-bold">Pasan Menos Coches (Valle):</span>
+
                 <span id="intradayValleyHour" class="font-bold font-mono">--</span>
+
               </div>
+
             </div>
+
           </div>
+
+
 
           <!-- Gráfico de Perfil Horario 24h -->
+
           <div class="h-60 w-full">
+
             <canvas id="chartIntradayTraffic"></canvas>
+
           </div>
+
         </div>
 
+
+
       </div>
+
+
 
 <!-- =======================================================================
+
            BLOQUE D: EMBUDO DE DESACOPLAMIENTO (WATERFALL) - UBICADO DEBAJO
+
            ======================================================================= -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+
         <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+
           <div>
+
             <h3 class="text-sm font-extrabold text-[#1A4B5B]">Embudo de Desacoplamiento (Waterfall)</h3>
+
             <p class="text-[11px] text-slate-400">Deducción de tráfico pasante y agregación de agitación (cruising)</p>
+
           </div>
+
           <span class="text-xs font-mono-num font-bold text-[#10B981]">
+
             DL Neta = <span id="waterfallDL">118 veh/h</span>
+
           </span>
+
         </div>
+
+
 
         <!-- Pasos del Embudo Waterfall -->
+
         <div class="space-y-3 text-xs">
+
           <div>
+
             <div class="flex justify-between text-slate-600 mb-1">
+
               <span>1. Aforo Viario Bruto Inmediato</span>
+
               <span id="wfStep1Val" class="font-mono-num font-bold text-slate-800">1.420 veh/h (100%)</span>
+
             </div>
+
             <div class="w-full bg-slate-100 rounded-full h-2.5">
+
               <div class="bg-slate-400 h-2.5 rounded-full" style="width: 100%;"></div>
+
             </div>
+
           </div>
 
+
+
           <div>
+
             <div class="flex justify-between text-slate-500 mb-1">
+
               <span>2. Deducción Tráfico Pasante (<span id="wfKappa">63%</span> deducido)</span>
+
               <span id="wfStep2Val" class="font-mono-num font-semibold text-slate-400">-895 veh/h</span>
+
             </div>
+
             <div class="w-full bg-slate-100 rounded-full h-2.5">
+
               <div id="wfStep2Bar" class="bg-slate-300 h-2.5 rounded-full" style="width: 63%;"></div>
+
             </div>
+
           </div>
 
+
+
           <div>
+
             <div class="flex justify-between text-slate-600 mb-1">
+
               <span>3. Destino Local + Agitación (Cruising) + Déficit Calzada</span>
+
               <span id="wfStep3Val" class="font-mono-num font-semibold text-[#D97706]">+142 veh/h</span>
+
             </div>
+
             <div class="w-full bg-slate-100 rounded-full h-2.5">
+
               <div class="bg-[#D97706] h-2.5 rounded-full" style="width: 42%;"></div>
+
             </div>
+
           </div>
 
+
+
           <div>
+
             <div class="flex justify-between text-[#10B981] font-semibold mb-1">
+
               <span>4. Demanda Latente Neta Capturable (DL)</span>
+
               <span id="wfStep4Val" class="font-mono-num font-extrabold text-sm">118 veh/h</span>
+
             </div>
+
             <div class="w-full bg-slate-100 rounded-full h-3.5">
+
               <div id="waterfallDLBar" class="bg-[#10B981] h-3.5 rounded-full transition-all duration-300" style="width: 35%;"></div>
+
             </div>
+
           </div>
+
         </div>
+
+
 
         <!-- Auditoría Matemática del Tráfico Pasante (Por qué 63% y no 85%) -->
+
         <div class="p-4 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] text-xs space-y-3">
+
           <div class="flex items-center justify-between">
+
             <span class="font-bold text-[#164250] flex items-center gap-1.5 uppercase tracking-wide text-[11px]">
+
               <i data-lucide="calculator" class="w-3.5 h-3.5 text-[#164250]"></i>
+
               Fórmula y Metodología: Tráfico Pasante
+
             </span>
+
             <span id="wfMethodBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-[#0284C7] border border-sky-200">
+
               Calibración Barcelona
+
             </span>
+
           </div>
+
+
 
           <!-- Expresión matemática -->
+
           <div class="p-2.5 rounded-xl bg-white border border-[#DFEAF0] font-mono text-[11px] text-slate-800 space-y-1">
+
             <div class="text-slate-400 text-[10px]">Fórmula de Desacoplamiento:</div>
+
             <div class="font-bold text-[#164250]">
+
               κ_pasante = κ_base(<span id="wfFormulaRoad">Distribuidora</span>) × ω_horaria
+
             </div>
+
             <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-100 flex items-center justify-between">
+
               <span>Cálculo: <strong id="wfFormulaCalc" class="text-slate-800">0.60 × 1.05 = 63.0%</strong></span>
+
               <span>Destino local: <strong id="wfLocalDestPct" class="text-emerald-600">37.0%</strong></span>
+
             </div>
+
           </div>
+
+
 
           <!-- Justificación técnica: Por qué 63% y no 85% -->
+
           <div class="text-[11px] text-slate-600 space-y-1.5">
+
             <div class="font-bold text-slate-800 flex items-center gap-1">
+
               <i data-lucide="help-circle" class="w-3 h-3 text-[#D97706]"></i>
+
               ¿Por qué un <span id="wfKappaExplainVal">63%</span> y no un 85%?
+
             </div>
+
             <p id="wfWhyNot85Text" class="leading-relaxed text-slate-600">
+
               El <strong>85%</strong> solo se aplica a autopistas urbanas o cinturones cerrados (Ronda de Dalt, Gran Via perimetral) sin comercio ni oficinas. En vías distribuidoras de Barcelona, el <strong>37%</strong> de los vehículos sí entra al tejido del barrio. Usar un 85% subestimaría la demanda real en más de un 60%.
+
             </p>
+
           </div>
+
         </div>
+
       </div>
 
+
+
     </div>
+
+
 
     <!-- =========================================================================
+
          PESTAÑA DE METODOLOGÍA: ¿CÓMO SE CALCULA LA DEMANDA LATENTE? (ESTADO C)
+
          ========================================================================= -->
+
     <div id="stateCView" class="hidden space-y-6 transition-opacity duration-200">
+
       
+
       <!-- 1. Encabezado de la Pestaña de Metodología -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
         <div>
+
           <div class="flex items-center gap-2 mb-1.5">
+
             <button onclick="app.switchState('A')" class="px-2.5 py-1 rounded-lg bg-[#F0F5F8] hover:bg-[#E6EFF3] text-[#164250] font-semibold text-xs transition-colors flex items-center gap-1">
+
               <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+
               <span>Volver a Visión Global</span>
+
             </button>
+
             <span class="text-xs text-slate-400">•</span>
+
             <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#E6EFF3] text-[#164250] border border-[#C8DFE8]">
+
               Ingeniería de Tráfico & Movilidad Urbana
+
             </span>
+
           </div>
+
+
 
           <h2 class="text-3xl font-black text-[#1A4B5B] tracking-tight">
+
             Metodología y Formulación Matemática · Cálculo de Demanda Latente
+
           </h2>
+
           <p class="text-xs text-slate-500 mt-1 max-w-4xl">
+
             Fundamentos teóricos, modelos físicos, formulación matemática, fuentes de datos abiertos de Barcelona y balance vehicular de flujos interanuales.
+
           </p>
+
         </div>
+
+
 
         <div class="flex items-center gap-2 shrink-0">
+
           <span class="px-3.5 py-2 rounded-xl bg-[#164250] text-white text-xs font-mono font-bold flex items-center gap-2 shadow-xs">
+
             <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+
             <span>Modelo Validado 30 Parkings NN</span>
+
           </span>
+
         </div>
+
       </div>
+
+
 
       <!-- 2. Tarjetas Explicativas de las 3 Métricas Clave -->
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
         
+
         <!-- Tarjeta 1: Demanda Latente -->
+
         <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-3 relative overflow-hidden">
+
           <div class="w-1.5 h-full bg-[#10B981] absolute left-0 top-0"></div>
+
           <div class="flex items-center justify-between">
+
             <span class="text-xs font-bold text-[#10B981] uppercase tracking-wider">Métrica 1</span>
+
             <div class="p-2 rounded-xl bg-emerald-50 text-[#10B981]">
+
               <i data-lucide="trending-up" class="w-4 h-4"></i>
+
             </div>
+
           </div>
+
           <h3 class="text-base font-extrabold text-[#1A4B5B]">Demanda Latente Cartera (6.906 veh/h)</h3>
+
           <p class="text-xs text-slate-600 leading-relaxed">
+
             Es la <strong>masa crítica de conductores que desean estacionar en la zona de influencia</strong> del parking pero no acceden de forma inmediata debido a saturación en superficie (zona azul/verde colapsada), falta de visibilidad del acceso, congestión en calzada o fricción peatonal.
+
           </p>
+
           <div class="pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-500">
+
             <strong>Cómo se calcula:</strong> Aforo Viario exterior &times; (1 - Tráfico Pasante) &times; Cuota Gravitatoria Huff + Déficit Calzada + POIs.
+
           </div>
+
         </div>
+
+
 
         <!-- Tarjeta 2: Agitación en Calzada -->
+
         <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-3 relative overflow-hidden">
+
           <div class="w-1.5 h-full bg-[#D97706] absolute left-0 top-0"></div>
+
           <div class="flex items-center justify-between">
+
             <span class="text-xs font-bold text-[#D97706] uppercase tracking-wider">Métrica 2</span>
+
             <div class="p-2 rounded-xl bg-amber-50 text-[#D97706]">
+
               <i data-lucide="compass" class="w-4 h-4"></i>
+
             </div>
+
           </div>
+
           <h3 class="text-base font-extrabold text-[#1A4B5B]">Agitación en Calzada (15.563 veh)</h3>
+
           <p class="text-xs text-slate-600 leading-relaxed">
+
             Corresponde al fenómeno de <strong>tráfico parásito de búsqueda ("cruising for parking")</strong>: conductores que circulan a baja velocidad buscando una plaza libre en la vía pública, generando retenciones y perdiendo entre 12 y 16 minutos por viaje.
+
           </p>
+
           <div class="pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-500">
+
             <strong>Cómo se calcula:</strong> Modelo probabilístico logit calibrado con la degradación de velocidad del tramo, ocupación en calzada (&gt;85%) y saturación DUM.
+
           </div>
+
         </div>
+
+
 
         <!-- Tarjeta 3: Capacidad Física Total -->
+
         <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-3 relative overflow-hidden">
+
           <div class="w-1.5 h-full bg-[#164250] absolute left-0 top-0"></div>
+
           <div class="flex items-center justify-between">
+
             <span class="text-xs font-bold text-[#164250] uppercase tracking-wider">Métrica 3</span>
+
             <div class="p-2 rounded-xl bg-slate-100 text-[#164250]">
+
               <i data-lucide="building-2" class="w-4 h-4"></i>
+
             </div>
+
           </div>
+
           <h3 class="text-base font-extrabold text-[#1A4B5B]">Capacidad Física Total (8.925 plazas)</h3>
+
           <p class="text-xs text-slate-600 leading-relaxed">
+
             Es el <strong>número total de plazas nominales y operativas</strong> autorizadas en los 30 activos de Núñez i Navarro en Barcelona. Determina el techo físico de absorción y actúa como masa de atracción gravitatoria sobre el tráfico de paso.
+
           </p>
+
           <div class="pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-500">
+
             <strong>Cómo se calcula:</strong> Suma censal verificada de plazas físicas de rotación y abono por activo en las licencias municipales de BCN.
+
           </div>
+
         </div>
 
+
+
       </div>
+
+
 
       <!-- 3. Metodología de Flujo: Suma de Coches de Paso + Salidas y Tendencia Interanual -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+
         <div class="flex items-center gap-2.5 pb-3 border-b border-[#DFEAF0]">
+
           <span class="p-2 rounded-xl bg-sky-50 text-[#0284C7]">
+
             <i data-lucide="git-merge" class="w-5 h-5"></i>
+
           </span>
+
           <div>
+
             <h3 class="text-base font-extrabold text-[#1A4B5B]">
+
               Metodología de Flujo Viario: Suma de Tráfico de Paso Exterior + Salidas del Parking y Variación Interanual
+
             </h3>
+
             <p class="text-xs text-slate-500">
+
               Evaluación combinada del caudal en calzada, evacuación de plazas y comportamiento interanual respecto al año anterior.
+
             </p>
+
           </div>
+
         </div>
+
+
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+
           <div class="p-4 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] space-y-2">
+
             <div class="font-bold text-[#164250] flex items-center gap-1.5">
+
               <span class="w-2 h-2 rounded-full bg-[#0284C7]"></span>
+
               1. Coches que Pasan (Aforo Exterior)
+
             </div>
+
             <p class="text-slate-600 leading-relaxed">
+
               Registrado por los lazos de inducción y radares de intensidad del Ajuntament de Barcelona en la calle principal adyacente. Define la <strong>masa vehicular circulante bruta</strong> que pasa frente a los accesos del parking.
+
             </p>
+
           </div>
 
+
+
           <div class="p-4 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] space-y-2">
+
             <div class="font-bold text-[#164250] flex items-center gap-1.5">
+
               <span class="w-2 h-2 rounded-full bg-[#F97316]"></span>
+
               2. Coches que Salen (Viales de Evacuación)
+
             </div>
+
             <p class="text-slate-600 leading-relaxed">
+
               Vehículos que han terminado su estacionamiento y salen del parking hacia la red viaria. <strong>La suma de los que pasan y los que salen representa la carga circulatoria total del tramo</strong>, mientras que la diferencia con las entradas mide la acumulación neta.
+
             </p>
+
           </div>
 
+
+
           <div class="p-4 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] space-y-2">
+
             <div class="font-bold text-[#164250] flex items-center gap-1.5">
+
               <span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+
               3. Variación Interanual (Año Anterior vs Actual)
+
             </div>
+
             <p class="text-slate-600 leading-relaxed">
+
               Comparativa mes a mes de los 12 meses actuales frente a los 12 meses precedentes. Permite identificar si la zona ha ganado tráfico (<strong>▲ Creció paso</strong>, ej. +3.2%) o ha perdido caudal por pacificaciones urbanas (<strong>▼ Decreció paso</strong>, ej. -1.8%).
+
             </p>
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <!-- 4. Ecuación Maestra Unificada y Pipeline Matemático en 7 Pasos -->
+
       <div class="bg-[#0F323D] text-white rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+
           <div>
+
             <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">Motor Físico Espaciotemporal</span>
+
             <h3 class="text-xl sm:text-2xl font-black tracking-tight text-white mt-0.5">
+
               Ecuación Maestra Unificada de Demanda Latente
+
             </h3>
+
           </div>
+
           <span class="px-3 py-1 rounded-xl bg-white/10 text-emerald-300 font-mono text-xs border border-white/10">
+
             D_L(i, t)
+
           </span>
+
         </div>
+
+
 
         <!-- Fórmula Renderizada con CSS de Alto Impacto -->
+
         <div class="p-5 sm:p-6 bg-[#0A222A] rounded-2xl border border-white/10 overflow-x-auto">
+
           <div class="text-sm sm:text-base font-mono text-emerald-300 whitespace-nowrap leading-relaxed">
+
             D<sub>L</sub>(i, t) = &lbrack; S<sub>ih</sub> &times; ( Q<sub>agitaci&oacute;n</sub>(i, t) + &Delta;D&eacute;ficit<sub>sup</sub>(i, t) + Q<sub>atractores</sub>(i, t) ) &times; ( 1 &minus; Fricci&oacute;n<sub>Tobler</sub>(i) ) &rbrack; &times; &Phi;<sub>clima</sub> &times; &Omega;<sub>evento</sub> &times; &Psi;<sub>precio</sub>
+
           </div>
+
         </div>
+
+
 
         <!-- Los 7 Pasos del Algoritmo -->
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+
           
+
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+
             <span class="text-emerald-400 font-mono font-bold block">Paso 1: Tráfico Pasante</span>
+
             <p class="text-slate-300">
+
               Deducción del flujo que no tiene fin de viaje en el barrio:
+
               <br><code class="text-white bg-black/30 px-1 rounded">Q_potencial = Q_total &times; (1 - &kappa;_pasante)</code>
+
               <br>&kappa; varía de 0.85 (Aragó/Diagonal) a 0.20 (Gràcia/Superilles).
+
             </p>
+
           </div>
 
+
+
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+
             <span class="text-emerald-400 font-mono font-bold block">Paso 2: Cruising Logit</span>
+
             <p class="text-slate-300">
+
               Fracción en búsqueda activa:
+
               <br><code class="text-white bg-black/30 px-1 rounded">&gamma; = 1 / (1 + exp(-(&beta;0 + &beta;1&Delta;V + &beta;2&theta; + &beta;3&rho;)))</code>
+
               <br>Depende de la caída de velocidad y congestión del tramo.
+
             </p>
+
           </div>
 
+
+
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+
             <span class="text-emerald-400 font-mono font-bold block">Paso 3: Déficit Superficie</span>
+
             <p class="text-slate-300">
+
               Excedente expulsado del Àrea Blava/Verda:
+
               <br><code class="text-white bg-black/30 px-1 rounded">&Delta;D&eacute;ficit = max(0, (&theta; - 0.85) &times; N_plazas &times; &mu;)</code>
+
               <br>Se activa cuando la ocupación de calle supera el 85%.
+
             </p>
+
           </div>
 
+
+
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+
             <span class="text-emerald-400 font-mono font-bold block">Paso 4: Generadores POIs</span>
+
             <p class="text-slate-300">
+
               Demanda inducida por equipamientos en la isocrona:
+
               <br>Hospitales (1.85 v/cama), Discotecas (0.28 v/plaza nocturna), Comercios (2.40 v/100m&sup2;) y Oficinas.
+
             </p>
+
           </div>
 
+
+
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+
             <span class="text-emerald-400 font-mono font-bold block">Paso 5: Fricción Tobler</span>
+
             <p class="text-slate-300">
+
               Penalización por esfuerzo al caminar:
+
               <br><code class="text-white bg-black/30 px-1 rounded">v(s) = 6 &times; exp(-3.5|s + 0.05|) km/h</code>
+
               <br>Calculado con cotas ICGC y retrasos semafóricos Cerdà.
+
             </p>
+
           </div>
 
+
+
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+
             <span class="text-emerald-400 font-mono font-bold block">Paso 6: Gravitación Huff</span>
+
             <p class="text-slate-300">
+
               Cuota de captura frente a competidores vecinos:
+
               <br><code class="text-white bg-black/30 px-1 rounded">S_ih = (Cap_i &times; e^(-&lambda;t)) / &sum;(Cap_k &times; e^(-&lambda;t))</code>
+
               <br>Mayor capacidad atrae exponencialmente más cuota.
+
             </p>
+
           </div>
+
+
 
         </div>
 
+
+
       </div>
+
+
 
       <!-- 5. Catálogo Oficial de Fuentes Públicas Gratuitas (0 €) -->
+
       <div class="bg-white rounded-3xl p-6 border border-[#DFEAF0] shadow-sm space-y-4">
+
         <div class="flex items-center gap-2.5 pb-3 border-b border-[#DFEAF0]">
+
           <span class="p-2 rounded-xl bg-emerald-50 text-[#10B981]">
+
             <i data-lucide="database" class="w-5 h-5"></i>
+
           </span>
+
           <div>
+
             <h3 class="text-base font-extrabold text-[#1A4B5B]">
+
               Catálogo de Datos Oficiales Abiertos de Barcelona (Coste: 0 €)
+
             </h3>
+
             <p class="text-xs text-slate-500">
+
               Fuentes públicas integradas automáticamente en el sistema sin intermediarios ni costes de licencia.
+
             </p>
+
           </div>
+
         </div>
+
+
 
         <div class="overflow-x-auto">
+
           <table class="w-full text-left text-xs border-collapse">
+
             <thead>
+
               <tr class="border-b border-[#DFEAF0] text-slate-400 font-semibold uppercase text-[10px]">
+
                 <th class="py-2.5 px-3">Organismo</th>
+
                 <th class="py-2.5 px-3">Dataset / Recurso</th>
+
                 <th class="py-2.5 px-3">Frecuencia</th>
+
                 <th class="py-2.5 px-3">Variables Extraídas</th>
+
               </tr>
+
             </thead>
+
             <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+
               <tr>
+
                 <td class="py-2.5 px-3 font-bold text-[#164250]">Open Data BCN</td>
+
                 <td class="py-2.5 px-3">Informació de Trams de Trànsit</td>
+
                 <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-mono text-[10px]">Cada 5 min</span></td>
+
                 <td class="py-2.5 px-3 text-slate-500">Estado de tráfico (0 a 5), congestión actual y previsión</td>
+
               </tr>
+
               <tr>
+
                 <td class="py-2.5 px-3 font-bold text-[#164250]">Open Data BCN</td>
+
                 <td class="py-2.5 px-3">Aforaments i Intensitat de Trànsit</td>
+
                 <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-mono text-[10px]">Mensual / Histórico</span></td>
+
                 <td class="py-2.5 px-3 text-slate-500">Intensidad vehicular horaria (veh/h) y ocupación de vía</td>
+
               </tr>
+
               <tr>
+
                 <td class="py-2.5 px-3 font-bold text-[#164250]">Open Data BCN</td>
+
                 <td class="py-2.5 px-3">Estacionament Regulat en Calçada</td>
+
                 <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono text-[10px]">Semestral</span></td>
+
                 <td class="py-2.5 px-3 text-slate-500">Plazas Àrea Blava y Verda, tarifas y tramos</td>
+
               </tr>
+
               <tr>
+
                 <td class="py-2.5 px-3 font-bold text-[#164250]">Open Data BCN / SPRO</td>
+
                 <td class="py-2.5 px-3">Zones DUM (Càrrega i Descàrrega)</td>
+
                 <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono text-[10px]">Semestral</span></td>
+
                 <td class="py-2.5 px-3 text-slate-500">Plazas DUM de reparto de mercancías y horarios</td>
+
               </tr>
+
               <tr>
+
                 <td class="py-2.5 px-3 font-bold text-[#164250]">Meteocat / XEMA</td>
+
                 <td class="py-2.5 px-3">Estacions Automàtiques Barcelona</td>
+
                 <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-mono text-[10px]">Cada 30 min</span></td>
+
                 <td class="py-2.5 px-3 text-slate-500">Precipitación en mm/h (+4.5% demanda por mm/h) y temperatura</td>
+
               </tr>
+
               <tr>
+
                 <td class="py-2.5 px-3 font-bold text-[#164250]">ICGC</td>
+
                 <td class="py-2.5 px-3">Model Digital d'Elevacions (MDE 2x2m)</td>
+
                 <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono text-[10px]">Anual</span></td>
+
                 <td class="py-2.5 px-3 text-slate-500">Cota altimétrica y pendiente media para la función de Tobler</td>
+
               </tr>
+
             </tbody>
+
           </table>
+
         </div>
+
       </div>
 
+
+
     </div>
+
+
 
   </main>
 
+
+
   <!-- =============================================================================
+
        MODAL DE CARGA DINÁMICA (EXCEL / CSV / TXT)
+
        ============================================================================= -->
+
   <div id="uploadModal" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2730]/60 backdrop-blur-xs hidden p-4">
+
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 border border-[#DFEAF0] shadow-2xl space-y-5">
+
       
+
       <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+
         <div class="flex items-center gap-2.5">
+
           <div class="w-8 h-8 rounded-xl bg-[#164250] text-white flex items-center justify-center font-bold text-xs">
+
             NN
+
           </div>
+
           <div>
+
             <h3 class="text-base font-bold text-[#1A4B5B]">Cargar Lista de Aparcamientos</h3>
+
             <p class="text-xs text-slate-500">Sube tu archivo Excel (.xlsx / .xls), .CSV o .TXT con las coordenadas y obras</p>
+
           </div>
+
         </div>
+
         <button onclick="app.closeModal('uploadModal')" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
+
           <i data-lucide="x" class="w-5 h-5"></i>
+
         </button>
+
       </div>
+
+
 
       <!-- Drag & Drop Zone -->
+
       <div class="border-2 border-dashed border-[#C8DFE8] hover:border-[#164250] rounded-2xl p-6 text-center bg-[#F8FAFB] transition-all cursor-pointer group" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault()" ondrop="app.handleFileDrop(event)">
+
         <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv,.txt" onchange="app.handleFileUpload(event)">
+
         <div class="w-12 h-12 rounded-full bg-[#E6EFF3] text-[#164250] flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+
           <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+
         </div>
+
         <div class="text-xs font-bold text-slate-700">Arrastra tu archivo .XLSX, .XLS, .CSV o .TXT aquí</div>
+
         <div class="text-[11px] text-slate-400 mt-1">Soporta columnas: <span class="font-mono text-slate-600">Obra Anterior, Obra Actual, Nombre de la Obra, X, Y, Dirección...</span></div>
+
         <div class="mt-3">
+
           <span class="inline-block px-3 py-1 bg-white border border-[#DFEAF0] rounded-lg text-xs font-semibold text-[#164250] shadow-xs">
+
             Seleccionar archivo local (.xlsx / .csv / .txt)
+
           </span>
+
         </div>
+
       </div>
+
+
 
       <!-- Pegar Texto Directo -->
+
       <div class="space-y-1.5">
+
         <span class="text-xs font-bold text-slate-700">O pega filas CSV / Excel directamente:</span>
+
         <textarea id="pasteTextInput" rows="4" placeholder="Obra Anterior,Obra Actual,Nombre de la Obra,X,Y,,,&#10;51,51,&quot;VALENCIA, 307 - 313&quot;,2.1678816,41.3961663,&quot;VALENCIA, 307 08009 BARCELONA&quot;,,p&#10;2004,2004,&quot;PK. LLUIS PERICOT, 12&quot;,2.1230725,41.3886402,&quot;C/ Lluís Pericot 12, 08034, Barcelona&quot;,,P" class="w-full p-2.5 bg-[#F8FAFB] border border-[#DFEAF0] rounded-xl text-xs font-mono focus:outline-none focus:border-[#164250]"></textarea>
+
       </div>
+
+
 
       <!-- Modal Footer -->
+
       <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+
         <button type="button" onclick="app.closeModal('uploadModal')" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-xs">Cancelar</button>
+
         <button type="button" onclick="app.handleTextPasteSubmit()" class="px-4 py-2 rounded-xl bg-[#164250] text-white font-semibold text-xs hover:bg-[#0F323D]">Calcular y Abrir Pestañas</button>
+
       </div>
 
+
+
     </div>
+
   </div>
+
+
 
   <!-- =============================================================================
+
        MODAL DE DIAGNÓSTICO DE APIS Y AUDITORÍA DE RECOPILACIÓN DE DATOS
+
        ============================================================================= -->
+
   <div id="apiDiagnosticModal" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2730]/60 backdrop-blur-xs hidden p-4">
+
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 border border-[#DFEAF0] shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+
       
+
       <div class="flex items-center justify-between pb-3 border-b border-[#DFEAF0]">
+
         <div class="flex items-center gap-2.5">
+
           <div class="w-9 h-9 rounded-xl bg-[#164250] text-white flex items-center justify-center font-bold text-xs">
+
             <i data-lucide="shield-check" class="w-5 h-5 text-emerald-300"></i>
+
           </div>
+
           <div>
+
             <h3 class="text-base font-bold text-[#1A4B5B]">Centro de Control de APIs y Salud de Datos</h3>
+
             <p class="text-xs text-slate-500">Verificación en tiempo real de conectores externos y detección de datos en 0</p>
+
           </div>
+
         </div>
+
         <button onclick="app.closeModal('apiDiagnosticModal')" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
+
           <i data-lucide="x" class="w-5 h-5"></i>
+
         </button>
+
       </div>
+
+
 
       <!-- Estado de las 3 Fuentes / APIs -->
+
       <div class="space-y-3 text-xs">
+
         <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">1. Conectividad con APIs Oficiales en Tiempo Real</div>
 
+
+
         <!-- API 1: Open Data Barcelona -->
+
         <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] flex items-center justify-between gap-3">
+
           <div class="flex items-start gap-3">
+
             <div class="p-2 rounded-xl bg-[#E6EFF3] text-[#164250] mt-0.5">
+
               <i data-lucide="database" class="w-4 h-4"></i>
+
             </div>
+
             <div>
-              <div class="font-bold text-[#1A4B5B]">API SQL Open Data Ajuntament de Barcelona (Aforos 2024-2025 &amp; Censo Comercial)</div>
+
+              <div class="font-bold text-[#1A4B5B]">API SQL Open Data Ajuntament de Barcelona (Aforos Trianuales 2024-2025, Fluidez Trams 2026 &amp; Censo Comercial)</div>
+
               <div class="text-[11px] text-slate-500">407 estaciones reales de aforo viario (IMD mensual y por día de la semana) + Locales activos a 300 m</div>
+
               <div class="text-[10px] font-mono text-slate-400 mt-0.5">Endpoint: opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql</div>
+
             </div>
+
           </div>
+
           <div id="modalStatusOpenData" class="px-3 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+
             Conectado OK
+
           </div>
+
         </div>
+
+
 
         <!-- API 2: Open-Meteo Barcelona -->
+
         <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] flex items-center justify-between gap-3">
+
           <div class="flex items-start gap-3">
+
             <div class="p-2 rounded-xl bg-[#E6EFF3] text-[#0284C7] mt-0.5">
+
               <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+
             </div>
+
             <div>
+
               <div class="font-bold text-[#1A4B5B]">API Open-Meteo Forecast Barcelona</div>
+
               <div class="text-[11px] text-slate-500">Meteorología horaria y previsión de lluvia a 7 días para trasvase modal</div>
+
               <div class="text-[10px] font-mono text-slate-400 mt-0.5">Endpoint: api.open-meteo.com/v1/forecast (Lat: 41.3888, Lon: 2.1590)</div>
+
             </div>
+
           </div>
+
           <div id="modalStatusMeteo" class="px-3 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+
             Conectado OK
+
           </div>
+
         </div>
+
+
 
         <!-- API 3: Topografía Copernicus DEM & SheetJS -->
+
         <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] flex items-center justify-between gap-3">
+
           <div class="flex items-start gap-3">
+
             <div class="p-2 rounded-xl bg-[#E6EFF3] text-[#164250] mt-0.5">
+
               <i data-lucide="map-pin" class="w-4 h-4"></i>
+
             </div>
+
             <div>
+
               <div class="font-bold text-[#1A4B5B]">API Open-Meteo Elevation (Copernicus DEM 90m) &amp; Lector SheetJS</div>
+
               <div class="text-[11px] text-slate-500">Cota real sobre el nivel del mar (m) y pendiente real (%) medida a 100 m N/S/E/O de cada coordenada</div>
+
               <div class="text-[10px] font-mono text-slate-400 mt-0.5">Endpoint: api.open-meteo.com/v1/elevation</div>
+
             </div>
+
           </div>
+
           <div id="modalStatusEngine" class="px-3 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+
             Conectado OK
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <!-- Auditoría de Integridad de Datos (Detección de Ceros) -->
+
       <div class="space-y-3 text-xs pt-2 border-t border-slate-100">
+
         <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">2. Auditoría de Recopilación de Datos en Gráficos y Sensores</div>
+
         <div id="modalDataAuditBox" class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+
           <div id="modalDataAuditSummary" class="font-bold text-emerald-900 text-xs">
-            ✓ Todas las APIs Oficiales Conectadas en Tiempo Real · 100% Datos Reales · 0 Inferidos.
+
+            ✓ Todas las APIs Oficiales Conectadas en Tiempo Real · Comparativa Trianual (2024 Real, 2025 Real y 2026 Estimado con Fórmula Visible).
+
           </div>
+
           <div id="modalDataAuditDetails" class="text-[11px] text-slate-600 space-y-1 font-mono">
+
             • Activos cargados: 0 aparcamientos<br>
+
             • Datos inferidos o inventados: 0
+
           </div>
+
         </div>
+
       </div>
+
+
 
       <!-- Footer de Acciones del Modal -->
+
       <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
+
         <button type="button" onclick="app.repairZeroDataAndResync()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
+
           <i data-lucide="zap" class="w-4 h-4"></i>
+
           <span>Sincronizar Datos Reales de APIs Ahora</span>
+
         </button>
+
         <div class="flex items-center gap-2">
+
           <button type="button" onclick="app.checkAllApisAndDataHealth(true)" class="px-4 py-2 rounded-xl bg-[#164250] hover:bg-[#0D2730] text-white font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
+
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+
             <span>Volver a Verificar APIs</span>
+
           </button>
+
           <button type="button" onclick="app.closeModal('apiDiagnosticModal')" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-xs cursor-pointer">
+
             Cerrar
+
           </button>
+
         </div>
+
       </div>
 
+
+
     </div>
+
   </div>
 
+
+
   <!-- Scripts de la Aplicación (con versión actualizada para evitar caché antigua) -->
-  <script src="js/data.js?v=3.4"></script>
-  <script src="js/engine.js?v=3.4"></script>
-  <script src="js/app.js?v=3.4"></script>
+
+  <script src="js/data.js?v=3.5"></script>
+
+  <script src="js/engine.js?v=3.5"></script>
+
+  <script src="js/app.js?v=3.5"></script>
+
 </body>
+
 </html>
+
