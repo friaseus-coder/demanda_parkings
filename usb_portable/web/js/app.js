@@ -3788,95 +3788,25 @@ class NNApp {
 
   loadPersistedState() {
 
-
-
     try {
 
-
-
-      const stored = localStorage.getItem("nn_parkings_state");
-
-
-
-      if (stored) {
-
-
-
-        const parsed = JSON.parse(stored);
-
-
-
-        if (parsed && Array.isArray(parsed.parkings) && parsed.parkings.length > 0) {
-
-
-
-          // Limpiar cualquier valor inferido de sesiones antiguas en localStorage (poner a 0 todo lo no real)
-
-
-
-          this.parkings = this.mergeWithKnownPortfolio(parsed.parkings);
-
-
-
-          if (parsed.selectedAssetId) {
-
-            this.selectedAssetId = parsed.selectedAssetId;
-
-          }
-
-          // Auto-sanación: Si 2024 tiene 0s por caché previa al TRIM, forzar sincronización limpia
-          const hasStale2024 = this.parkings.some(p => {
-            const tp = p.trafficPoints?.[0];
-            return tp && (tp.annualCarsPrevYear || 0) > 0 && (!tp.monthlyPrev2Year || tp.monthlyPrev2Year.every(v => v === 0));
-          });
-          if (hasStale2024) {
-            console.log("[Persistencia] Aforos 2024 en 0 detectados. Resincronizando Open Data BCN...");
-            setTimeout(() => this.syncRealApisForPortfolio(false), 50);
-          }
-
-          this.savePersistedState();
-
-
-
-          console.log(`[Persistencia] Cartera restaurada desde localStorage con 0 datos inferidos (${this.parkings.length} aparcamientos).`);
-
-
-
-          return;
-
-
-
-        }
-
-
-
-      }
-
-
+      // Regla estricta: No guardar ni restaurar aparcamientos entre sesiones.
+      // Cada vez que se abre la aplicación arranca 100% limpia a la espera de que el usuario suba el archivo XLS/CSV.
+      localStorage.removeItem("nn_parkings_state");
 
     } catch (e) {
 
-
-
-      console.warn("[Persistencia] Error al leer nn_parkings_state desde localStorage:", e);
-
-
+      console.warn("[Persistencia] Aviso de limpieza de sesión:", e);
 
     }
 
-
-
     this.parkings = [];
-
-
 
     this.selectedAssetId = null;
 
+    this.currentState = "A";
 
-
-    console.log("[Cartera Base] Iniciando sin aparcamientos pregrabados (esperando carga por XLSX/CSV).");
-
-
+    console.log("[Cartera Base] Inicio limpio sin aparcamientos precargados (esperando carga por XLSX/CSV).");
 
   }
 
@@ -3884,51 +3814,13 @@ class NNApp {
 
   savePersistedState() {
 
-
+    // No se persisten aparcamientos en localStorage para garantizar inicio limpio en cada sesión.
 
     try {
 
+      localStorage.removeItem("nn_parkings_state");
 
-
-      const state = {
-
-
-
-        parkings: this.parkings,
-
-
-
-        sliders: this.sliders,
-
-
-
-        selectedAssetId: this.selectedAssetId,
-
-
-
-        lastUpdated: new Date().toISOString()
-
-
-
-      };
-
-
-
-      localStorage.setItem("nn_parkings_state", JSON.stringify(state));
-
-
-
-    } catch (e) {
-
-
-
-      console.warn("[Persistencia] Error al guardar nn_parkings_state en localStorage:", e);
-
-
-
-    }
-
-
+    } catch (e) {}
 
   }
 
