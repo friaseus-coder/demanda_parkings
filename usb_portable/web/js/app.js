@@ -778,10 +778,6 @@ class NNApp {
     // 7. Cascada Waterfall y Auditoría Matemática de Tráfico Pasante
     this.updateWaterfall(enriched);
 
-    // 8. Simulador Dinámico What-If y Gráfico Radar Multiaxial
-    this.updateSimulationControlsDisplay();
-    this.updateRadarChart(enriched);
-
     if (window.lucide) {
       lucide.createIcons();
     }
