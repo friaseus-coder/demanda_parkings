@@ -337,12 +337,20 @@ const DemandEngine = {
     }
 
     const parser = new DOMParser();
+    const getByTag = (docOrNode, tag) => {
+      let res = docOrNode.getElementsByTagName(tag);
+      if (!res || res.length === 0) {
+        res = docOrNode.getElementsByTagNameNS("*", tag);
+      }
+      return res || [];
+    };
+
     const sharedStrings = [];
     if (files["xl/sharedStrings.xml"]) {
       const ssDoc = parser.parseFromString(files["xl/sharedStrings.xml"], "application/xml");
-      const siNodes = ssDoc.getElementsByTagName("si");
+      const siNodes = getByTag(ssDoc, "si");
       for (let i = 0; i < siNodes.length; i++) {
-        const tNodes = siNodes[i].getElementsByTagName("t");
+        const tNodes = getByTag(siNodes[i], "t");
         let val = "";
         for (let j = 0; j < tNodes.length; j++) {
           val += tNodes[j].textContent || "";
@@ -355,7 +363,7 @@ const DemandEngine = {
     if (!sheetKey) return [];
 
     const sheetDoc = parser.parseFromString(files[sheetKey], "application/xml");
-    const rowNodes = sheetDoc.getElementsByTagName("row");
+    const rowNodes = getByTag(sheetDoc, "row");
     const rows = [];
 
     const colRefToIdx = (ref) => {
@@ -368,7 +376,7 @@ const DemandEngine = {
     };
 
     for (let r = 0; r < rowNodes.length; r++) {
-      const cellNodes = rowNodes[r].getElementsByTagName("c");
+      const cellNodes = getByTag(rowNodes[r], "c");
       const rowArr = [];
       for (let c = 0; c < cellNodes.length; c++) {
         const cell = cellNodes[c];

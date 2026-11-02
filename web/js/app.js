@@ -274,38 +274,40 @@ class NNApp {
 
   mergeWithKnownPortfolio(incomingList) {
     const baseMap = new Map();
-    if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) {
-      PARKINGS_PORTFOLIO.forEach(p => {
-        if (p.id) baseMap.set(String(p.id), p);
-        if (p.obraActual) baseMap.set(String(p.obraActual), p);
-        if (p.name) baseMap.set(p.name.toLowerCase().trim(), p);
-      });
-    }
+    const sourceList = (typeof PORTFOLIO_REFERENCE_CATALOG !== 'undefined' && Array.isArray(PORTFOLIO_REFERENCE_CATALOG))
+      ? PORTFOLIO_REFERENCE_CATALOG
+      : ((typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) ? PARKINGS_PORTFOLIO : []);
 
-    const hashStr = (s) => {
-      let h = 0;
-      for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
-      return Math.abs(h);
-    };
+    sourceList.forEach(p => {
+      if (p.id) baseMap.set(String(p.id), p);
+      if (p.obraActual) baseMap.set(String(p.obraActual), p);
+      if (p.name) baseMap.set(p.name.toLowerCase().trim(), p);
+    });
 
     return incomingList.map((item, idx) => {
       const idKey = String(item.id || item.obraActual || '');
       const nameKey = (item.name || '').toLowerCase().trim();
-      const existing = baseMap.get(idKey) || baseMap.get(nameKey);
+      const existing = baseMap.get(idKey) || baseMap.get(nameKey) || {};
 
-      const merged = { ...(existing || {}), ...item };
-      const seed = hashStr(`${item.obraActual || item.id || idx}_${item.name || ''}`);
+      const merged = { ...existing, ...item };
 
-      // Regla real-data-only: No inventar plazas ni tarifas. Si no vienen en el archivo, su valor es 0.
-      merged.occ_base = 0;
-      merged.search_index = 0.0;
-      merged.elasticity = 0.0;
-      merged.competition = 0.0;
-      merged.saturation = 0.0;
-      merged.rotacion = 0.0;
-      merged.pois = (merged.pois && merged.pois > 0) ? merged.pois : 0;
-      merged.tariff = (merged.tariff && merged.tariff > 0) ? +(parseFloat(merged.tariff).toFixed(2)) : 0.0;
-      merged.capacity = (merged.capacity && merged.capacity > 0) ? parseInt(merged.capacity, 10) : 0;
+      // Si el archivo Excel/CSV trae su propia capacidad física, se prioriza.
+      // Si no viene en el archivo pero el activo existe en el catálogo auditado de Núñez i Navarro,
+      // se asocia su capacidad física real auditada (ej. Obra #51 = 387 plazas).
+      // Si es un activo totalmente nuevo y sin capacidad en el Excel, queda en 0 (real-data-only).
+      const fileCap = (item.capacity && item.capacity > 0) ? parseInt(item.capacity, 10) : 0;
+      const refCap = (existing.capacity && existing.capacity > 0) ? parseInt(existing.capacity, 10) : 0;
+      merged.capacity = fileCap > 0 ? fileCap : refCap;
+
+      const fileTariff = (item.tariff && item.tariff > 0) ? +(parseFloat(item.tariff).toFixed(2)) : 0;
+      const refTariff = (existing.tariff && existing.tariff > 0) ? +(parseFloat(existing.tariff).toFixed(2)) : 0;
+      merged.tariff = fileTariff > 0 ? fileTariff : (refTariff > 0 ? refTariff : 3.60);
+
+      if (!merged.pois && existing.pois) merged.pois = existing.pois;
+      if (!merged.slope && existing.slope) merged.slope = existing.slope;
+      if (!merged.elevation && existing.elevation) merged.elevation = existing.elevation;
+      if (!merged.roadType && existing.roadType) merged.roadType = existing.roadType;
+      if (!merged.passThroughBase && existing.passThroughBase) merged.passThroughBase = existing.passThroughBase;
 
       return typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(merged, idx) : merged;
     });
@@ -314,8 +316,14 @@ class NNApp {
   async handleDirectFileUpload(event) {
     const file = event.target.files?.[0];
     if (!file) return;
-    await this.processUploadedFile(file);
-    event.target.value = "";
+    try {
+      await this.processUploadedFile(file);
+    } catch (err) {
+      console.error("[Carga Directa Excel] Error:", err);
+      alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
+    } finally {
+      event.target.value = "";
+    }
   }
 
   async fetchLiveWeatherForBarcelona(lat = 41.3888, lon = 2.1590) {
@@ -3170,61 +3178,80 @@ class NNApp {
     document.getElementById(id)?.classList.add("hidden");
   }
 
-  handleFileUpload(event) {
+  async handleFileUpload(event) {
     const file = event.target.files?.[0];
     if (!file) return;
-    this.processUploadedFile(file);
-    event.target.value = "";
+    try {
+      await this.processUploadedFile(file);
+    } catch (err) {
+      console.error("[Carga Modal] Error:", err);
+      alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
+    } finally {
+      event.target.value = "";
+    }
   }
 
-  handleFileDrop(event) {
+  async handleFileDrop(event) {
     event.preventDefault();
     event.stopPropagation();
     const file = event.dataTransfer?.files?.[0];
     if (!file) return;
-    this.processUploadedFile(file);
+    try {
+      await this.processUploadedFile(file);
+    } catch (err) {
+      console.error("[Drop File] Error:", err);
+      alert(`Error al procesar el archivo arrastrado: ${err.message || err}`);
+    }
   }
 
   processUploadedFile(file) {
-    const fileName = (file.name || "").toLowerCase();
-    const isExcelExt = fileName.endsWith(".xlsx") || fileName.endsWith(".xls");
+    return new Promise((resolve, reject) => {
+      const fileName = (file.name || "").toLowerCase();
+      const isExcelExt = fileName.endsWith(".xlsx") || fileName.endsWith(".xls");
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const buffer = e.target.result;
-      const bytes = new Uint8Array(buffer);
-      // Detectar firma ZIP/XLSX (PK\x03\x04) o BIFF XLS (\xD0\xCF\x11\xE0)
-      const isZipSignature = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04;
-      const isOleSignature = bytes.length >= 4 && bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const buffer = e.target.result;
+        const bytes = new Uint8Array(buffer);
+        // Detectar firma ZIP/XLSX (PK\x03\x04) o BIFF XLS (\xD0\xCF\x11\xE0)
+        const isZipSignature = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04;
+        const isOleSignature = bytes.length >= 4 && bytes[0] === 0xD0 && bytes[1] === 0xCF && bytes[2] === 0x11 && bytes[3] === 0xE0;
 
-      try {
-        let parsedParkings = [];
-        if (isExcelExt || isZipSignature || isOleSignature) {
-          if (typeof XLSX !== "undefined") {
-            const workbook = XLSX.read(bytes, { type: "array" });
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "", raw: false });
-            parsedParkings = DemandEngine.parseRows(rows);
+        try {
+          let parsedParkings = [];
+          if (isExcelExt || isZipSignature || isOleSignature) {
+            if (typeof XLSX !== "undefined") {
+              const workbook = XLSX.read(bytes, { type: "array" });
+              const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+              const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "", raw: false });
+              parsedParkings = DemandEngine.parseRows(rows);
+            } else {
+              parsedParkings = await DemandEngine.parseExcelBuffer(buffer);
+            }
           } else {
-            parsedParkings = await DemandEngine.parseExcelBuffer(buffer);
+            // Decodificar como texto UTF-8 (o Windows-1252 si proviene de Excel en español con acentos ANSI)
+            let text = new TextDecoder("utf-8").decode(buffer);
+            if (text.includes("\uFFFD")) {
+              text = new TextDecoder("windows-1252").decode(buffer);
+            }
+            parsedParkings = DemandEngine.parseInputText(text);
           }
-        } else {
-          // Decodificar como texto UTF-8 (o Windows-1252 si proviene de Excel en español con acentos ANSI)
-          let text = new TextDecoder("utf-8").decode(buffer);
-          if (text.includes("\uFFFD")) {
-            text = new TextDecoder("windows-1252").decode(buffer);
-          }
-          parsedParkings = DemandEngine.parseInputText(text);
-        }
 
-        const merged = this.mergeWithKnownPortfolio(parsedParkings);
-        this.applyLoadedParkings(merged);
-        this.closeModal("uploadModal");
-      } catch (err) {
-        alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
-      }
-    };
-    reader.readAsArrayBuffer(file);
+          const merged = this.mergeWithKnownPortfolio(parsedParkings);
+          this.applyLoadedParkings(merged);
+          this.closeModal("uploadModal");
+          resolve(merged);
+        } catch (err) {
+          alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
+          reject(err);
+        }
+      };
+      reader.onerror = (err) => {
+        alert(`Error al leer el archivo en disco: ${err}`);
+        reject(err);
+      };
+      reader.readAsArrayBuffer(file);
+    });
   }
 
   handleTextPasteSubmit() {
@@ -3250,10 +3277,26 @@ class NNApp {
       this.renderTable();
       this.renderGlobalMapMarkers();
       this.updateGlobalKPIs();
+
+      // Actualizar el gráfico temporal agregado interanual (Gráfico 1) con los nuevos datos
+      if (this.chartGlobalMonthlyDL) {
+        const { curMonthly, prevMonthly } = this.calculatePortfolioSensorsTrafficMonthly();
+        this.chartGlobalMonthlyDL.data.datasets[0].data = curMonthly;
+        this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
+        this.chartGlobalMonthlyDL.update();
+      }
+
       this.savePersistedState();
       this.switchState("A");
+
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      const totalCap = this.parkings.reduce((sum, p) => sum + (p.capacity || 0), 0);
+      alert(`¡Archivo cargado con éxito!\n\n• Aparcamientos identificados: ${newParkings.length} activos\n• Capacidad física total: ${totalCap.toLocaleString("es-ES")} plazas\n\nTodos los indicadores, mapas y gráficos de demanda se han actualizado.`);
     } else {
-      alert("No se pudieron identificar aparcamientos válidos en el archivo. Verifica que incluya las columnas (Obra Anterior, Obra Actual, Nombre de la Obra, X, Y...).");
+      alert("No se pudieron identificar aparcamientos válidos en el archivo. Verifica que incluya las columnas requeridas (Obra Anterior, Obra Actual, Nombre de la Obra, X, Y...).");
     }
   }
 

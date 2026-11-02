@@ -18,7 +18,13 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- SheetJS (xlsx) oficial para ingesta directa de Excel (.xlsx / .xls) y CSV en el cliente -->
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <!-- SheetJS (xlsx) con copia local garantizada para funcionamiento 100% offline y fallback a CDN -->
+  <script src="js/vendor/xlsx.full.min.js"></script>
+  <script>
+    if (typeof XLSX === "undefined") {
+      document.write('<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"><\/script>');
+    }
+  </script>
 
   <script>
     tailwind.config = {
@@ -169,12 +175,12 @@
         <!-- Input de archivo oculto para SheetJS -->
         <input type="file" id="directExcelFileInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="app.handleDirectFileUpload(event)">
 
-        <!-- Botón Cargar Excel/CSV -->
-        <button onclick="document.getElementById('directExcelFileInput').click()" class="px-3.5 py-2 rounded-xl bg-[#004B57] hover:bg-[#0D2730] text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ring-1 ring-white/20" title="Cargar directamente un archivo Excel (.xlsx/.xls) o CSV">
+        <!-- Botón Cargar Excel/CSV (con label nativo para activación garantizada al 100%) -->
+        <label for="directExcelFileInput" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){document.getElementById('directExcelFileInput').click()}" class="px-3.5 py-2 rounded-xl bg-[#004B57] hover:bg-[#0D2730] text-white font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ring-1 ring-white/20 select-none" title="Cargar directamente un archivo Excel (.xlsx/.xls) o CSV">
           <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-300"></i>
           <span class="hidden sm:inline">Cargar Excel/CSV</span>
           <span class="sm:hidden">Excel</span>
-        </button>
+        </label>
 
         <!-- Botón Limpiar Cartera / Restablecer -->
         <button onclick="app.restoreOriginalData()" class="px-3 py-2 rounded-xl bg-white hover:bg-[#E6EFF3] text-[#164250] border border-[#DFEAF0] font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer" title="Limpiar cartera y restablecer a 0 aparcamientos">
