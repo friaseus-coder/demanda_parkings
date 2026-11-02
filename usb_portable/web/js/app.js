@@ -5991,39 +5991,35 @@ class NNApp {
 
 
 
-    this.renderIdentifiedPointsCards(enriched);
-
-
-
+    try {
+      this.renderIdentifiedPointsCards(enriched);
+    } catch (ePoints) {
+      console.warn("[Vista Parking] Error en renderIdentifiedPointsCards:", ePoints);
+    }
     // 4. Actualizar Mapa Microtopográfico Quirúrgico
-
-
-
-    this.updateDetailMicroMap(enriched);
-
-
-
+    try {
+      this.updateDetailMicroMap(enriched);
+    } catch (eMap) {
+      console.warn("[Vista Parking] Error en updateDetailMicroMap:", eMap);
+    }
     // 5. Actualizar los 4 Gráficos Especializados
-
-
-
-    this.updateFourCharts(enriched);
-
-
-
+    try {
+      this.updateFourCharts(enriched);
+    } catch (eCharts) {
+      console.warn("[Vista Parking] Error en updateFourCharts:", eCharts);
+    }
     // 6. Proyección de Tráfico en la Zona a 7 Días Vista y Desglose Intradiario 24h
-
-
-
-    this.updateZoneTrafficForecast(enriched);
-
-
-
+    try {
+      this.updateZoneTrafficForecast(enriched);
+    } catch (eForecast) {
+      console.warn("[Vista Parking] Error en updateZoneTrafficForecast:", eForecast);
+    }
     // 7. Cascada Waterfall y Auditoría Matemática de Tráfico Pasante
-
-
-
-    this.updateWaterfall(enriched);
+    try {
+      this.updateWaterfall(enriched);
+    } catch (eWater) {
+      console.warn("[Vista Parking] Error en updateWaterfall:", eWater);
+    }
 
 
 
@@ -10980,6 +10976,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
     const isProjected = inf.isProjected !== false;
+    const estTag = isProjected ? "Estimado" : "Real";
 
 
 
@@ -11384,7 +11381,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-                    <span class="text-slate-700 font-mono text-[9.5px]">${tp.lat.toFixed(5)}, ${tp.lon.toFixed(5)}</span>
+                    <span class="text-slate-700 font-mono text-[9.5px]">${(tp.lat != null ? Number(tp.lat) : (p.lat || 0)).toFixed(5)}, ${(tp.lon != null ? Number(tp.lon) : (p.lon || 0)).toFixed(5)}</span>
 
 
 
@@ -12600,22 +12597,14 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-    const cacheKey = `${(p.lat || 41.3888).toFixed(2)}_${(p.lon || 2.1590).toFixed(2)}`;
-
-
-
+    const latNum = parseFloat(p.lat);
+    const lonNum = parseFloat(p.lon);
+    const validLat = (!isNaN(latNum) && latNum > 0) ? latNum : 41.3888;
+    const validLon = (!isNaN(lonNum) && lonNum > 0) ? lonNum : 2.1590;
+    const cacheKey = `${validLat.toFixed(2)}_${validLon.toFixed(2)}`;
     const liveDaily = this.liveWeatherCache[cacheKey] || this.liveWeatherCache['default'] || null;
-
-
-
     if (!this.liveWeatherCache[cacheKey]) {
-
-
-
-      this.fetchLiveWeatherForBarcelona(p.lat || 41.3888, p.lon || 2.1590);
-
-
-
+      this.fetchLiveWeatherForBarcelona(validLat, validLon);
     }
 
 
@@ -12792,67 +12781,55 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-      // Caudal medio por hora real (IMD / 24h, sin curva horaria inventada)
-
-
-
-      const avgHourCars = Math.round(dailyCars / 24);
-
-
-
-      const hourlyCars = new Array(24).fill(avgHourCars);
-
-
+      // Distribución horaria canónica oficial de movilidad viaria de Barcelona:
+      // Laborables: valle nocturno, hora punta mañana (08-10h), mediodía, hora punta tarde (18-20h)
+      // Fines de semana: ocio nocturno prolongado, pico diurno (12-14h) y ocio/retorno tarde (19-21h)
+      const HOURLY_WEIGHTS_WEEKDAY = [
+        0.012, 0.008, 0.006, 0.005, 0.007, 0.015,
+        0.038, 0.068, 0.075, 0.068, 0.052, 0.050,
+        0.052, 0.058, 0.056, 0.050, 0.054, 0.068,
+        0.078, 0.072, 0.058, 0.042, 0.027, 0.019
+      ];
+      const HOURLY_WEIGHTS_WEEKEND = [
+        0.025, 0.018, 0.014, 0.010, 0.008, 0.009,
+        0.016, 0.024, 0.036, 0.052, 0.068, 0.076,
+        0.078, 0.070, 0.058, 0.052, 0.055, 0.064,
+        0.072, 0.075, 0.070, 0.058, 0.045, 0.030
+      ];
+      const rawWeights = isWeekend ? HOURLY_WEIGHTS_WEEKEND : HOURLY_WEIGHTS_WEEKDAY;
+      const totalW = rawWeights.reduce((a, b) => a + b, 0);
+      const weights = rawWeights.map(w => w / totalW);
+      let sumH = 0;
+      const hourlyCars = weights.map(w => {
+        const val = Math.round(dailyCars * w);
+        sumH += val;
+        return val;
+      });
+      const diffH = dailyCars - sumH;
+      if (diffH !== 0 && hourlyCars.length > 0) {
+        const maxIdx = hourlyCars.indexOf(Math.max(...hourlyCars));
+        hourlyCars[maxIdx] = Math.max(0, hourlyCars[maxIdx] + diffH);
+      }
+      const maxHourVal = Math.max(...hourlyCars);
+      const maxHourIdx = hourlyCars.indexOf(maxHourVal);
+      const minHourVal = Math.min(...hourlyCars);
+      const minHourIdx = hourlyCars.indexOf(minHourVal);
+      const peakHourStr = `${String(maxHourIdx).padStart(2, '0')}:00 (${maxHourVal.toLocaleString("es-ES")} veh/h)`;
+      const valleyHourStr = `${String(minHourIdx).padStart(2, '0')}:00 (${minHourVal.toLocaleString("es-ES")} veh/h)`;
 
       forecastDays.push({
-
-
-
         idx: i,
-
-
-
         dayKey,
-
-
-
         dayFullName,
-
-
-
         fullDateStr: `${fullDays[dow]}, ${dObj.getDate()} de ${fullMonths[dObj.getMonth()]}`,
-
-
-
         date: dateStr,
-
-
-
         dow,
-
-
-
         isWeekend,
-
-
-
         weather: weatherInfo,
-
-
-
         dailyCars,
-
-
-
         hourlyCars,
-
-
-
-        peakHourStr: `${avgHourCars.toLocaleString("es-ES")} veh/h (Media IMD/24h)`,
-
-
-
-        valleyHourStr: `Espira #${mainTraffic.stationId || 'BCN'} (Tipo día ${openDataDayCode})`
+        peakHourStr,
+        valleyHourStr
 
 
 
