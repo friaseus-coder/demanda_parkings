@@ -429,7 +429,7 @@ class NNApp {
         const { curMonthly, prevMonthly, prev2Monthly } = this.calculatePortfolioSensorsTrafficMonthly();
         if (this.chartGlobalMonthlyDL.data.datasets[0]) this.chartGlobalMonthlyDL.data.datasets[0].data = prev2Monthly;
         if (this.chartGlobalMonthlyDL.data.datasets[1]) this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
-        if (this.chartGlobalMonthlyDL.data.datasets[2]) this.chartGlobalMonthlyDL.data.datasets[2].data = curMonthly;
+        if (this.chartGlobalMonthlyDL.data.datasets[2]) this.chartGlobalMonthlyDL.data.datasets[2].data = curChartMonthly || curMonthly.map((v, idx) => ((typeof ACTIVE_DATA_YEARS !== 'undefined' ? ACTIVE_DATA_YEARS.estYear : 2026) === (new Date()).getFullYear() && idx >= (new Date()).getMonth()) ? null : v);
         this.chartGlobalMonthlyDL.update();
 
 
@@ -2488,9 +2488,14 @@ class NNApp {
 
 
             curMonthlyImd = prevMonthlyImd.map((val25, m) => {
-
-
-
+              // Regla real-data-only: Si el mes no está cerrado (en curso o futuro), no se proyecta total mensual
+              const nowCheck = new Date();
+              const curYearCheck = nowCheck.getFullYear();
+              const curMonthIdxCheck = nowCheck.getMonth();
+              const yEstCheck = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
+              if (yEstCheck === curYearCheck && m >= curMonthIdxCheck) {
+                return 0;
+              }
               const val24 = prev2MonthlyImd[m] || 0;
 
 
@@ -2552,9 +2557,13 @@ class NNApp {
 
 
               curMonthlyByDayType[dt] = arr25.map((v25, m) => {
-
-
-
+                const nowCheck = new Date();
+                const curYearCheck = nowCheck.getFullYear();
+                const curMonthIdxCheck = nowCheck.getMonth();
+                const yEstCheck = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
+                if (yEstCheck === curYearCheck && m >= curMonthIdxCheck) {
+                  return 0;
+                }
                 const v24 = arr24[m] || 0;
 
 
@@ -2599,22 +2608,17 @@ class NNApp {
 
 
 
-          const annualPrev2 = prev2MonthlyImd.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+          const nowAnnCheck = new Date();
+          const curYearAnnCheck = nowAnnCheck.getFullYear();
+          const curMonthIdxAnnCheck = nowAnnCheck.getMonth();
+          const yEstAnnCheck = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
+          const closedMonths = (yEstAnnCheck === curYearAnnCheck) ? curMonthIdxAnnCheck : 12;
 
-
-
-          const annualPrev = prevMonthlyImd.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
-
-
-
-          const annualCur = curMonthlyImd.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
-
-
-
+          // Comparativa rigurosa y auditable: solo meses naturales cerrados (Enero a Octubre)
+          const annualPrev2 = prev2MonthlyImd.slice(0, closedMonths).reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+          const annualPrev = prevMonthlyImd.slice(0, closedMonths).reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+          const annualCur = curMonthlyImd.slice(0, closedMonths).reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
           const yoyPct = annualPrev > 0 ? +(((annualCur - annualPrev) / annualPrev) * 100).toFixed(1) : 0;
-
-
-
           const yoy24to25Pct = annualPrev2 > 0 ? +(((annualPrev - annualPrev2) / annualPrev2) * 100).toFixed(1) : 0;
 
 
@@ -3858,7 +3862,7 @@ class NNApp {
         const { curMonthly, prevMonthly, prev2Monthly } = this.calculatePortfolioSensorsTrafficMonthly();
         if (this.chartGlobalMonthlyDL.data.datasets[0]) this.chartGlobalMonthlyDL.data.datasets[0].data = prev2Monthly;
         if (this.chartGlobalMonthlyDL.data.datasets[1]) this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
-        if (this.chartGlobalMonthlyDL.data.datasets[2]) this.chartGlobalMonthlyDL.data.datasets[2].data = curMonthly;
+        if (this.chartGlobalMonthlyDL.data.datasets[2]) this.chartGlobalMonthlyDL.data.datasets[2].data = curChartMonthly || curMonthly.map((v, idx) => ((typeof ACTIVE_DATA_YEARS !== 'undefined' ? ACTIVE_DATA_YEARS.estYear : 2026) === (new Date()).getFullYear() && idx >= (new Date()).getMonth()) ? null : v);
         this.chartGlobalMonthlyDL.update();
 
 
@@ -7843,7 +7847,7 @@ class NNApp {
 
 
 
-              data: monthlyCurTotal,
+              data: monthlyCurTotal.map((v, idx) => (yEst === (new Date()).getFullYear() && idx >= (new Date()).getMonth()) ? null : v),
 
 
 
@@ -7940,14 +7944,15 @@ class NNApp {
 
 
               callbacks: {
-
-
-
-                label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh/mes`
-
-
-
-              }
+                  label: (ctx) => {
+                    if (ctx.raw == null) {
+                      const nowTip = new Date();
+                      const isCur = ctx.dataIndex === nowTip.getMonth();
+                      return `${ctx.dataset.label}: ${isCur ? 'En curso (Incompleto)' : 'Sin datos (Futuro)'}`;
+                    }
+                    return `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh/mes`;
+                  }
+                }
 
 
 
@@ -10211,7 +10216,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-            data: monthlyHourlyCur,
+            data: monthlyHourlyCur.map((v, idx) => (yEst === (new Date()).getFullYear() && idx >= (new Date()).getMonth()) ? null : v),
 
 
 
@@ -10259,86 +10264,45 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-          this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh/h`;
-
-
-
-          this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
-
-
-
-            if (!items || items.length === 0) return [];
-
-
-
-            const idx = items[0].dataIndex;
-
-
-
-            const p2Val = monthlyHourlyPrev2[idx] || 0;
-
-
-
-            const pVal = monthlyHourlyPrev[idx] || 0;
-
-
-
-            const cVal = monthlyHourlyCur[idx] || 0;
-
-
-
-            const diffVsPrev = cVal - pVal;
-
-
-
-            const pctVsPrev = pVal > 0 ? ((diffVsPrev / pVal) * 100).toFixed(1) : '0.0';
-
-
-
-            const diffReal = pVal - p2Val;
-
-
-
-            const pctReal = p2Val > 0 ? ((diffReal / p2Val) * 100).toFixed(1) : '0.0';
-
-
-
-            return [
-
-
-
-              ' ',
-
-
-
-              `-----------------------------------------`,
-
-
-
-              `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} veh/h (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
-
-
-
-              `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} veh/h (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
-
-
-
-            ];
-
-
-
+          const nowHourC = new Date();
+          const curYearHourC = nowHourC.getFullYear();
+          const curMonthIdxHourC = nowHourC.getMonth();
+          this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => {
+            if (ctx.raw == null) {
+              const isCur = ctx.dataIndex === curMonthIdxHourC;
+              return `${ctx.dataset.label}: ${isCur ? 'En curso (Incompleto)' : 'Sin datos (Futuro)'}`;
+            }
+            return `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh/h`;
           };
-
-
-
+          this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
+            if (!items || items.length === 0) return [];
+            const idx = items[0].dataIndex;
+            const isUnclosed = (yEst === curYearHourC && idx >= curMonthIdxHourC);
+            const p2Val = monthlyHourlyPrev2[idx] || 0;
+            const pVal = monthlyHourlyPrev[idx] || 0;
+            const cVal = isUnclosed ? null : (monthlyHourlyCur[idx] || 0);
+            const diffReal = pVal - p2Val;
+            const pctReal = p2Val > 0 ? ((diffReal / p2Val) * 100).toFixed(1) : '0.0';
+            if (isUnclosed) {
+              const note = (idx === curMonthIdxHourC) ? 'Mes en curso (Incompleto)' : 'Mes futuro (Sin datos)';
+              return [
+                ' ',
+                `-----------------------------------------`,
+                `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} veh/h (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
+                `Var. Proyectada (${yPrev}→${yEst}): — (${note})`
+              ];
+            }
+            const diffVsPrev = cVal - pVal;
+            const pctVsPrev = pVal > 0 ? ((diffVsPrev / pVal) * 100).toFixed(1) : '0.0';
+            return [
+              ' ',
+              `-----------------------------------------`,
+              `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} veh/h (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
+              `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} veh/h (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
+            ];
+          };
         }
-
-
-
         this.chartTrafficPassing.update();
-
-
-
       }
 
 
@@ -10351,94 +10315,49 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+          const nowHourGrid = new Date();
+          const curYearHourGrid = nowHourGrid.getFullYear();
+          const curMonthIdxHourGrid = nowHourGrid.getMonth();
+          const isCurrentMonth = (yEst === curYearHourGrid && mIdx === curMonthIdxHourGrid);
+          const isFutureMonth = (yEst === curYearHourGrid && mIdx > curMonthIdxHourGrid);
+          const isUnclosed = isCurrentMonth || isFutureMonth;
+
           const v24 = monthlyHourlyPrev2[mIdx] || 0;
-
-
-
           const v25 = monthlyHourlyPrev[mIdx] || 0;
-
-
-
-          const v26 = monthlyHourlyCur[mIdx] || 0;
-
-
-
+          const v26 = isUnclosed ? 0 : (monthlyHourlyCur[mIdx] || 0);
           const diffUnits = v26 - v25;
-
-
-
           const pct = v25 > 0 ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
-
-
-
           const isUp = diffUnits >= 0;
-
-
-
           const sign = isUp ? "+" : "";
 
+          let badgeHtml = '';
+          let v26Display = '';
 
+          if (isCurrentMonth) {
+            v26Display = `<span class="text-amber-600 font-bold" title="Mes en curso">En curso</span>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">En curso</span>`;
+          } else if (isFutureMonth) {
+            v26Display = `<span class="text-slate-400 font-semibold" title="Mes futuro">0</span>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">Futuro</span>`;
+          } else {
+            v26Display = `<strong class="text-[#164250]">${v26}</strong>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+              isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+            }">
+              ${isUp ? '▲' : '▼'} ${sign}${pct}%
+            </span>`;
+          }
 
           return `
-
-
-
             <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all relative">
-
-
-
               <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
-
-
-
-              
-
-
-
               <div class="text-[8.5px] text-slate-400 font-mono space-y-0.5 mb-1 leading-tight text-left">
-
-
-
                 <div class="flex justify-between"><span>${yPrev2}:</span><strong class="text-slate-600">${v24}</strong></div>
-
-
-
                 <div class="flex justify-between"><span>${yPrev}:</span><strong class="text-emerald-700">${v25}</strong></div>
-
-
-
-                <div class="flex justify-between"><span>${yEst}:</span><strong class="text-[#164250]">${v26}</strong></div>
-
-
-
+                <div class="flex justify-between"><span>${yEst}:</span>${v26Display}</div>
               </div>
-
-
-
-              <span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1 py-0.5 rounded-md ${
-
-
-
-                isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-
-
-
-              }">
-
-
-
-                ${isUp ? '▲' : '▼'} ${sign}${pct}%
-
-
-
-              </span>
-
-
-
+              ${badgeHtml}
             </div>
-
-
-
           `;
 
 
@@ -10663,7 +10582,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-          data: monthlyCur,
+          data: monthlyCur.map((v, idx) => (yEst === (new Date()).getFullYear() && idx >= (new Date()).getMonth()) ? null : v),
 
 
 
@@ -10711,86 +10630,45 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-        this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} ${unitLabelShort}`;
-
-
-
-        this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
-
-
-
-          if (!items || items.length === 0) return [];
-
-
-
-          const idx = items[0].dataIndex;
-
-
-
-          const p2Val = monthlyPrev2[idx] || 0;
-
-
-
-          const pVal = monthlyPrev[idx] || 0;
-
-
-
-          const cVal = monthlyCur[idx] || 0;
-
-
-
-          const diffVsPrev = cVal - pVal;
-
-
-
-          const pctVsPrev = pVal > 0 ? ((diffVsPrev / pVal) * 100).toFixed(1) : '0.0';
-
-
-
-          const diffReal = pVal - p2Val;
-
-
-
-          const pctReal = p2Val > 0 ? ((diffReal / p2Val) * 100).toFixed(1) : '0.0';
-
-
-
-          return [
-
-
-
-            ' ',
-
-
-
-            `-----------------------------------------`,
-
-
-
-            `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} ${unitLabelShort} (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
-
-
-
-            `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} ${unitLabelShort} (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
-
-
-
-          ];
-
-
-
+        const nowDayMC = new Date();
+        const curYearDayMC = nowDayMC.getFullYear();
+        const curMonthIdxDayMC = nowDayMC.getMonth();
+        this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => {
+          if (ctx.raw == null) {
+            const isCur = ctx.dataIndex === curMonthIdxDayMC;
+            return `${ctx.dataset.label}: ${isCur ? 'En curso (Incompleto)' : 'Sin datos (Futuro)'}`;
+          }
+          return `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} ${unitLabelShort}`;
         };
-
-
-
+        this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
+          if (!items || items.length === 0) return [];
+          const idx = items[0].dataIndex;
+          const isUnclosed = (yEst === curYearDayMC && idx >= curMonthIdxDayMC);
+          const p2Val = monthlyPrev2[idx] || 0;
+          const pVal = monthlyPrev[idx] || 0;
+          const cVal = isUnclosed ? null : (monthlyCur[idx] || 0);
+          const diffReal = pVal - p2Val;
+          const pctReal = p2Val > 0 ? ((diffReal / p2Val) * 100).toFixed(1) : '0.0';
+          if (isUnclosed) {
+            const note = (idx === curMonthIdxDayMC) ? 'Mes en curso (Incompleto)' : 'Mes futuro (Sin datos)';
+            return [
+              ' ',
+              `-----------------------------------------`,
+              `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} ${unitLabelShort} (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
+              `Var. Proyectada (${yPrev}→${yEst}): — (${note})`
+            ];
+          }
+          const diffVsPrev = cVal - pVal;
+          const pctVsPrev = pVal > 0 ? ((diffVsPrev / pVal) * 100).toFixed(1) : '0.0';
+          return [
+            ' ',
+            `-----------------------------------------`,
+            `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} ${unitLabelShort} (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
+            `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} ${unitLabelShort} (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
+          ];
+        };
       }
-
-
-
       this.chartTrafficPassing.update();
-
-
-
     }
 
 
@@ -10831,94 +10709,49 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+          const nowDayMGrid = new Date();
+          const curYearDayMGrid = nowDayMGrid.getFullYear();
+          const curMonthIdxDayMGrid = nowDayMGrid.getMonth();
+          const isCurrentMonth = (yEst === curYearDayMGrid && mIdx === curMonthIdxDayMGrid);
+          const isFutureMonth = (yEst === curYearDayMGrid && mIdx > curMonthIdxDayMGrid);
+          const isUnclosed = isCurrentMonth || isFutureMonth;
+
           const v24 = monthlyPrev2[mIdx] || 0;
-
-
-
           const v25 = monthlyPrev[mIdx] || 0;
-
-
-
-          const v26 = monthlyCur[mIdx] || 0;
-
-
-
+          const v26 = isUnclosed ? 0 : (monthlyCur[mIdx] || 0);
           const diffUnits = v26 - v25;
-
-
-
           const pct = v25 > 0 ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
-
-
-
           const isUp = diffUnits >= 0;
-
-
-
           const sign = isUp ? "+" : "";
 
+          let badgeHtml = '';
+          let v26Display = '';
 
+          if (isCurrentMonth) {
+            v26Display = `<span class="text-amber-600 font-bold" title="Mes en curso (1-2 días transcurridos)">En curso</span>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200" title="Mes incompleto: no se proyecta total">En curso</span>`;
+          } else if (isFutureMonth) {
+            v26Display = `<span class="text-slate-400 font-semibold" title="Mes futuro">0</span>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200" title="Sin datos: mes futuro">Futuro</span>`;
+          } else {
+            v26Display = `<strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+              isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+            }">
+              ${isUp ? '▲' : '▼'} ${sign}${pct}%
+            </span>`;
+          }
 
           return `
-
-
-
             <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all">
-
-
-
               <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
-
-
-
-              
-
-
-
               <div class="text-[8.5px] text-slate-400 font-mono space-y-0.5 mb-1 leading-tight text-left">
-
-
-
                 <div class="flex justify-between"><span>${yPrev2}:</span><strong class="text-slate-600">${v24.toLocaleString("es-ES")}</strong></div>
-
-
-
                 <div class="flex justify-between"><span>${yPrev}:</span><strong class="text-emerald-700">${v25.toLocaleString("es-ES")}</strong></div>
-
-
-
-                <div class="flex justify-between"><span>${yEst}:</span><strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong></div>
-
-
-
+                <div class="flex justify-between"><span>${yEst}:</span>${v26Display}</div>
               </div>
-
-
-
-              <span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
-
-
-
-                isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-
-
-
-              }">
-
-
-
-                ${isUp ? '▲' : '▼'} ${sign}${pct}%
-
-
-
-              </span>
-
-
-
+              ${badgeHtml}
             </div>
-
-
-
           `;
 
 
@@ -11157,6 +10990,10 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+      <div class="flex items-center gap-1.5 text-[10px] text-emerald-800 pt-1">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+        <span><strong>Veracidad de Datos (Regla real-data-only):</strong> Al estar el mes actual (${MONTHS_LABELS[(new Date()).getMonth()]}) en curso sin cerrar y los posteriores sin transcurrir, no se generan estimaciones mensuales de volumen para meses no completados (quedando en 0 / En curso / Futuro). El crecimiento interanual auditado se calcula de forma rigurosa y homogénea sobre los meses completos cerrados (Enero a ${MONTHS_LABELS[(new Date()).getMonth() - 1]}).</span>
+      </div>
       <div class="flex items-center gap-1.5 text-[10px] text-amber-800 pt-1">
 
 
@@ -13306,6 +13143,9 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
     const count = this.parkings.length;
+    const nowKpi = new Date();
+    const curYearKpi = nowKpi.getFullYear();
+    const curMonthIdxKpi = nowKpi.getMonth();
 
 
 
@@ -13509,47 +13349,26 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-      const maxVal = Math.max(...monthlyCurTotal);
+      const closedMonthsKpi = (yEst === curYearKpi) ? curMonthIdxKpi : 12;
 
-
-
+      const validCurValues = monthlyCurTotal.slice(0, closedMonthsKpi);
+      const maxVal = validCurValues.length > 0 ? Math.max(...validCurValues) : 0;
       const maxIdx = monthlyCurTotal.indexOf(maxVal);
-
-
-
       if (peakBadgeEl) {
-
-
-
-        peakBadgeEl.innerText = `${MONTHS_LABELS[maxIdx]} (${maxVal.toLocaleString("es-ES")} veh/mes)`;
-
-
-
+        if (maxVal > 0 && maxIdx >= 0) {
+          peakBadgeEl.innerText = `Pico Máximo Sensores: ${MONTHS_LABELS[maxIdx]} (${maxVal.toLocaleString("es-ES")} veh/mes)`;
+        } else {
+          peakBadgeEl.innerText = "Sin datos cerrados";
+        }
       }
-
-
-
-      const totalCur = monthlyCurTotal.reduce((a, b) => a + b, 0);
-
-
-
-      const totalPrev = monthlyPrevTotal.reduce((a, b) => a + b, 0);
-
-
-
-      const diffPct = totalPrev > 0 ? (((totalCur - totalPrev) / totalPrev) * 100).toFixed(1) : "0.0";
-
-
-
+      const totalCurClosed = monthlyCurTotal.slice(0, closedMonthsKpi).reduce((a, b) => a + b, 0);
+      const totalPrevClosed = monthlyPrevTotal.slice(0, closedMonthsKpi).reduce((a, b) => a + b, 0);
+      const diffPct = totalPrevClosed > 0 ? (((totalCurClosed - totalPrevClosed) / totalPrevClosed) * 100).toFixed(1) : "0.0";
       if (yoyBadgeEl) {
-
-
-
-        yoyBadgeEl.innerHTML = `<span class="w-2 h-2 rounded-full ${diffPct >= 0 ? 'bg-[#10B981]' : 'bg-rose-500'}"></span> ${diffPct >= 0 ? '+' : ''}${diffPct}% Crecimiento Red Sensores (${yPrev}→${yEst})`;
-
-
-
+        const periodTag = closedMonthsKpi < 12 ? ` (Ene–${MONTHS_LABELS[closedMonthsKpi - 1]})` : '';
+        yoyBadgeEl.innerHTML = `<span class="w-2 h-2 rounded-full ${diffPct >= 0 ? 'bg-[#10B981]' : 'bg-rose-500'}"></span> ${diffPct >= 0 ? '+' : ''}${diffPct}% Crecimiento Red Sensores (${yPrev}→${yEst}${periodTag})`;
       }
+    
 
 
 
@@ -13825,7 +13644,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-          data: monthlyCurTotal,
+          data: monthlyCurTotal.map((v, idx) => (yEst === curYearKpi && idx >= curMonthIdxKpi) ? null : v),
 
 
 
@@ -13917,94 +13736,49 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+          const nowGrid = new Date();
+          const curYearGrid = nowGrid.getFullYear();
+          const curMonthIdxGrid = nowGrid.getMonth();
+          const isCurrentMonth = (yEst === curYearGrid && mIdx === curMonthIdxGrid);
+          const isFutureMonth = (yEst === curYearGrid && mIdx > curMonthIdxGrid);
+          const isUnclosed = isCurrentMonth || isFutureMonth;
+
           const v24 = monthlyPrev2Total[mIdx] || 0;
-
-
-
           const v25 = monthlyPrevTotal[mIdx] || 0;
-
-
-
-          const v26 = monthlyCurTotal[mIdx] || 0;
-
-
-
+          const v26 = isUnclosed ? 0 : (monthlyCurTotal[mIdx] || 0);
           const diffUnits = v26 - v25;
-
-
-
           const pct = v25 > 0 ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
-
-
-
           const isUp = diffUnits >= 0;
-
-
-
           const sign = isUp ? "+" : "";
 
+          let badgeHtml = '';
+          let v26Display = '';
 
+          if (isCurrentMonth) {
+            v26Display = `<span class="text-amber-600 font-bold" title="Mes en curso (1-2 días transcurridos)">En curso</span>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200" title="Mes incompleto: no se proyecta total">En curso</span>`;
+          } else if (isFutureMonth) {
+            v26Display = `<span class="text-slate-400 font-semibold" title="Mes futuro">0</span>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200" title="Sin datos: mes futuro">Futuro</span>`;
+          } else {
+            v26Display = `<strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong>`;
+            badgeHtml = `<span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+              isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+            }">
+              ${isUp ? '▲' : '▼'} ${sign}${pct}%
+            </span>`;
+          }
 
           return `
-
-
-
             <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all">
-
-
-
               <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
-
-
-
-              
-
-
-
               <div class="text-[8.5px] text-slate-400 font-mono space-y-0.5 mb-1 leading-tight text-left">
-
-
-
                 <div class="flex justify-between"><span>${yPrev2}:</span><strong class="text-slate-600">${v24.toLocaleString("es-ES")}</strong></div>
-
-
-
                 <div class="flex justify-between"><span>${yPrev}:</span><strong class="text-emerald-700">${v25.toLocaleString("es-ES")}</strong></div>
-
-
-
-                <div class="flex justify-between"><span>${yEst}:</span><strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong></div>
-
-
-
+                <div class="flex justify-between"><span>${yEst}:</span>${v26Display}</div>
               </div>
-
-
-
-              <span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
-
-
-
-                isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-
-
-
-              }">
-
-
-
-                ${isUp ? '▲' : '▼'} ${sign}${pct}%
-
-
-
-              </span>
-
-
-
+              ${badgeHtml}
             </div>
-
-
-
           `;
 
 
@@ -14030,6 +13804,10 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
     const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const nowCheck = new Date();
+    const curYearCheck = nowCheck.getFullYear();
+    const curMonthIdxCheck = nowCheck.getMonth();
+    const yEstCheck = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
 
 
 
@@ -14114,9 +13892,9 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
     const curMonthly = MONTHS_LABELS.map((_, mIdx) => {
-
-
-
+      if (yEstCheck === curYearCheck && mIdx >= curMonthIdxCheck) {
+        return 0; // Regla real-data-only: Sin mes completo no se puede estimar volumen
+      }
       const days = DAYS_IN_MONTH[mIdx] || 30;
 
 
@@ -14153,7 +13931,8 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-    return { curMonthly, prevMonthly, prev2Monthly };
+    const curChartMonthly = curMonthly.map((v, idx) => (yEstCheck === curYearCheck && idx >= curMonthIdxCheck) ? null : v);
+    return { curMonthly, prevMonthly, prev2Monthly, curChartMonthly };
 
 
 
