@@ -13,6 +13,7 @@ import re
 import json
 import webbrowser
 import unicodedata
+from datetime import datetime
 from pathlib import Path
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
@@ -77,6 +78,43 @@ class PortableAppHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
+
+        # Endpoint API: Comprobar conexión en vivo con Open Data Barcelona (CKAN v3)
+        if path == "/api/check_opendata":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+
+            connected = False
+            latency_ms = 0
+            datasets_count = 0
+            try:
+                import urllib.request, ssl, time
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+                t0 = time.time()
+                url = "https://opendata-ajuntament.barcelona.cat/data/api/3/action/package_search?q=aforaments&rows=1"
+                req = urllib.request.Request(url, headers={"User-Agent": "NN-Parkings-Pulse/1.0"})
+                with urllib.request.urlopen(req, context=ctx, timeout=6) as resp:
+                    t1 = time.time()
+                    data = json.loads(resp.read().decode("utf-8"))
+                    if data.get("success"):
+                        connected = True
+                        latency_ms = round((t1 - t0) * 1000)
+                        datasets_count = data.get("result", {}).get("count", 0)
+            except Exception:
+                connected = False
+
+            payload = {
+                "connected": connected,
+                "latency_ms": latency_ms,
+                "datasets_count": datasets_count,
+                "timestamp": datetime.now().isoformat()
+            }
+            self.wfile.write(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+            return
 
         # Endpoint API: Lista de parkings benchmark
         if path == "/api/parkings":

@@ -68,9 +68,126 @@ class NNApp {
     this.updateGlobalKPIs();
     this.setupKeyboardEvents();
     this.fetchLiveWeatherForBarcelona(41.3888, 2.1590);
+    this.checkOpenDataConnection(false);
 
     if (window.lucide) {
       lucide.createIcons();
+    }
+  }
+
+  // ===========================================================================
+  // CONEXIÓN EN TIEMPO REAL CON LA API DE OPEN DATA AJUNTAMENT DE BARCELONA
+  // ===========================================================================
+
+  async checkOpenDataConnection(userTriggered = false) {
+    const badgeTextEl = document.getElementById("openDataStatusText");
+    const badgeDotEl = document.getElementById("openDataStatusDot");
+    const latencyEl = document.getElementById("openDataLatency");
+    const btnEl = document.getElementById("btnReconnectOpenData");
+    const iconEl = document.getElementById("reconnectIcon");
+    const centerStatusEl = document.getElementById("centerOpenDataStatus");
+    const centerPingEl = document.getElementById("centerOpenDataPing");
+
+    // Feedback visual inmediato: Comprobando conexión...
+    if (iconEl) iconEl.classList.add("animate-spin");
+    if (btnEl) btnEl.disabled = true;
+    if (badgeTextEl) badgeTextEl.innerText = "OPENDATA BCN: CONECTANDO...";
+    if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
+    if (centerStatusEl) {
+      centerStatusEl.className = "font-mono-num font-bold text-amber-600 flex items-center gap-1";
+      centerStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Verificando...`;
+    }
+
+    const t0 = performance.now();
+    let isConnected = false;
+    let latencyMs = 0;
+    let totalDatasets = 0;
+
+    try {
+      // 1. Intento directo a la API pública oficial CKAN v3 de Open Data Ajuntament de Barcelona
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const apiUrl = "https://opendata-ajuntament.barcelona.cat/data/api/3/action/package_search?q=aforaments&rows=1";
+
+      const resp = await fetch(apiUrl, {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json && (json.success === true || json.result)) {
+          isConnected = true;
+          latencyMs = Math.round(performance.now() - t0);
+          totalDatasets = json.result?.count || 4;
+        }
+      }
+    } catch (e1) {
+      console.warn("[OpenData BCN] Intento directo no disponible, probando proxy local:", e1);
+      // 2. Fallback a endpoint local proxy si está corriendo server_portable.py
+      try {
+        const resp2 = await fetch("/api/check_opendata?t=" + Date.now(), { cache: "no-store" });
+        if (resp2.ok) {
+          const json2 = await resp2.json();
+          if (json2 && json2.connected) {
+            isConnected = true;
+            latencyMs = json2.latency_ms || Math.round(performance.now() - t0);
+            totalDatasets = json2.datasets_count || 4;
+          }
+        }
+      } catch (e2) {
+        console.warn("[OpenData BCN] Fallback local no respondió:", e2);
+      }
+    }
+
+    if (iconEl) iconEl.classList.remove("animate-spin");
+    if (btnEl) btnEl.disabled = false;
+
+    if (isConnected) {
+      this.openDataConnected = true;
+      if (badgeTextEl) badgeTextEl.innerText = "OPENDATA BCN · CONECTADO";
+      if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-[#10B981] pulsing-dot";
+      if (latencyEl) {
+        latencyEl.innerText = `${latencyMs} ms`;
+        latencyEl.classList.remove("hidden");
+      }
+      if (centerStatusEl) {
+        centerStatusEl.className = "font-mono-num font-semibold text-[#10B981]";
+        centerStatusEl.innerText = "Conectado OK";
+      }
+      if (centerPingEl) {
+        centerPingEl.innerText = `(${latencyMs} ms)`;
+      }
+
+      if (userTriggered) {
+        alert(`¡Conexión verificada con éxito!
+
+• Servicio: Open Data Ajuntament de Barcelona
+• Protocolo: API REST CKAN v3 (Catálogo de Aforamientos y Tráfico)
+• Latencia de respuesta: ${latencyMs} ms
+• Estado: Conectado y operativo.`);
+      }
+    } else {
+      this.openDataConnected = false;
+      if (badgeTextEl) badgeTextEl.innerText = "OPENDATA BCN · SIN CONEXIÓN";
+      if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-rose-500";
+      if (latencyEl) {
+        latencyEl.innerText = "Offline";
+        latencyEl.classList.remove("hidden");
+      }
+      if (centerStatusEl) {
+        centerStatusEl.className = "font-mono-num font-semibold text-rose-600";
+        centerStatusEl.innerText = "Desconectado";
+      }
+      if (centerPingEl) {
+        centerPingEl.innerText = "(Sin respuesta)";
+      }
+
+      if (userTriggered) {
+        alert("Aviso de Conexión:\n\nNo se ha podido conectar con la API de Open Data Ajuntament de Barcelona (tiempo de espera agotado o modo local sin Internet).\n\nPuedes pulsar 'Reconectar' para reintentar cuando dispongas de conexión.");
+      }
     }
   }
 
