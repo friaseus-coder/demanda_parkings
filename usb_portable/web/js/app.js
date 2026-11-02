@@ -29,9 +29,9 @@ class NNApp {
     // Sliders de simulación
     this.sliders = {
       rain: 0.0,
-      sat: 92,
+      sat: 0,
       event: "none",
-      tariff: 3.75
+      tariff: 0.0
     };
 
     // Referencias a mapas Leaflet
@@ -86,13 +86,7 @@ class NNApp {
 
     if (iconEl) iconEl.classList.remove("animate-spin");
 
-    // Si el usuario pulsó verificar y hay algún dato en 0, repararlo automáticamente
-    const hasZeroTraffic = this.parkings.some(p => !p.totalAnnualTrafficCurrentYear || p.totalAnnualTrafficCurrentYear <= 0);
-    if (hasZeroTraffic && this.parkings.length > 0) {
-      this.repairZeroDataAndResync(true);
-    } else {
-      this.auditDataHealth();
-    }
+    this.auditDataHealth();
 
     if (userTriggered) {
       this.openModal("apiDiagnosticModal");
@@ -106,7 +100,7 @@ class NNApp {
       return acc + (p.trafficPoints ? p.trafficPoints.filter(tp => (tp.annualCarsCurrentYear || 0) > 0).length : 0);
     }, 0);
     const totalCap = this.parkings.reduce((acc, p) => acc + (p.capacity || 0), 0);
-    const zeroTrafficCount = this.parkings.filter(p => !p.totalAnnualTrafficCurrentYear || p.totalAnnualTrafficCurrentYear <= 0).length;
+    const apiDown = (this.openDataConnected === false);
 
     const cardEl = document.getElementById("centerDataHealthCard");
     const dotEl = document.getElementById("dataHealthDot");
@@ -119,7 +113,19 @@ class NNApp {
     const modalSummaryEl = document.getElementById("modalDataAuditSummary");
     const modalDetailsEl = document.getElementById("modalDataAuditDetails");
 
-    if (count === 0) {
+    if (apiDown) {
+      if (cardEl) cardEl.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-800 transition-all cursor-pointer";
+      if (dotEl) dotEl.className = "w-2 h-2 rounded-full bg-rose-600 animate-ping";
+      if (statusEl) {
+        statusEl.className = "font-mono-num font-bold text-rose-700";
+        statusEl.innerText = "¡Alerta API Offline!";
+      }
+      if (bannerEl) {
+        bannerEl.classList.remove("hidden");
+        if (bannerTitleEl) bannerTitleEl.innerText = "Aviso de Conectividad: Una API externa no responde";
+        if (bannerDescEl) bannerDescEl.innerText = "La API de Open Data Barcelona no ha respondido. Pulsa 'Reconectar / Auditar APIs' en el encabezado para reintentar la conexión.";
+      }
+    } else if (count === 0) {
       if (cardEl) cardEl.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#F8FAFB] hover:bg-[#E6EFF3] border border-[#DFEAF0] text-slate-600 transition-all cursor-pointer";
       if (dotEl) dotEl.className = "w-2 h-2 rounded-full bg-slate-400";
       if (statusEl) {
@@ -130,73 +136,42 @@ class NNApp {
       if (modalBoxEl) modalBoxEl.className = "p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2";
       if (modalSummaryEl) {
         modalSummaryEl.className = "font-bold text-slate-700 text-xs";
-        modalSummaryEl.innerText = "Cartera vacía: esperando subida de archivo Excel (.xlsx) o CSV.";
+        modalSummaryEl.innerText = "Cartera vacía (0 aparcamientos): esperando subida de archivo Excel (.xlsx) o CSV.";
       }
       if (modalDetailsEl) {
-        modalDetailsEl.innerHTML = "• Activos cargados: 0 aparcamientos<br>• Sube tu archivo con el botón 'Cargar Excel/CSV' o pulsa 'Forzar Reparación' para cargar el catálogo auditado.";
+        modalDetailsEl.innerHTML = "• Activos cargados: 0 aparcamientos<br>• Norma activa: 100% Datos Reales (0 datos inferidos o inventados).";
       }
       return;
-    }
-
-    if (zeroTrafficCount > 0 || activeSensors < totalSensors || totalCap === 0) {
-      if (cardEl) cardEl.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-800 transition-all cursor-pointer";
-      if (dotEl) dotEl.className = "w-2 h-2 rounded-full bg-rose-600 animate-ping";
-      if (statusEl) {
-        statusEl.className = "font-mono-num font-bold text-rose-700";
-        statusEl.innerText = `¡Alerta: Datos en 0!`;
-      }
-      if (bannerEl) {
-        bannerEl.classList.remove("hidden");
-        if (bannerTitleEl) bannerTitleEl.innerText = "Alerta del Monitor de Datos: Detectados valores a 0 en la red de sensores";
-        if (bannerDescEl) bannerDescEl.innerText = `Se han detectado ${zeroTrafficCount} aparcamientos con lectura de sensores en 0 veh/mes o sin capacidad vinculada (procedentes de una sesión anterior en caché). Pulsa el botón de la derecha para repararlos al instante.`;
-      }
-      if (modalBoxEl) modalBoxEl.className = "p-4 rounded-2xl bg-rose-50 border border-rose-200 space-y-2";
-      if (modalSummaryEl) {
-        modalSummaryEl.className = "font-bold text-rose-900 text-xs";
-        modalSummaryEl.innerText = `⚠️ Se han detectado ${zeroTrafficCount} activos con lecturas en 0.`;
-      }
-      if (modalDetailsEl) {
-        modalDetailsEl.innerHTML = `• Activos cargados: ${count} aparcamientos<br>• Sensores con flujo activo (&gt;0): ${activeSensors} de ${totalSensors}<br>• Capacidad física total: ${totalCap.toLocaleString("es-ES")} plazas`;
-      }
     } else {
       if (cardEl) cardEl.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200 text-slate-700 transition-all cursor-pointer";
       if (dotEl) dotEl.className = "w-2 h-2 rounded-full bg-[#10B981] pulsing-dot";
       if (statusEl) {
         statusEl.className = "font-mono-num font-bold text-emerald-700";
-        statusEl.innerText = `${activeSensors}/${totalSensors} Sensores OK`;
+        statusEl.innerText = `0 Inferidos (${count} Activos)`;
       }
       if (bannerEl) bannerEl.classList.add("hidden");
-      if (modalBoxEl) modalBoxEl.className = "p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2";
-      if (modalSummaryEl) {
-        modalSummaryEl.className = "font-bold text-emerald-900 text-xs";
-        modalSummaryEl.innerText = "✓ Todos los sensores y gráficos están recopilando datos correctamente (0 anomalías).";
-      }
-      if (modalDetailsEl) {
-        modalDetailsEl.innerHTML = `• Activos cargados: ${count} aparcamientos<br>• Sensores con flujo viario &gt; 0: ${activeSensors} / ${totalSensors} sensores activos<br>• Capacidad física auditada: ${totalCap.toLocaleString("es-ES")} plazas`;
-      }
+    }
+
+    if (modalBoxEl) modalBoxEl.className = "p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2";
+    if (modalSummaryEl) {
+      modalSummaryEl.className = "font-bold text-emerald-900 text-xs";
+      modalSummaryEl.innerText = "✓ Norma de Veracidad Activa: 100% Datos Reales o Calculados de Reales · 0 Datos Inferidos.";
+    }
+    if (modalDetailsEl) {
+      modalDetailsEl.innerHTML = `
+        • <strong>Datos Reales del Excel (${count} activos):</strong> Obra Anterior, Obra Actual, Nombre, Coordenadas X/Y, Dirección y Distrito postal.<br>
+        • <strong>Datos Reales de APIs en Vivo:</strong> Meteorología horaria/7 días (Open-Meteo) y estado de conexión CKAN (Open Data BCN).<br>
+        • <strong>Datos Puestos a 0 (No incluidos en el Excel subido):</strong> Capacidad (${totalCap} plazas), Lecturas de sensores (${activeSensors}/${totalSensors} con datos en Excel), Cota ICGC (0 m), Pendiente (0 %), Atractores POIs (0) y Barreras de Entrada/Salida (0).
+      `;
     }
   }
 
   repairZeroDataAndResync(silent = false) {
     try {
-      let baseList = this.parkings && this.parkings.length > 0
-        ? this.parkings
-        : ((typeof PORTFOLIO_REFERENCE_CATALOG !== 'undefined' && Array.isArray(PORTFOLIO_REFERENCE_CATALOG)) ? PORTFOLIO_REFERENCE_CATALOG : []);
-
-      // Limpiar cualquier serie previa en 0 para forzar reconstrucción limpia de los 58 sensores
-      const cleaned = baseList.map(p => {
-        const copy = { ...p };
-        delete copy.trafficPoints;
-        delete copy.totalAnnualTrafficCurrentYear;
-        delete copy.totalAnnualTrafficPrevYear;
-        return copy;
-      });
-
-      this.parkings = this.mergeWithKnownPortfolio(cleaned);
-      if (!this.selectedAssetId && this.parkings.length > 0) {
-        this.selectedAssetId = this.parkings[0].id;
+      // Depura cualquier dato inferido antiguo en memoria y deja estrictamente los datos reales del Excel + 0 en los no informados
+      if (this.parkings && this.parkings.length > 0) {
+        this.parkings = this.mergeWithKnownPortfolio(this.parkings);
       }
-
       this.recalcAllParkings();
       this.renderTabsBar();
       this.renderTable();
@@ -222,12 +197,11 @@ class NNApp {
       }
 
       if (!silent) {
-        const totalCap = this.parkings.reduce((s, p) => s + (p.capacity || 0), 0);
-        alert(`¡Datos reparados y sincronizados con éxito!\n\n• Activos verificados: ${this.parkings.length} aparcamientos\n• Sensores de aforo activos: ${this.parkings.length * 2} sensores con flujo > 0\n• Capacidad física total: ${totalCap.toLocaleString("es-ES")} plazas`);
+        alert(`Auditoría de Veracidad completada:\n\n• Activos cargados del Excel: ${this.parkings.length} aparcamientos (Coordenadas X/Y, Obra, Nombre y Dirección reales)\n• Datos inferidos o inventados: 0 (todos puestos estrictamente a 0)`);
       }
     } catch (err) {
-      console.error("[Reparación de Datos] Error:", err);
-      if (!silent) alert(`Error al reparar datos: ${err.message || err}`);
+      console.error("[Auditoría de Datos] Error:", err);
+      if (!silent) alert(`Error al auditar datos: ${err.message || err}`);
     }
   }
 
@@ -367,24 +341,13 @@ class NNApp {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && Array.isArray(parsed.parkings) && parsed.parkings.length > 0) {
-          // Auditar y re-enriquecer automáticamente por si localStorage tenía sensores a 0 de una sesión previa
-          const cleaned = parsed.parkings.map(p => {
-            if (!p.totalAnnualTrafficCurrentYear || p.totalAnnualTrafficCurrentYear <= 0 || !p.capacity) {
-              const copy = { ...p };
-              delete copy.trafficPoints;
-              return copy;
-            }
-            return p;
-          });
-          this.parkings = this.mergeWithKnownPortfolio(cleaned);
-          if (parsed.sliders) {
-            this.sliders = { ...this.sliders, ...parsed.sliders };
-          }
+          // Limpiar cualquier valor inferido de sesiones antiguas en localStorage (poner a 0 todo lo no real)
+          this.parkings = this.mergeWithKnownPortfolio(parsed.parkings);
           if (parsed.selectedAssetId) {
             this.selectedAssetId = parsed.selectedAssetId;
           }
           this.savePersistedState();
-          console.log(`[Persistencia] Cartera restaurada y auditada desde localStorage (${this.parkings.length} aparcamientos).`);
+          console.log(`[Persistencia] Cartera restaurada desde localStorage con 0 datos inferidos (${this.parkings.length} aparcamientos).`);
           return;
         }
       }
@@ -392,8 +355,6 @@ class NNApp {
       console.warn("[Persistencia] Error al leer nn_parkings_state desde localStorage:", e);
     }
 
-    // La aplicación inicia sin aparcamientos pregrabados (cartera vacía).
-    // Todos los activos se cargan dinámicamente mediante archivos Excel (.xlsx/.xls), CSV o TXT.
     this.parkings = [];
     this.selectedAssetId = null;
     console.log("[Cartera Base] Iniciando sin aparcamientos pregrabados (esperando carga por XLSX/CSV).");
@@ -418,9 +379,9 @@ class NNApp {
       localStorage.removeItem("nn_parkings_state");
       this.sliders = {
         rain: 0.0,
-        sat: 92,
+        sat: 0,
         event: "none",
-        tariff: 3.75
+        tariff: 0.0
       };
 
       this.parkings = [];
@@ -433,6 +394,7 @@ class NNApp {
       this.renderGlobalMapMarkers();
       this.updateGlobalKPIs();
       this.updateSimulationControlsDisplay();
+      this.auditDataHealth();
       this.switchState("A");
 
       if (this.chartGlobalMonthlyDL) {
@@ -449,43 +411,31 @@ class NNApp {
   }
 
   mergeWithKnownPortfolio(incomingList) {
-    const baseMap = new Map();
-    const sourceList = (typeof PORTFOLIO_REFERENCE_CATALOG !== 'undefined' && Array.isArray(PORTFOLIO_REFERENCE_CATALOG))
-      ? PORTFOLIO_REFERENCE_CATALOG
-      : ((typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) ? PARKINGS_PORTFOLIO : []);
-
-    sourceList.forEach(p => {
-      if (p.id) baseMap.set(String(p.id), p);
-      if (p.obraActual) baseMap.set(String(p.obraActual), p);
-      if (p.name) baseMap.set(p.name.toLowerCase().trim(), p);
-    });
-
-    return incomingList.map((item, idx) => {
-      const idKey = String(item.id || item.obraActual || '');
-      const nameKey = (item.name || '').toLowerCase().trim();
-      const existing = baseMap.get(idKey) || baseMap.get(nameKey) || {};
-
-      const merged = { ...existing, ...item };
-
-      // Si el archivo Excel/CSV trae su propia capacidad física, se prioriza.
-      // Si no viene en el archivo pero el activo existe en el catálogo auditado de Núñez i Navarro,
-      // se asocia su capacidad física real auditada (ej. Obra #51 = 387 plazas).
-      // Si es un activo totalmente nuevo y sin capacidad en el Excel, queda en 0 (real-data-only).
-      const fileCap = (item.capacity && item.capacity > 0) ? parseInt(item.capacity, 10) : 0;
-      const refCap = (existing.capacity && existing.capacity > 0) ? parseInt(existing.capacity, 10) : 0;
-      merged.capacity = fileCap > 0 ? fileCap : refCap;
-
-      const fileTariff = (item.tariff && item.tariff > 0) ? +(parseFloat(item.tariff).toFixed(2)) : 0;
-      const refTariff = (existing.tariff && existing.tariff > 0) ? +(parseFloat(existing.tariff).toFixed(2)) : 0;
-      merged.tariff = fileTariff > 0 ? fileTariff : (refTariff > 0 ? refTariff : 3.60);
-
-      if (!merged.pois && existing.pois) merged.pois = existing.pois;
-      if (!merged.slope && existing.slope) merged.slope = existing.slope;
-      if (!merged.elevation && existing.elevation) merged.elevation = existing.elevation;
-      if (!merged.roadType && existing.roadType) merged.roadType = existing.roadType;
-      if (!merged.passThroughBase && existing.passThroughBase) merged.passThroughBase = existing.passThroughBase;
-
-      return typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(merged, idx) : merged;
+    // Regla estricta Real-Data-Only: NO se cruza con ningún catálogo inferido.
+    // Solo se conservan las columnas reales del Excel (Obra, Nombre, X, Y, Dirección) y todo dato no presente en el Excel se pone a 0.
+    return (incomingList || []).map((item, idx) => {
+      const cleanItem = {
+        id: item.id || parseInt(item.obraActual || item.obraAnterior, 10) || (1000 + idx + 1),
+        obraAnterior: item.obraAnterior || String(item.id || ""),
+        obraActual: item.obraActual || String(item.id || ""),
+        key: item.key || `obra_${item.obraActual || item.id || idx}_${idx}`,
+        name: item.name || "",
+        address: item.address || "",
+        district: item.district || "",
+        lat: !isNaN(parseFloat(item.lat)) ? parseFloat(item.lat) : 0,
+        lon: !isNaN(parseFloat(item.lon)) ? parseFloat(item.lon) : 0,
+        statusType: item.statusType || "P",
+        // Poner estrictamente a 0 cualquier valor que hubiera sido inferido en sesiones previas
+        capacity: 0,
+        tariff: 0,
+        elevation: 0,
+        slope: 0,
+        pois: 0,
+        roadType: "Sin datos en archivo",
+        passThroughBase: 0,
+        fromExcel: false
+      };
+      return typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(cleanItem, idx) : cleanItem;
     });
   }
 
@@ -580,89 +530,12 @@ class NNApp {
   }
 
   getBarcelonaUrbanEventForDate(dateObj) {
-    const dow = dateObj.getDay(); // 0=Dom, 1=Lun ... 6=Sab
-    const dayNum = dateObj.getDate();
-    const monthNum = dateObj.getMonth() + 1; // 1..12
-    const md = `${monthNum}-${dayNum}`;
-
-    // Festivos oficiales de Barcelona / Catalunya
-    const holidays = {
-      "1-1": { title: "Año Nuevo (Festivo)", tag: "Festivo Oficial", type: "sunday", desc: "Movilidad reducida por mañana, restauración familiar al mediodía.", factorEvent: 0.85 },
-      "1-6": { title: "Reyes (Festivo)", tag: "Festivo Familiar", type: "shopping", desc: "Comidas familiares y desplazamientos metropolitanos en vehículo privado.", factorEvent: 1.12 },
-      "5-1": { title: "Día del Trabajador", tag: "Festivo Oficial", type: "shopping", desc: "Intensa movilidad de ocio, restauración y frentes litorales.", factorEvent: 1.15 },
-      "6-24": { title: "Sant Joan (Festivo)", tag: "Festivo Catalunya", type: "sunday", desc: "Baja actividad laboral; rotación concentrada en zonas de ocio y costa.", factorEvent: 0.88 },
-      "8-15": { title: "La Asunción (Festivo)", tag: "Festivo Agosto", type: "sunday", desc: "Fuerte presencia turística en centro y Sagrada Família.", factorEvent: 0.92 },
-      "9-11": { title: "Diada de Catalunya", tag: "Cortes y Movilización", type: "congress", desc: "Afectaciones viarias en Eixample/Centro y alta presión de estacionamiento.", factorEvent: 1.28 },
-      "9-24": { title: "La Mercè (Fiesta Mayor)", tag: "Fiesta Mayor BCN", type: "sports", desc: "Conciertos y eventos masivos en toda Barcelona. Cortes de tráfico en superficie.", factorEvent: 1.35 },
-      "10-12": { title: "Fiesta Nacional", tag: "Apertura & Ocio", type: "shopping", desc: "Fuerte tirón de ocio, centros comerciales y restauración en Barcelona.", factorEvent: 1.22 },
-      "11-1": { title: "Todos los Santos (Festivo)", tag: "Festivo & Ocio", type: "shopping", desc: "Desplazamientos familiares, restauración a plena carga y ocio urbano.", factorEvent: 1.18 },
-      "12-6": { title: "Día de la Constitución", tag: "Campaña Navidad", type: "shopping", desc: "Puente de diciembre con máxima afluencia comercial en Eixample y centro.", factorEvent: 1.30 },
-      "12-8": { title: "La Inmaculada (Festivo)", tag: "Puente Diciembre", type: "shopping", desc: "Apertura comercial navideña autorizada y saturación en ejes centrales.", factorEvent: 1.32 },
-      "12-25": { title: "Navidad (Festivo)", tag: "Comidas Familiares", type: "sunday", desc: "Alta rotación de mediodía por comidas navideñas en toda la ciudad.", factorEvent: 0.95 },
-      "12-26": { title: "Sant Esteve (Festivo)", tag: "Festivo Catalunya", type: "shopping", desc: "Tradicional jornada de comidas familiares de Sant Esteve y ocio vespertino.", factorEvent: 1.08 }
-    };
-
-    if (holidays[md]) {
-      return { hasEvent: true, ...holidays[md] };
-    }
-
-    if (dow === 4) { // Jueves
-      return {
-        hasEvent: true,
-        title: "Actividad Fira / Congresos BCN",
-        tag: "Congresos & Negocios",
-        type: "congress",
-        desc: "Pico semanal de negocios, ferias profesionales y restauración ejecutiva (afterwork).",
-        factorEvent: 1.18
-      };
-    }
-    if (dow === 5) { // Viernes
-      return {
-        hasEvent: true,
-        title: "Víspera Fin de Semana",
-        tag: "Comercio, Teatros y Cenas",
-        type: "leisure",
-        desc: "Solape de jornada laboral con compras de tarde, cartelera teatral y restauración nocturna.",
-        factorEvent: 1.22
-      };
-    }
-    if (dow === 6) { // Sábado
-      return {
-        hasEvent: true,
-        title: "Sábado Comercial & Eventos BCN",
-        tag: "Shopping & Agenda Urbana",
-        type: "sports",
-        desc: "Máxima afluencia comercial metropolitana en Eixample/Diagonal y eventos deportivos/culturales.",
-        factorEvent: 1.26
-      };
-    }
-    if (dow === 0) { // Domingo
-      return {
-        hasEvent: false,
-        title: "Jornada Dominical",
-        tag: "Paseo & Restauración",
-        type: "sunday",
-        desc: "Tráfico laboral nulo; demanda concentrada en almuerzos familiares, cultura y ocio.",
-        factorEvent: 0.82
-      };
-    }
-    if (dow === 2 || dow === 3) { // Martes / Miércoles
-      return {
-        hasEvent: false,
-        title: "Plena Actividad Laboral BCN",
-        tag: "Oficinas, Clínicas & Gestión",
-        type: "business",
-        desc: "Alta rotación matinal y vespertina en despachos, centros médicos y sedes corporativas.",
-        factorEvent: 1.05
-      };
-    }
-    // Lunes
     return {
       hasEvent: false,
-      title: "Inicio de Semana Laboral",
-      tag: "Corporativo & Pendular",
-      type: "business",
-      desc: "Entrada pendular metropolitana, gestiones administrativas y actividad comercial.",
+      title: "Sin eventos en archivo",
+      tag: "Sin datos",
+      type: "none",
+      desc: "No se infieren eventos semanales ni ferias no cargadas.",
       factorEvent: 1.00
     };
   }
@@ -1001,10 +874,10 @@ class NNApp {
     const obraBadge = enriched.obraActual ? `Obra #${enriched.obraActual} • ` : "";
     document.getElementById("detailTitle").innerText = enriched.name;
     document.getElementById("detailAddress").innerText = `${obraBadge}${enriched.address} • Distrito: ${enriched.district} • Coord: (${enriched.lon.toFixed(5)}, ${enriched.lat.toFixed(5)})`;
-    document.getElementById("detailRoadType").innerText = enriched.roadType || "Arterial Primaria";
-    const elevVal = enriched.elevation || 38;
-    const slopeVal = enriched.slope || 1.2;
-    const poisVal = enriched.pois || 112;
+    document.getElementById("detailRoadType").innerText = enriched.roadType || "Sin datos en archivo";
+    const elevVal = enriched.elevation || 0;
+    const slopeVal = enriched.slope || 0;
+    const poisVal = enriched.pois || 0;
 
     document.getElementById("detailElevation").innerText = `${elevVal} m`;
     document.getElementById("detailSlope").innerText = `${slopeVal} %`;
@@ -1012,40 +885,44 @@ class NNApp {
 
     const elevDescEl = document.getElementById("detailElevationDesc");
     if (elevDescEl) {
-      elevDescEl.innerHTML = `<strong>¿Qué significa?:</strong> El aparcamiento está a <strong>${elevVal} metros</strong> sobre el nivel del mar (cota oficial ICGC en ${enriched.district}). Permite medir el desnivel real respecto a las manzanas vecinas.`;
+      elevDescEl.innerHTML = elevVal > 0
+        ? `<strong>¿Qué significa?:</strong> Altitud de <strong>${elevVal} metros</strong> sobre el nivel del mar para medir el desnivel respecto a las manzanas vecinas.`
+        : `<strong>¿Qué significa?:</strong> Altitud sobre el nivel del mar (ICGC). <strong>Actualmente a 0 m</strong> porque este dato no figura en el Excel de coordenadas subido (0 datos inferidos).`;
     }
 
     const slopeTagEl = document.getElementById("detailSlopeTag");
     const slopeDescEl = document.getElementById("detailSlopeDesc");
-    if (slopeVal <= 2.0) {
+    if (slopeVal === 0) {
+      if (slopeTagEl) {
+        slopeTagEl.className = "text-[10px] font-semibold text-slate-500 block";
+        slopeTagEl.innerText = "Sin datos en archivo (0%)";
+      }
+      if (slopeDescEl) {
+        slopeDescEl.innerHTML = `<strong>¿Qué significa?:</strong> Inclinación de la calle (metros que sube por cada 100 m) para calcular el esfuerzo de caminar (Ley de Tobler). <strong>Puesto a 0 %</strong> por no venir en el Excel cargado.`;
+      }
+    } else if (slopeVal <= 2.0) {
       if (slopeTagEl) {
         slopeTagEl.className = "text-[10px] font-semibold text-emerald-700 block";
         slopeTagEl.innerText = "Tobler neutra (Terreno llano)";
       }
       if (slopeDescEl) {
-        slopeDescEl.innerHTML = `<strong>¿Qué significa?:</strong> La calle sube solo <strong>${slopeVal} m por cada 100 m</strong>. Según la Ley de Tobler, al ser llana (&le;2%), el conductor camina a pie sin esfuerzo extra (radio completo de 300 m).`;
-      }
-    } else if (slopeVal <= 3.2) {
-      if (slopeTagEl) {
-        slopeTagEl.className = "text-[10px] font-semibold text-amber-700 block";
-        slopeTagEl.innerText = "Tobler moderada (Ligera pendiente)";
-      }
-      if (slopeDescEl) {
-        slopeDescEl.innerHTML = `<strong>¿Qué significa?:</strong> La calle tiene una inclinación de <strong>${slopeVal} m cada 100 m</strong>. Esta pendiente ligera reduce un ~12% la distancia que el cliente acepta caminar tras aparcar.`;
+        slopeDescEl.innerHTML = `<strong>¿Qué significa?:</strong> La calle sube <strong>${slopeVal} m por cada 100 m</strong>. Al ser llana (&le;2%), el conductor camina a pie sin esfuerzo extra.`;
       }
     } else {
       if (slopeTagEl) {
-        slopeTagEl.className = "text-[10px] font-semibold text-rose-700 block";
-        slopeTagEl.innerText = "Penalización Tobler (Cuesta)";
+        slopeTagEl.className = "text-[10px] font-semibold text-amber-700 block";
+        slopeTagEl.innerText = "Con pendiente (Tobler)";
       }
       if (slopeDescEl) {
-        slopeDescEl.innerHTML = `<strong>¿Qué significa?:</strong> Pendiente pronunciada (<strong>${slopeVal} m cada 100 m</strong>). Por la fricción de cuesta (Tobler), el usuario evita caminar lejos y busca aparcar lo más cerca posible de su destino.`;
+        slopeDescEl.innerHTML = `<strong>¿Qué significa?:</strong> La calle tiene una inclinación de <strong>${slopeVal} m cada 100 m</strong>, reduciendo la distancia que el usuario acepta caminar.`;
       }
     }
 
     const poisDescEl = document.getElementById("detailPoisDesc");
     if (poisDescEl) {
-      poisDescEl.innerHTML = `<strong>¿Qué significa?:</strong> Hay <strong>${poisVal} locales activos</strong> (comercios, oficinas, clínicas, restaurantes y centros) a menos de 5 min a pie (~300 m) que generan visitas continuas en coche.`;
+      poisDescEl.innerHTML = poisVal > 0
+        ? `<strong>¿Qué significa?:</strong> Hay <strong>${poisVal} locales activos</strong> (comercios, oficinas, clínicas y restaurantes) a menos de 5 min a pie (~300 m).`
+        : `<strong>¿Qué significa?:</strong> Comercios, oficinas, clínicas y restaurantes a menos de 5 min a pie (~300 m). <strong>Puesto a 0</strong> porque el Excel subido no incluye recuento de locales.`;
     }
 
     // 2. Cuatro Tarjetas Ejecutivas Superiores (Interanuales)
@@ -1902,7 +1779,7 @@ class NNApp {
           ],
           datasets: [{
             label: 'Índice de Presión (0-100)',
-            data: [75, 80, 85, 90, 70, 82],
+            data: [0, 0, 0, 0, 0, 0],
             backgroundColor: 'rgba(0, 75, 87, 0.20)',
             borderColor: '#004B57',
             pointBackgroundColor: '#10B981',
@@ -1931,7 +1808,7 @@ class NNApp {
             r: {
               angleLines: { color: '#E2E8F0' },
               grid: { color: '#F1F5F9' },
-              suggestedMin: 15,
+              suggestedMin: 0,
               suggestedMax: 100,
               ticks: { display: false },
               pointLabels: {
@@ -1956,7 +1833,7 @@ class NNApp {
     const poisIdx = (p.pois && p.pois > 0) ? Math.max(0, Math.min(100, Math.round((p.pois / 200) * 100))) : 0;
     const deficitIdx = hasCap ? Math.max(0, Math.min(100, Math.round(((calc.deficit || 0) / 120) * 100))) : 0;
     const cruisingIdx = hasCap ? Math.max(0, Math.min(100, Math.round(((calc.cruising || 0) / 150) * 100))) : 0;
-    const topoEaseIdx = Math.max(0, Math.min(100, Math.round(100 - (p.slope || 1.4) * 15)));
+    const topoEaseIdx = (p.slope && p.slope > 0) ? Math.max(0, Math.min(100, Math.round(100 - p.slope * 15))) : 0;
     const huffIdx = hasCap ? Math.max(0, Math.min(100, Math.round(((calc.dl || 0) / 200) * 100))) : 0;
 
     this.radarChart.data.datasets[0].data = [
@@ -2751,14 +2628,14 @@ class NNApp {
     if (elStep4) elStep4.innerText = `${calc.dl} veh/h`;
     if (elDLText) elDLText.innerText = `${calc.dl} veh/h`;
     if (elBar) {
-      const pct = Math.min(100, Math.max(10, Math.round((calc.dl / Math.max(1, wf.grossFlow)) * 100)));
+      const pct = wf.grossFlow > 0 ? Math.min(100, Math.round((calc.dl / wf.grossFlow) * 100)) : 0;
       elBar.style.width = `${pct}%`;
     }
 
     // Auditoría Matemática de la Fórmula del Tráfico Pasante
-    const roadType = p.roadType || "Distribuidora Eixample";
-    const kappaBase = p.passThroughBase || ((roadType.toLowerCase().includes("arterial")) ? 0.72 : (roadType.toLowerCase().includes("superilla") || roadType.toLowerCase().includes("peatonal") ? 0.25 : (roadType.toLowerCase().includes("malla") || roadType.toLowerCase().includes("residencial") ? 0.42 : 0.60)));
-    const omega = 1.05; // Hora punta estándar comercial
+    const roadType = p.roadType || "Sin datos en archivo";
+    const kappaBase = p.passThroughBase || 0;
+    const omega = kappaBase > 0 ? 1.05 : 0;
     const kappaPct = wf.passThroughPct; // Consistencia 100% con la barra del Waterfall
     const localPct = (100 - kappaPct).toFixed(1);
 
@@ -2800,7 +2677,7 @@ class NNApp {
     const mainTraffic = p.trafficPoints?.[0] || {};
     const annualCars = mainTraffic.annualCarsCurrentYear || p.totalAnnualTrafficCurrentYear || 0;
     const baseDailyCars = Math.round(annualCars / 365);
-    const yoyTrend = (mainTraffic.yoyGrowthPct || 1.8);
+    const yoyTrend = (mainTraffic.yoyGrowthPct || 0);
 
     const today = new Date();
     const forecastDays = [];
@@ -2821,10 +2698,14 @@ class NNApp {
         const tMax = liveDaily.temperature_2m_max?.[i] ?? 20;
         weatherInfo = this.mapWmoWeatherCode(wCode, rainMm, tMax);
       } else {
-        const fallbackCodes = [1, 0, 2, 61, 1, 0, 2];
-        const fallbackRain = [0.0, 0.0, 0.0, 4.2, 0.0, 0.0, 0.5];
-        const fallbackTemp = [19, 20, 19, 17, 19, 21, 20];
-        weatherInfo = this.mapWmoWeatherCode(fallbackCodes[i % 7], fallbackRain[i % 7], fallbackTemp[i % 7]);
+        weatherInfo = {
+          iconName: "cloud",
+          condition: "Sin conexión a Open-Meteo",
+          rainMm: 0,
+          tempMax: 0,
+          desc: "0 mm • 0°C",
+          factorRain: 1.0
+        };
       }
 
       // Factores reales de variación día a día en Barcelona según la pauta semanal:

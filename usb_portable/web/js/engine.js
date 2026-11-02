@@ -20,15 +20,15 @@ const DemandEngine = {
    */
   calculate(parking, options = {}) {
     const rain = options.rain !== undefined ? options.rain : 0.0;
-    const sat = options.saturation !== undefined ? options.saturation : (parking.saturation || 90);
+    const sat = options.saturation !== undefined ? options.saturation : (parking.saturation || 0);
     const event = options.event || "none";
-    const tariff = options.tariff !== undefined ? options.tariff : (parking.tariff || 3.60);
+    const tariff = options.tariff !== undefined ? options.tariff : (parking.tariff || 0);
     const hour = options.hour !== undefined ? options.hour : 18;
 
     const cap = (parking.capacity && parking.capacity > 0) ? parking.capacity : 0;
-    const slope = parking.slope || 1.5;
+    const slope = parking.slope || 0;
     const pois = (parking.pois && parking.pois > 0) ? parking.pois : 0;
-    const kappaBase = parking.passThroughBase || 0.60;
+    const kappaBase = parking.passThroughBase || 0;
 
     // Regla real-data-only: Si no se dispone de capacidad física de plazas en el archivo cargado,
     // todas las métricas de demanda, agitación (cruising) y aforo exterior son estrictamente 0.
@@ -557,13 +557,13 @@ const DemandEngine = {
 
       const rowIdx = parsed.length;
       if (isNaN(lat) || isNaN(lon)) {
-        lat = +(41.3880 + Math.sin(rowIdx + 1) * 0.012).toFixed(6);
-        lon = +(2.1580 + Math.cos(rowIdx + 1) * 0.018).toFixed(6);
+        lat = 0;
+        lon = 0;
       }
 
       const inferredDistrict = district || (typeof inferBarcelonaDistrict === "function"
         ? inferBarcelonaDistrict(name, address, lat, lon)
-        : "Eixample");
+        : "Barcelona");
 
       const numericId = parseInt(obraActual || obraAnterior, 10);
       const uniqueId = (!isNaN(numericId) && !parsed.some(p => p.id === numericId))
@@ -580,8 +580,12 @@ const DemandEngine = {
         address: address,
         lat: lat,
         lon: lon,
-        capacity: capacity,
-        tariff: tariff,
+        capacity: capacity || 0,
+        tariff: tariff || 0,
+        elevation: 0,
+        slope: 0,
+        pois: 0,
+        fromExcel: true,
         statusType: statusType || "P"
       };
 

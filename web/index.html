@@ -588,11 +588,11 @@
           <div class="bg-[#F8FAFB] p-3.5 rounded-2xl border border-[#DFEAF0] flex flex-col justify-between">
             <div class="text-center">
               <span class="text-slate-500 block font-bold uppercase tracking-wider text-[10px]">Cota ICGC</span>
-              <span id="detailElevation" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">38 m</span>
+              <span id="detailElevation" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">0 m</span>
               <span class="text-[10px] font-semibold text-[#0284C7] block">sobre el nivel del mar</span>
             </div>
             <p id="detailElevationDesc" class="text-[10.5px] text-slate-600 mt-2.5 pt-2 border-t border-slate-200/80 leading-snug text-left">
-              <strong>¿Qué significa?:</strong> Es la altitud del terreno respecto al mar (según el Institut Cartogràfic de Catalunya). Sirve para medir si las calles vecinas tienen desnivel.
+              <strong>¿Qué significa?:</strong> Altitud sobre el nivel del mar (ICGC). <strong>Actualmente a 0 m</strong> porque este dato no figura en el Excel de coordenadas subido (0 datos inferidos).
             </p>
           </div>
 
@@ -600,11 +600,11 @@
           <div class="bg-[#F8FAFB] p-3.5 rounded-2xl border border-[#DFEAF0] flex flex-col justify-between">
             <div class="text-center">
               <span class="text-slate-500 block font-bold uppercase tracking-wider text-[10px]">Pendiente Media</span>
-              <span id="detailSlope" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">1.2 %</span>
-              <span id="detailSlopeTag" class="text-[10px] font-semibold text-emerald-700 block">Tobler neutra (Terreno llano)</span>
+              <span id="detailSlope" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">0 %</span>
+              <span id="detailSlopeTag" class="text-[10px] font-semibold text-slate-500 block">Sin datos en archivo (0%)</span>
             </div>
             <p id="detailSlopeDesc" class="text-[10.5px] text-slate-600 mt-2.5 pt-2 border-t border-slate-200/80 leading-snug text-left">
-              <strong>¿Qué significa?:</strong> Inclinación de la calle (sube 1,2 m cada 100 m). Al ser llana (&lt;2%), el conductor camina a pie sin esfuerzo extra tras aparcar (Ley de Tobler).
+              <strong>¿Qué significa?:</strong> Inclinación de la calle (metros que sube por cada 100 m) para calcular el esfuerzo de caminar (Ley de Tobler). <strong>Puesto a 0 %</strong> por no venir en el Excel cargado.
             </p>
           </div>
 
@@ -612,11 +612,11 @@
           <div class="bg-[#F8FAFB] p-3.5 rounded-2xl border border-[#DFEAF0] flex flex-col justify-between">
             <div class="text-center">
               <span class="text-slate-500 block font-bold uppercase tracking-wider text-[10px]">Atractores (5m)</span>
-              <span id="detailPois" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">112</span>
+              <span id="detailPois" class="text-xl font-extrabold font-mono-num text-[#1A4B5B] mt-0.5 block">0</span>
               <span class="text-[10px] font-semibold text-[#164250] block">locales y centros (a 5 min)</span>
             </div>
             <p id="detailPoisDesc" class="text-[10.5px] text-slate-600 mt-2.5 pt-2 border-t border-slate-200/80 leading-snug text-left">
-              <strong>¿Qué significa?:</strong> Número de comercios, oficinas, restaurantes, clínicas y negocios a menos de 5 min a pie (~300 m) que atraen visitas en coche al parking.
+              <strong>¿Qué significa?:</strong> Comercios, oficinas, clínicas y restaurantes a menos de 5 min a pie (~300 m). <strong>Puesto a 0</strong> porque el Excel subido no incluye recuento de locales.
             </p>
           </div>
         </div>
@@ -1721,12 +1721,11 @@
         <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">2. Auditoría de Recopilación de Datos en Gráficos y Sensores</div>
         <div id="modalDataAuditBox" class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
           <div id="modalDataAuditSummary" class="font-bold text-emerald-900 text-xs">
-            Todos los sensores y gráficos están recopilando datos correctamente.
+            ✓ Norma de Veracidad Activa: 100% Datos Reales o Calculados de Reales · 0 Datos Inferidos.
           </div>
           <div id="modalDataAuditDetails" class="text-[11px] text-slate-600 space-y-1 font-mono">
-            • Activos cargados: 29 aparcamientos<br>
-            • Sensores con flujo viario &gt; 0: 58 / 58 sensores activos<br>
-            • Capacidad física auditada: 8.317 plazas
+            • Activos cargados: 0 aparcamientos<br>
+            • Datos inferidos o inventados: 0 (todos puestos estrictamente a 0)
           </div>
         </div>
       </div>
@@ -1735,7 +1734,7 @@
       <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
         <button type="button" onclick="app.repairZeroDataAndResync()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
           <i data-lucide="zap" class="w-4 h-4"></i>
-          <span>Forzar Reparación y Recálculo de Datos</span>
+          <span>Depurar Inferidos (Poner a 0 No Reales)</span>
         </button>
         <div class="flex items-center gap-2">
           <button type="button" onclick="app.checkAllApisAndDataHealth(true)" class="px-4 py-2 rounded-xl bg-[#164250] hover:bg-[#0D2730] text-white font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
@@ -1752,8 +1751,8 @@
   </div>
 
   <!-- Scripts de la Aplicación (con versión actualizada para evitar caché antigua) -->
-  <script src="js/data.js?v=3.2"></script>
-  <script src="js/engine.js?v=3.2"></script>
-  <script src="js/app.js?v=3.2"></script>
+  <script src="js/data.js?v=3.3"></script>
+  <script src="js/engine.js?v=3.3"></script>
+  <script src="js/app.js?v=3.3"></script>
 </body>
 </html>
