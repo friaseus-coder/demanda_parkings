@@ -1638,26 +1638,22 @@ class NNApp {
 
 
 
-      // C) Poblar BCN_EVENTS_7DAYS en memoria con los eventos oficiales deduplicados y ordenados por fecha
-
-
-
+      // C) Poblar BCN_EVENTS_7DAYS integrando la agenda oficial de recintos (Complex Olímpic BSM) con las APIs en vivo
       if (typeof BCN_EVENTS_7DAYS !== "undefined") {
+        const existingKeys = new Set(unifiedEvents.map(e => `${e.date}_${(e.title || '').slice(0, 15).toLowerCase()}`));
+        const baseOfficial = (typeof BCN_OFFICIAL_EVENTS_SCHEDULE !== "undefined") ? BCN_OFFICIAL_EVENTS_SCHEDULE : [];
 
-
+        baseOfficial.forEach(bev => {
+          const titleKey = `${bev.date}_${(bev.title || '').slice(0, 15).toLowerCase()}`;
+          if (!existingKeys.has(titleKey)) {
+            unifiedEvents.push(bev);
+            existingKeys.add(titleKey);
+          }
+        });
 
         BCN_EVENTS_7DAYS.length = 0;
-
-
-
         unifiedEvents.sort((a, b) => a.date.localeCompare(b.date));
-
-
-
         unifiedEvents.forEach(ev => BCN_EVENTS_7DAYS.push(ev));
-
-
-
       }
 
 
@@ -11896,7 +11892,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-      const knownVenue = (typeof BCN_MAJOR_VENUES !== 'undefined' && BCN_MAJOR_VENUES[evt.venueId]) ? BCN_MAJOR_VENUES[evt.venueId] : null;
+      const knownVenue = (typeof BCN_MAJOR_VENUES !== 'undefined' && BCN_MAJOR_VENUES[evt.venueId]) ? BCN_MAJOR_VENUES[evt.venueId] : ((typeof BCN_VENUES !== 'undefined' && BCN_VENUES[evt.venueId]) ? BCN_VENUES[evt.venueId] : null);
 
 
 
