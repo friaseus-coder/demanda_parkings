@@ -426,18 +426,10 @@ class NNApp {
 
 
 
-        const { curMonthly, prevMonthly } = this.calculatePortfolioSensorsTrafficMonthly();
-
-
-
-        this.chartGlobalMonthlyDL.data.datasets[0].data = curMonthly;
-
-
-
-        this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
-
-
-
+        const { curMonthly, prevMonthly, prev2Monthly } = this.calculatePortfolioSensorsTrafficMonthly();
+        if (this.chartGlobalMonthlyDL.data.datasets[0]) this.chartGlobalMonthlyDL.data.datasets[0].data = prev2Monthly;
+        if (this.chartGlobalMonthlyDL.data.datasets[1]) this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
+        if (this.chartGlobalMonthlyDL.data.datasets[2]) this.chartGlobalMonthlyDL.data.datasets[2].data = curMonthly;
         this.chartGlobalMonthlyDL.update();
 
 
@@ -2094,83 +2086,36 @@ class NNApp {
 
 
 
-      const fetchPromises = [
+      // Consultar secuencialmente con reintento para evitar error 503 (concurrencia de CKAN) en Open Data Barcelona
+      const fetchWithRetry = async (sql, retries = 2) => {
+        const url = `https://opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql?sql=${encodeURIComponent(sql)}`;
+        for (let attempt = 0; attempt <= retries; attempt++) {
+          try {
+            const resp = await fetch(url);
+            if (resp.ok) {
+              const json = await resp.json();
+              if (json?.result?.records) return json.result.records;
+            }
+          } catch (e) {
+            console.warn(`[Open Data BCN] Intento ${attempt + 1} fallido:`, e);
+          }
+          if (attempt < retries) await new Promise(r => setTimeout(r, 600));
+        }
+        return [];
+      };
 
-
-
-        fetch(`https://opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql?sql=${encodeURIComponent(sql2025)}`),
-
-
-
-        fetch(`https://opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql?sql=${encodeURIComponent(sql2024)}`)
-
-
-
-      ];
-
-
-
+      const records25 = await fetchWithRetry(sql2025);
+      const records24 = await fetchWithRetry(sql2024);
+      let records26 = [];
       if (resource2026Id) {
-
-
-
         const sql2026 = `
-
-
-
           SELECT "Id_aforament", "Mes", "Codi_tipus_dia", ROUND(AVG(CAST("Valor_IMD" AS NUMERIC))) AS imd
-
-
-
           FROM "${resource2026Id}"
-
-
-
           WHERE "Id_aforament" IN (${idListSql}) AND "Valor_IMD" ~ '^[0-9]+$' AND CAST("Valor_IMD" AS NUMERIC) > 0
-
-
-
           GROUP BY "Id_aforament", "Mes", "Codi_tipus_dia"
-
-
-
         `;
-
-
-
-        fetchPromises.push(fetch(`https://opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql?sql=${encodeURIComponent(sql2026)}`));
-
-
-
+        records26 = await fetchWithRetry(sql2026);
       }
-
-
-
-      const responses = await Promise.all(fetchPromises);
-
-
-
-      const resp25 = responses[0];
-
-
-
-      const resp24 = responses[1];
-
-
-
-      const resp26 = resource2026Id && responses[2] ? responses[2] : null;
-
-
-
-      const records25 = resp25.ok ? ((await resp25.json())?.result?.records || []) : [];
-
-
-
-      const records24 = resp24.ok ? ((await resp24.json())?.result?.records || []) : [];
-
-
-
-      const records26 = resp26 && resp26.ok ? ((await resp26.json())?.result?.records || []) : [];
 
 
 
@@ -3910,18 +3855,10 @@ class NNApp {
 
 
 
-        const { curMonthly, prevMonthly } = this.calculatePortfolioSensorsTrafficMonthly();
-
-
-
-        this.chartGlobalMonthlyDL.data.datasets[0].data = curMonthly;
-
-
-
-        this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
-
-
-
+        const { curMonthly, prevMonthly, prev2Monthly } = this.calculatePortfolioSensorsTrafficMonthly();
+        if (this.chartGlobalMonthlyDL.data.datasets[0]) this.chartGlobalMonthlyDL.data.datasets[0].data = prev2Monthly;
+        if (this.chartGlobalMonthlyDL.data.datasets[1]) this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
+        if (this.chartGlobalMonthlyDL.data.datasets[2]) this.chartGlobalMonthlyDL.data.datasets[2].data = curMonthly;
         this.chartGlobalMonthlyDL.update();
 
 
