@@ -2,7 +2,15 @@
 
 
 
+
+
+
+
  * Aplicación Web Principal - NN Parkings Barcelona
+
+
+
+
 
 
 
@@ -10,7 +18,15 @@
 
 
 
+
+
+
+
  * 1. Pestaña Global (Torre de Control)
+
+
+
+
 
 
 
@@ -18,7 +34,15 @@
 
 
 
+
+
+
+
  * 3. Identificación de Puntos en los que pasan coches (Aforos viarios, Entradas y Salidas)
+
+
+
+
 
 
 
@@ -26,7 +50,15 @@
 
 
 
+
+
+
+
  *    - Gráfico 1: Tráfico Pasante Interanual (Año Anterior vs. Actual: ¿Creció o decreció?)
+
+
+
+
 
 
 
@@ -34,7 +66,15 @@
 
 
 
+
+
+
+
  *    - Gráfico 3: Análisis de Puntos de Entrada (Cómo empezó hace 1 año y evolución)
+
+
+
+
 
 
 
@@ -42,7 +82,15 @@
 
 
 
+
+
+
+
  */
+
+
+
+
 
 
 
@@ -50,7 +98,15 @@ class NNApp {
 
 
 
+
+
+
+
   constructor() {
+
+
+
+
 
 
 
@@ -58,7 +114,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.selectedAssetId = null;
+
+
+
+
 
 
 
@@ -66,7 +130,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.searchQuery = "";
+
+
+
+
 
 
 
@@ -74,7 +146,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.chart1Unit = "day"; // 'day' (IMD veh/día), 'hour' (veh/h), 'month' (veh/mes)
+
+
+
+
 
 
 
@@ -82,7 +162,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.currentEventFilter = "all"; // 'all', 'olimpic', 'fcb', 'fira'
+
+
+
+
 
 
 
@@ -90,11 +178,23 @@ class NNApp {
 
 
 
+
+
+
+
     // Cartera inicialmente vacía hasta que el usuario cargue un archivo Excel / CSV / TXT
 
 
 
+
+
+
+
     this.parkings = [];
+
+
+
+
 
 
 
@@ -102,11 +202,23 @@ class NNApp {
 
 
 
+
+
+
+
     this.sliders = {
 
 
 
+
+
+
+
       rain: 0.0,
+
+
+
+
 
 
 
@@ -114,7 +226,15 @@ class NNApp {
 
 
 
+
+
+
+
       event: "none",
+
+
+
+
 
 
 
@@ -122,7 +242,15 @@ class NNApp {
 
 
 
+
+
+
+
     };
+
+
+
+
 
 
 
@@ -130,7 +258,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.leafletMap = null;
+
+
+
+
 
 
 
@@ -138,7 +274,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.markersLayer = null;
+
+
+
+
 
 
 
@@ -146,7 +290,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.detailIsochronesLayer = null;
+
+
+
+
 
 
 
@@ -154,7 +306,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.detailNearbySensorsLayer = null;
+
+
+
+
 
 
 
@@ -162,7 +322,15 @@ class NNApp {
 
 
 
+
+
+
+
     // Referencias a los Gráficos de Chart.js
+
+
+
+
 
 
 
@@ -170,7 +338,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.chartInOutBalance = null;
+
+
+
+
 
 
 
@@ -178,7 +354,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.chartIntradayTraffic = null;
+
+
+
+
 
 
 
@@ -186,7 +370,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.radarChart = null;
+
+
+
+
 
 
 
@@ -194,7 +386,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.selectedIntradayDayIdx = 0;
+
+
+
+
 
 
 
@@ -202,11 +402,23 @@ class NNApp {
 
 
 
+
+
+
+
     this.liveWeatherCache = {};
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -214,11 +426,23 @@ class NNApp {
 
 
 
+
+
+
+
     this.loadPersistedState();
 
 
 
+
+
+
+
     this.recalcAllParkings();
+
+
+
+
 
 
 
@@ -226,7 +450,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.initLeafletMaps();
+
+
+
+
 
 
 
@@ -234,7 +466,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.renderTable();
+
+
+
+
 
 
 
@@ -242,11 +482,23 @@ class NNApp {
 
 
 
+
+
+
+
     this.setupKeyboardEvents();
 
 
 
+
+
+
+
     this.auditDataHealth();
+
+
+
+
 
 
 
@@ -254,7 +506,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (window.lucide) {
+
+
+
+
 
 
 
@@ -262,11 +522,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -274,7 +546,15 @@ class NNApp {
 
 
 
+
+
+
+
     const iconEl = document.getElementById("reconnectIcon");
+
+
+
+
 
 
 
@@ -282,7 +562,15 @@ class NNApp {
 
 
 
+
+
+
+
     await Promise.allSettled([
+
+
+
+
 
 
 
@@ -290,7 +578,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.fetchLiveWeatherForBarcelona(41.3888, 2.1590),
+
+
+
+
 
 
 
@@ -298,7 +594,15 @@ class NNApp {
 
 
 
+
+
+
+
     ]);
+
+
+
+
 
 
 
@@ -306,7 +610,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.auditDataHealth();
+
+
+
+
 
 
 
@@ -314,7 +626,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.openModal("apiDiagnosticModal");
+
+
+
+
 
 
 
@@ -322,11 +642,23 @@ class NNApp {
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
   /**
+
+
+
+
 
 
 
@@ -334,7 +666,15 @@ class NNApp {
 
 
 
+
+
+
+
    * y Open-Meteo Elevation (Copernicus DEM) para cada aparcamiento cargado en la cartera:
+
+
+
+
 
 
 
@@ -342,7 +682,15 @@ class NNApp {
 
 
 
+
+
+
+
    * 2. Atractores / POIs reales a 5 min (~300 m) del Censo de Locales en Planta Baja de Barcelona.
+
+
+
+
 
 
 
@@ -350,7 +698,15 @@ class NNApp {
 
 
 
+
+
+
+
    */
+
+
+
+
 
 
 
@@ -358,7 +714,15 @@ class NNApp {
 
 
 
+
+
+
+
     const badgeTextEl = document.getElementById("openDataStatusText");
+
+
+
+
 
 
 
@@ -366,11 +730,23 @@ class NNApp {
 
 
 
+
+
+
+
       badgeTextEl.innerText = "SINCRONIZANDO APIS EN VIVO...";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -378,7 +754,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.fetchRealTrafficFromOpenDataBCN(),
+
+
+
+
 
 
 
@@ -386,9 +770,19 @@ class NNApp {
 
 
 
+
+
+
+
       this.fetchRealElevationAndSlopeForPortfolio(),
 
+
+
       this.fetchRealEventsFromOpenData()
+
+
+
+
 
 
 
@@ -396,7 +790,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (this.parkings.length > 0) {
+
+
+
+
 
 
 
@@ -404,7 +806,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.renderTabsBar();
+
+
+
+
 
 
 
@@ -412,7 +822,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.renderGlobalMapMarkers();
+
+
+
+
 
 
 
@@ -420,7 +838,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (this.chartGlobalMonthlyDL) {
+
+
+
+
 
 
 
@@ -428,7 +854,15 @@ class NNApp {
 
 
 
+
+
+
+
         this.chartGlobalMonthlyDL.data.datasets[0].data = curMonthly;
+
+
+
+
 
 
 
@@ -436,11 +870,23 @@ class NNApp {
 
 
 
+
+
+
+
         this.chartGlobalMonthlyDL.update();
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -448,11 +894,23 @@ class NNApp {
 
 
 
+
+
+
+
         this.updateAssetDetails();
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -460,7 +918,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -468,11 +934,23 @@ class NNApp {
 
 
 
+
+
+
+
       badgeTextEl.innerText = "OPENDATA BCN · CONECTADO";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -480,7 +958,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (window.lucide) {
+
+
+
+
 
 
 
@@ -488,7 +974,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -496,7 +990,15 @@ class NNApp {
 
 
 
+
+
+
+
       const activeSensors = this.parkings.reduce((acc, p) => acc + (p.trafficPoints ? p.trafficPoints.filter(tp => (tp.annualCarsCurrentYear || 0) > 0).length : 0), 0);
+
+
+
+
 
 
 
@@ -504,7 +1006,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -512,7 +1022,15 @@ class NNApp {
 
 
 
+
+
+
+
   /**
+
+
+
+
 
 
 
@@ -520,11 +1038,23 @@ class NNApp {
 
 
 
+
+
+
+
    *    midiendo la altitud exacta de la coordenada central y de los 4 puntos cardinales a 100 m (N, S, E, O).
 
 
 
+
+
+
+
    */
+
+
+
+
 
 
 
@@ -532,11 +1062,23 @@ class NNApp {
 
 
 
+
+
+
+
     if (!this.parkings || this.parkings.length === 0) return;
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -544,7 +1086,15 @@ class NNApp {
 
 
 
+
+
+
+
       for (let start = 0; start < this.parkings.length; start += chunkSize) {
+
+
+
+
 
 
 
@@ -552,7 +1102,15 @@ class NNApp {
 
 
 
+
+
+
+
         const lats = [];
+
+
+
+
 
 
 
@@ -560,7 +1118,15 @@ class NNApp {
 
 
 
+
+
+
+
         slice.forEach(p => {
+
+
+
+
 
 
 
@@ -568,7 +1134,15 @@ class NNApp {
 
 
 
+
+
+
+
           const lon = parseFloat(p.lon) || 2.1590;
+
+
+
+
 
 
 
@@ -576,7 +1150,15 @@ class NNApp {
 
 
 
+
+
+
+
           lats.push(lat.toFixed(5), (lat + 0.0009).toFixed(5), (lat - 0.0009).toFixed(5), lat.toFixed(5), lat.toFixed(5));
+
+
+
+
 
 
 
@@ -584,7 +1166,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -592,7 +1182,15 @@ class NNApp {
 
 
 
+
+
+
+
         const resp = await fetch(url);
+
+
+
+
 
 
 
@@ -600,7 +1198,15 @@ class NNApp {
 
 
 
+
+
+
+
         const data = await resp.json();
+
+
+
+
 
 
 
@@ -608,7 +1214,15 @@ class NNApp {
 
 
 
+
+
+
+
         slice.forEach((p, idx) => {
+
+
+
+
 
 
 
@@ -616,7 +1230,15 @@ class NNApp {
 
 
 
+
+
+
+
           const z0 = elevs[baseIdx];
+
+
+
+
 
 
 
@@ -624,7 +1246,15 @@ class NNApp {
 
 
 
+
+
+
+
           const zS = elevs[baseIdx + 2];
+
+
+
+
 
 
 
@@ -632,7 +1262,15 @@ class NNApp {
 
 
 
+
+
+
+
           const zW = elevs[baseIdx + 4];
+
+
+
+
 
 
 
@@ -640,7 +1278,15 @@ class NNApp {
 
 
 
+
+
+
+
             p.elevation = Math.round(z0);
+
+
+
+
 
 
 
@@ -648,7 +1294,15 @@ class NNApp {
 
 
 
+
+
+
+
             const slopeEW = (zE !== undefined && zW !== undefined) ? (Math.abs(zE - zW) / 200) * 100 : 0;
+
+
+
+
 
 
 
@@ -656,7 +1310,15 @@ class NNApp {
 
 
 
+
+
+
+
             p.fromApi = true;
+
+
+
+
 
 
 
@@ -664,11 +1326,23 @@ class NNApp {
 
 
 
+
+
+
+
         });
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -676,7 +1350,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -684,7 +1366,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.elevationApiConnected = false;
+
+
+
+
 
 
 
@@ -692,11 +1382,23 @@ class NNApp {
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
   /**
+
+
+
+
 
 
 
@@ -704,7 +1406,15 @@ class NNApp {
 
 
 
+
+
+
+
    *    en un radio de ~300 m (5 min a pie) desde la API SQL de Open Data Ajuntament de Barcelona
+
+
+
+
 
 
 
@@ -712,7 +1422,15 @@ class NNApp {
 
 
 
+
+
+
+
    */
+
+
+
+
 
 
 
@@ -720,11 +1438,23 @@ class NNApp {
 
 
 
+
+
+
+
     if (!this.parkings || this.parkings.length === 0) return;
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -732,7 +1462,15 @@ class NNApp {
 
 
 
+
+
+
+
         const lat = parseFloat(p.lat) || 41.3888;
+
+
+
+
 
 
 
@@ -740,7 +1478,15 @@ class NNApp {
 
 
 
+
+
+
+
         return `SUM(CASE WHEN CAST("Latitud" AS FLOAT) BETWEEN ${(lat - 0.0027).toFixed(5)} AND ${(lat + 0.0027).toFixed(5)} AND CAST("Longitud" AS FLOAT) BETWEEN ${(lon - 0.0036).toFixed(5)} AND ${(lon + 0.0036).toFixed(5)} THEN 1 ELSE 0 END) AS p_${idx}`;
+
+
+
+
 
 
 
@@ -748,7 +1494,15 @@ class NNApp {
 
 
 
+
+
+
+
       const sql = `SELECT ${cases} FROM "38babeec-5c47-43d3-84e7-b13a4b89004f" WHERE "Codi_Principal_Activitat" = '1'`;
+
+
+
+
 
 
 
@@ -756,11 +1510,23 @@ class NNApp {
 
 
 
+
+
+
+
       const resp = await fetch(url);
 
 
 
+
+
+
+
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+
+
+
 
 
 
@@ -768,7 +1534,15 @@ class NNApp {
 
 
 
+
+
+
+
       const row = json?.result?.records?.[0];
+
+
+
+
 
 
 
@@ -776,7 +1550,15 @@ class NNApp {
 
 
 
+
+
+
+
         this.parkings.forEach((p, idx) => {
+
+
+
+
 
 
 
@@ -784,7 +1566,15 @@ class NNApp {
 
 
 
+
+
+
+
           if (!isNaN(count)) {
+
+
+
+
 
 
 
@@ -792,7 +1582,15 @@ class NNApp {
 
 
 
+
+
+
+
             p.fromApi = true;
+
+
+
+
 
 
 
@@ -800,7 +1598,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -808,11 +1614,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -820,7 +1638,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.poisApiConnected = false;
+
+
+
+
 
 
 
@@ -828,11 +1654,23 @@ class NNApp {
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
   /**
+
+
+
+
 
 
 
@@ -840,7 +1678,15 @@ class NNApp {
 
 
 
+
+
+
+
    *    Modelo Trianual Dinámico:
+
+
+
+
 
 
 
@@ -848,7 +1694,15 @@ class NNApp {
 
 
 
+
+
+
+
    *    - Año Anterior: 2025 Real (45fc3faa-cdc6-4ac3-83e9-d019c8a629b9)
+
+
+
+
 
 
 
@@ -856,11 +1710,23 @@ class NNApp {
 
 
 
+
+
+
+
    *    - Adaptación Dinámica: si la API publica '2026_aforament_detall', se toma 2026 como Real y se proyecta 2027.
 
 
 
+
+
+
+
    */
+
+
+
+
 
 
 
@@ -868,7 +1734,15 @@ class NNApp {
 
 
 
+
+
+
+
    * 4. Obtiene los eventos reales en vivo, partidos del FC Barcelona, conciertos y actos de gran afluencia
+
+
+
+
 
 
 
@@ -876,7 +1750,15 @@ class NNApp {
 
 
 
+
+
+
+
    *    - API 1: Open Data Ajuntament de Barcelona (ab2d47b7-8493-4ed5-9f63-49ed116135f9): Partidos oficiales, fútbol, carreras y cortes.
+
+
+
+
 
 
 
@@ -884,7 +1766,15 @@ class NNApp {
 
 
 
+
+
+
+
    */
+
+
+
+
 
 
 
@@ -892,7 +1782,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -900,7 +1798,15 @@ class NNApp {
 
 
 
+
+
+
+
       const todayIso = now.toISOString().split("T")[0];
+
+
+
+
 
 
 
@@ -908,7 +1814,15 @@ class NNApp {
 
 
 
+
+
+
+
       const targetDate = (now.getFullYear() >= 2026) ? todayIso : "2026-11-01";
+
+
+
+
 
 
 
@@ -916,11 +1830,23 @@ class NNApp {
 
 
 
+
+
+
+
       // A) Consulta 1: Open Data Ajuntament de Barcelona (Deportes, Partidos FCB y Carreras populares)
 
 
 
+
+
+
+
       try {
+
+
+
+
 
 
 
@@ -928,7 +1854,15 @@ class NNApp {
 
 
 
+
+
+
+
           SELECT name, start_date, end_date, institution_name, addresses_road_name, geo_epgs_4326_lat, geo_epgs_4326_lon
+
+
+
+
 
 
 
@@ -936,7 +1870,15 @@ class NNApp {
 
 
 
+
+
+
+
           WHERE start_date >= '${targetDate}'
+
+
+
+
 
 
 
@@ -944,11 +1886,23 @@ class NNApp {
 
 
 
+
+
+
+
           LIMIT 25
 
 
 
+
+
+
+
         `;
+
+
+
+
 
 
 
@@ -956,7 +1910,15 @@ class NNApp {
 
 
 
+
+
+
+
         const respSports = await fetch(urlSports);
+
+
+
+
 
 
 
@@ -964,7 +1926,15 @@ class NNApp {
 
 
 
+
+
+
+
           const jsonSports = await respSports.json();
+
+
+
+
 
 
 
@@ -972,7 +1942,15 @@ class NNApp {
 
 
 
+
+
+
+
           records.forEach((r, idx) => {
+
+
+
+
 
 
 
@@ -980,7 +1958,15 @@ class NNApp {
 
 
 
+
+
+
+
             const lowerName = name.toLowerCase();
+
+
+
+
 
 
 
@@ -988,7 +1974,15 @@ class NNApp {
 
 
 
+
+
+
+
             let expectedAttendance = 6000;
+
+
+
+
 
 
 
@@ -996,7 +1990,15 @@ class NNApp {
 
 
 
+
+
+
+
             if (lowerName.includes('futbol') || lowerName.includes('f.c. barcelona') || lowerName.includes('partit') || lowerName.includes('champions')) {
+
+
+
+
 
 
 
@@ -1004,7 +2006,15 @@ class NNApp {
 
 
 
+
+
+
+
               if (lowerName.includes('f.c. barcelona') || lowerName.includes('aston villa') || lowerName.includes('atletico') || lowerName.includes('celta')) {
+
+
+
+
 
 
 
@@ -1012,7 +2022,15 @@ class NNApp {
 
 
 
+
+
+
+
                 venueId = 'camp_nou';
+
+
+
+
 
 
 
@@ -1020,11 +2038,23 @@ class NNApp {
 
 
 
+
+
+
+
                 expectedAttendance = 12000;
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -1032,7 +2062,15 @@ class NNApp {
 
 
 
+
+
+
+
               cat = 'sport';
+
+
+
+
 
 
 
@@ -1040,7 +2078,15 @@ class NNApp {
 
 
 
+
+
+
+
             } else if (lowerName.includes('bàsquet') || lowerName.includes('basquet') || lowerName.includes('lliga endesa')) {
+
+
+
+
 
 
 
@@ -1048,7 +2094,15 @@ class NNApp {
 
 
 
+
+
+
+
               expectedAttendance = 6800;
+
+
+
+
 
 
 
@@ -1056,7 +2110,15 @@ class NNApp {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -1064,7 +2126,15 @@ class NNApp {
 
 
 
+
+
+
+
             const dateStr = rawDate.slice(0, 10);
+
+
+
+
 
 
 
@@ -1072,7 +2142,15 @@ class NNApp {
 
 
 
+
+
+
+
             let lat = parseFloat(r.geo_epgs_4326_lat);
+
+
+
+
 
 
 
@@ -1080,7 +2158,15 @@ class NNApp {
 
 
 
+
+
+
+
             // Coordenadas de alta fidelidad si el evento es en Camp Nou / Palau Blaugrana
+
+
+
+
 
 
 
@@ -1088,7 +2174,15 @@ class NNApp {
 
 
 
+
+
+
+
               lat = 41.3809;
+
+
+
+
 
 
 
@@ -1096,7 +2190,15 @@ class NNApp {
 
 
 
+
+
+
+
             } else if (venueId === 'palau_blaugrana') {
+
+
+
+
 
 
 
@@ -1104,7 +2206,15 @@ class NNApp {
 
 
 
+
+
+
+
               lon = 2.1205;
+
+
+
+
 
 
 
@@ -1112,7 +2222,15 @@ class NNApp {
 
 
 
+
+
+
+
             unifiedEvents.push({
+
+
+
+
 
 
 
@@ -1120,7 +2238,15 @@ class NNApp {
 
 
 
+
+
+
+
               title: name,
+
+
+
+
 
 
 
@@ -1128,7 +2254,15 @@ class NNApp {
 
 
 
+
+
+
+
               venueId: venueId,
+
+
+
+
 
 
 
@@ -1136,7 +2270,15 @@ class NNApp {
 
 
 
+
+
+
+
               date: dateStr,
+
+
+
+
 
 
 
@@ -1144,7 +2286,15 @@ class NNApp {
 
 
 
+
+
+
+
               lat: !isNaN(lat) ? lat : 41.3879,
+
+
+
+
 
 
 
@@ -1152,7 +2302,15 @@ class NNApp {
 
 
 
+
+
+
+
               expectedAttendance: expectedAttendance,
+
+
+
+
 
 
 
@@ -1160,7 +2318,15 @@ class NNApp {
 
 
 
+
+
+
+
             });
+
+
+
+
 
 
 
@@ -1168,7 +2334,15 @@ class NNApp {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -1176,11 +2350,23 @@ class NNApp {
 
 
 
+
+
+
+
         console.warn("[Open Data BCN · Eventos Deportivos] Aviso:", errSports);
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -1188,7 +2374,15 @@ class NNApp {
 
 
 
+
+
+
+
       try {
+
+
+
+
 
 
 
@@ -1196,7 +2390,15 @@ class NNApp {
 
 
 
+
+
+
+
         const urlCulture = `https://analisi.transparenciacatalunya.cat/resource/rhpv-yr4f.json?$where=${encodeURIComponent(whereClause)}&$limit=25&$order=data_inici%20ASC`;
+
+
+
+
 
 
 
@@ -1204,7 +2406,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (respCulture.ok) {
+
+
+
+
 
 
 
@@ -1212,7 +2422,15 @@ class NNApp {
 
 
 
+
+
+
+
           (recordsCulture || []).forEach((r, idx) => {
+
+
+
+
 
 
 
@@ -1220,7 +2438,15 @@ class NNApp {
 
 
 
+
+
+
+
             const lowerTitle = title.toLowerCase();
+
+
+
+
 
 
 
@@ -1228,7 +2454,15 @@ class NNApp {
 
 
 
+
+
+
+
             const lowerEspai = espai.toLowerCase();
+
+
+
+
 
 
 
@@ -1236,7 +2470,15 @@ class NNApp {
 
 
 
+
+
+
+
             let expectedAttendance = 3500;
+
+
+
+
 
 
 
@@ -1244,7 +2486,15 @@ class NNApp {
 
 
 
+
+
+
+
             if (lowerEspai.includes('sant jordi') || lowerTitle.includes('sant jordi')) {
+
+
+
+
 
 
 
@@ -1252,7 +2502,15 @@ class NNApp {
 
 
 
+
+
+
+
               venueId = lowerEspai.includes('club') ? 'sant_jordi_club' : 'palau_sant_jordi';
+
+
+
+
 
 
 
@@ -1260,7 +2518,15 @@ class NNApp {
 
 
 
+
+
+
+
               expectedAttendance = 2200;
+
+
+
+
 
 
 
@@ -1268,7 +2534,15 @@ class NNApp {
 
 
 
+
+
+
+
               expectedAttendance = 1800;
+
+
+
+
 
 
 
@@ -1276,7 +2550,15 @@ class NNApp {
 
 
 
+
+
+
+
               cat = 'fair';
+
+
+
+
 
 
 
@@ -1284,11 +2566,23 @@ class NNApp {
 
 
 
+
+
+
+
               venueId = lowerEspai.includes('gran via') ? 'fira_gran_via' : 'fira_montjuic';
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -1296,7 +2590,15 @@ class NNApp {
 
 
 
+
+
+
+
             const dateStr = rawDate.slice(0, 10);
+
+
+
+
 
 
 
@@ -1304,7 +2606,15 @@ class NNApp {
 
 
 
+
+
+
+
             let lat = parseFloat(r.latitud);
+
+
+
+
 
 
 
@@ -1312,7 +2622,15 @@ class NNApp {
 
 
 
+
+
+
+
             if (venueId === 'palau_sant_jordi') {
+
+
+
+
 
 
 
@@ -1320,7 +2638,15 @@ class NNApp {
 
 
 
+
+
+
+
               lon = 2.1520;
+
+
+
+
 
 
 
@@ -1328,7 +2654,15 @@ class NNApp {
 
 
 
+
+
+
+
               lat = 41.3638;
+
+
+
+
 
 
 
@@ -1336,7 +2670,15 @@ class NNApp {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -1344,7 +2686,15 @@ class NNApp {
 
 
 
+
+
+
+
               id: `gencat_cult_${idx}`,
+
+
+
+
 
 
 
@@ -1352,7 +2702,15 @@ class NNApp {
 
 
 
+
+
+
+
               category: cat,
+
+
+
+
 
 
 
@@ -1360,7 +2718,15 @@ class NNApp {
 
 
 
+
+
+
+
               venueName: espai || "Barcelona",
+
+
+
+
 
 
 
@@ -1368,7 +2734,15 @@ class NNApp {
 
 
 
+
+
+
+
               time: timeStr,
+
+
+
+
 
 
 
@@ -1376,7 +2750,15 @@ class NNApp {
 
 
 
+
+
+
+
               lon: !isNaN(lon) ? lon : 2.1699,
+
+
+
+
 
 
 
@@ -1384,7 +2766,15 @@ class NNApp {
 
 
 
+
+
+
+
               source: "Agenda Cultural Oficial de Catalunya"
+
+
+
+
 
 
 
@@ -1392,11 +2782,23 @@ class NNApp {
 
 
 
+
+
+
+
           });
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -1404,11 +2806,23 @@ class NNApp {
 
 
 
+
+
+
+
         console.warn("[Agenda Cultural Catalunya] Aviso:", errCulture);
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -1416,7 +2830,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (typeof BCN_EVENTS_7DAYS !== "undefined") {
+
+
+
+
 
 
 
@@ -1424,7 +2846,15 @@ class NNApp {
 
 
 
+
+
+
+
         unifiedEvents.sort((a, b) => a.date.localeCompare(b.date));
+
+
+
+
 
 
 
@@ -1432,7 +2862,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -1440,7 +2878,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.totalLiveEventsCount = unifiedEvents.length;
+
+
+
+
 
 
 
@@ -1448,7 +2894,15 @@ class NNApp {
 
 
 
+
+
+
+
       const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
+
+
+
+
 
 
 
@@ -1456,7 +2910,15 @@ class NNApp {
 
 
 
+
+
+
+
         this.renderEvents7Days(curParking);
+
+
+
+
 
 
 
@@ -1464,7 +2926,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -1472,11 +2942,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -1484,7 +2966,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -1492,11 +2982,23 @@ class NNApp {
 
 
 
+
+
+
+
       let resource2026Id = null;
 
 
 
+
+
+
+
       try {
+
+
+
+
 
 
 
@@ -1504,7 +3006,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (pkgResp.ok) {
+
+
+
+
 
 
 
@@ -1512,7 +3022,15 @@ class NNApp {
 
 
 
+
+
+
+
           const found2026 = (pkgJson?.result?.resources || []).find(r => {
+
+
+
+
 
 
 
@@ -1520,11 +3038,23 @@ class NNApp {
 
 
 
+
+
+
+
             return name.includes("2026") && (name.includes("detall") || name.includes("valor"));
 
 
 
+
+
+
+
           });
+
+
+
+
 
 
 
@@ -1532,7 +3062,15 @@ class NNApp {
 
 
 
+
+
+
+
             resource2026Id = found2026.id;
+
+
+
+
 
 
 
@@ -1540,7 +3078,15 @@ class NNApp {
 
 
 
+
+
+
+
               ACTIVE_DATA_YEARS.prev2Year = 2025;
+
+
+
+
 
 
 
@@ -1548,7 +3094,15 @@ class NNApp {
 
 
 
+
+
+
+
               ACTIVE_DATA_YEARS.estYear = 2027;
+
+
+
+
 
 
 
@@ -1556,7 +3110,15 @@ class NNApp {
 
 
 
+
+
+
+
               ACTIVE_DATA_YEARS.has2026Real = true;
+
+
+
+
 
 
 
@@ -1564,11 +3126,23 @@ class NNApp {
 
 
 
+
+
+
+
           }
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -1576,11 +3150,23 @@ class NNApp {
 
 
 
+
+
+
+
         console.warn("[Open Data BCN] Verificación de catálogo aforaments-detall completada (modo estándar 2024-2025-2026):", checkErr);
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -1588,7 +3174,15 @@ class NNApp {
 
 
 
+
+
+
+
       const sqlStations = `
+
+
+
+
 
 
 
@@ -1596,7 +3190,15 @@ class NNApp {
 
 
 
+
+
+
+
                ROUND(AVG(CAST(d."Valor_IMD" AS NUMERIC))) AS avg_imd_2025
+
+
+
+
 
 
 
@@ -1604,7 +3206,15 @@ class NNApp {
 
 
 
+
+
+
+
         JOIN "45fc3faa-cdc6-4ac3-83e9-d019c8a629b9" d ON s."Id_aforament" = d."Id_aforament"
+
+
+
+
 
 
 
@@ -1612,11 +3222,23 @@ class NNApp {
 
 
 
+
+
+
+
         GROUP BY s."Id_aforament", s."Desc_aforament", s."Num_carrils", s."Latitud", s."Longitud"
 
 
 
+
+
+
+
       `;
+
+
+
+
 
 
 
@@ -1624,7 +3246,15 @@ class NNApp {
 
 
 
+
+
+
+
       const respStations = await fetch(urlStations);
+
+
+
+
 
 
 
@@ -1632,7 +3262,15 @@ class NNApp {
 
 
 
+
+
+
+
       const jsonStations = await respStations.json();
+
+
+
+
 
 
 
@@ -1640,7 +3278,15 @@ class NNApp {
 
 
 
+
+
+
+
       const stations = rawStations.map(r => ({
+
+
+
+
 
 
 
@@ -1648,7 +3294,15 @@ class NNApp {
 
 
 
+
+
+
+
         desc: String(r.Desc_aforament || "").trim(),
+
+
+
+
 
 
 
@@ -1656,7 +3310,15 @@ class NNApp {
 
 
 
+
+
+
+
         lat: parseFloat(r.Latitud),
+
+
+
+
 
 
 
@@ -1664,7 +3326,15 @@ class NNApp {
 
 
 
+
+
+
+
         avgImd2025: parseInt(r.avg_imd_2025, 10) || 0
+
+
+
+
 
 
 
@@ -1672,7 +3342,15 @@ class NNApp {
 
 
 
+
+
+
+
       // Poblar el catálogo municipal en memoria con las estaciones reales de Open Data Barcelona
+
+
+
+
 
 
 
@@ -1680,7 +3358,15 @@ class NNApp {
 
 
 
+
+
+
+
         BCN_MUNICIPAL_TRAFFIC_SENSORS.length = 0;
+
+
+
+
 
 
 
@@ -1688,7 +3374,15 @@ class NNApp {
 
 
 
+
+
+
+
           BCN_MUNICIPAL_TRAFFIC_SENSORS.push({
+
+
+
+
 
 
 
@@ -1696,7 +3390,15 @@ class NNApp {
 
 
 
+
+
+
+
             stationId: s.id,
+
+
+
+
 
 
 
@@ -1704,7 +3406,15 @@ class NNApp {
 
 
 
+
+
+
+
             street: s.desc,
+
+
+
+
 
 
 
@@ -1712,7 +3422,15 @@ class NNApp {
 
 
 
+
+
+
+
             lon: s.lon,
+
+
+
+
 
 
 
@@ -1720,7 +3438,15 @@ class NNApp {
 
 
 
+
+
+
+
             direction: `${s.lanes} carril(es) · Espira Oficial BCN`,
+
+
+
+
 
 
 
@@ -1728,7 +3454,15 @@ class NNApp {
 
 
 
+
+
+
+
             source: "Open Data Ajuntament de Barcelona"
+
+
+
+
 
 
 
@@ -1736,7 +3470,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -1744,7 +3486,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.openDataConnected = true;
+
+
+
+
 
 
 
@@ -1752,7 +3502,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (!this.parkings || this.parkings.length === 0 || stations.length === 0) return;
+
+
+
+
 
 
 
@@ -1760,7 +3518,15 @@ class NNApp {
 
 
 
+
+
+
+
       const neededStationIds = new Set();
+
+
+
+
 
 
 
@@ -1768,7 +3534,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.parkings.forEach(p => {
+
+
+
+
 
 
 
@@ -1776,7 +3550,15 @@ class NNApp {
 
 
 
+
+
+
+
           station: s,
+
+
+
+
 
 
 
@@ -1784,7 +3566,15 @@ class NNApp {
 
 
 
+
+
+
+
         })).sort((a, b) => a.distKm - b.distKm);
+
+
+
+
 
 
 
@@ -1792,7 +3582,15 @@ class NNApp {
 
 
 
+
+
+
+
         parkingClosestMap.set(p.id, top2);
+
+
+
+
 
 
 
@@ -1800,7 +3598,15 @@ class NNApp {
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -1808,55 +3614,41 @@ class NNApp {
 
 
 
+
+
+
+
       // Paso C: Consultar en paralelo el desglose mensual (Mes 1..12) y por tipo de día (Codi_tipus_dia 1..5) en 2025 y 2024
 
 
 
+
+
+
+
       const sql2025 = `
-
-
-
-        SELECT "Id_aforament", "Mes", "Codi_tipus_dia", ROUND(AVG(CAST("Valor_IMD" AS NUMERIC))) AS imd
-
-
-
+        SELECT "Id_aforament", "Mes", "Codi_tipus_dia", ROUND(AVG(CAST(TRIM("Valor_IMD") AS NUMERIC))) AS imd
         FROM "45fc3faa-cdc6-4ac3-83e9-d019c8a629b9"
-
-
-
-        WHERE "Id_aforament" IN (${idListSql}) AND "Valor_IMD" ~ '^[0-9]+$' AND CAST("Valor_IMD" AS NUMERIC) > 0
-
-
-
+        WHERE "Id_aforament" IN (${idListSql}) AND TRIM("Valor_IMD") ~ '^[0-9]+$' AND CAST(TRIM("Valor_IMD") AS NUMERIC) > 0
         GROUP BY "Id_aforament", "Mes", "Codi_tipus_dia"
-
-
-
       `;
+
+
+
+
 
 
 
       const sql2024 = `
-
-
-
-        SELECT "Id_aforament", "Mes", "Codi_tipus_dia", ROUND(AVG(CAST("Valor_IMD" AS NUMERIC))) AS imd
-
-
-
+        SELECT "Id_aforament", "Mes", "Codi_tipus_dia", ROUND(AVG(CAST(TRIM("Valor_IMD") AS NUMERIC))) AS imd
         FROM "5b2c39d8-2f51-4fc5-9478-a479b77f9a48"
-
-
-
-        WHERE "Id_aforament" IN (${idListSql}) AND "Valor_IMD" ~ '^[0-9]+$' AND CAST("Valor_IMD" AS NUMERIC) > 0
-
-
-
+        WHERE "Id_aforament" IN (${idListSql}) AND TRIM("Valor_IMD") ~ '^[0-9]+$' AND CAST(TRIM("Valor_IMD") AS NUMERIC) > 0
         GROUP BY "Id_aforament", "Mes", "Codi_tipus_dia"
-
-
-
       `;
+
+
+
+
 
 
 
@@ -1864,7 +3656,15 @@ class NNApp {
 
 
 
+
+
+
+
         fetch(`https://opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql?sql=${encodeURIComponent(sql2025)}`),
+
+
+
+
 
 
 
@@ -1872,7 +3672,15 @@ class NNApp {
 
 
 
+
+
+
+
       ];
+
+
+
+
 
 
 
@@ -1880,7 +3688,15 @@ class NNApp {
 
 
 
+
+
+
+
         const sql2026 = `
+
+
+
+
 
 
 
@@ -1888,7 +3704,15 @@ class NNApp {
 
 
 
+
+
+
+
           FROM "${resource2026Id}"
+
+
+
+
 
 
 
@@ -1896,11 +3720,23 @@ class NNApp {
 
 
 
+
+
+
+
           GROUP BY "Id_aforament", "Mes", "Codi_tipus_dia"
 
 
 
+
+
+
+
         `;
+
+
+
+
 
 
 
@@ -1908,7 +3744,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -1916,7 +3760,15 @@ class NNApp {
 
 
 
+
+
+
+
       const resp25 = responses[0];
+
+
+
+
 
 
 
@@ -1924,7 +3776,15 @@ class NNApp {
 
 
 
+
+
+
+
       const resp26 = resource2026Id && responses[2] ? responses[2] : null;
+
+
+
+
 
 
 
@@ -1932,7 +3792,15 @@ class NNApp {
 
 
 
+
+
+
+
       const records24 = resp24.ok ? ((await resp24.json())?.result?.records || []) : [];
+
+
+
+
 
 
 
@@ -1940,7 +3808,15 @@ class NNApp {
 
 
 
+
+
+
+
       // Helper para construir la matriz [mes 0..11] y [Codi_tipus_dia '1'..'5'] de cada estación
+
+
+
+
 
 
 
@@ -1948,7 +3824,15 @@ class NNApp {
 
 
 
+
+
+
+
         const byStation = {};
+
+
+
+
 
 
 
@@ -1956,7 +3840,15 @@ class NNApp {
 
 
 
+
+
+
+
           const sid = String(r.Id_aforament).trim();
+
+
+
+
 
 
 
@@ -1964,7 +3856,15 @@ class NNApp {
 
 
 
+
+
+
+
           const dType = String(r.Codi_tipus_dia).trim();
+
+
+
+
 
 
 
@@ -1972,7 +3872,15 @@ class NNApp {
 
 
 
+
+
+
+
           if (mIdx < 0 || mIdx > 11 || val <= 0) return;
+
+
+
+
 
 
 
@@ -1980,7 +3888,15 @@ class NNApp {
 
 
 
+
+
+
+
             byStation[sid] = {
+
+
+
+
 
 
 
@@ -1988,7 +3904,15 @@ class NNApp {
 
 
 
+
+
+
+
               byDayTypeSum: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+
+
+
+
 
 
 
@@ -1996,11 +3920,23 @@ class NNApp {
 
 
 
+
+
+
+
             };
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -2008,7 +3944,15 @@ class NNApp {
 
 
 
+
+
+
+
           if (byStation[sid].byDayTypeSum[dType] !== undefined) {
+
+
+
+
 
 
 
@@ -2016,7 +3960,15 @@ class NNApp {
 
 
 
+
+
+
+
             byStation[sid].byDayTypeCount[dType] += 1;
+
+
+
+
 
 
 
@@ -2024,7 +3976,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -2032,7 +3992,15 @@ class NNApp {
 
 
 
+
+
+
+
         Object.keys(byStation).forEach(sid => {
+
+
+
+
 
 
 
@@ -2040,7 +4008,15 @@ class NNApp {
 
 
 
+
+
+
+
           const avgByDayType = {};
+
+
+
+
 
 
 
@@ -2048,11 +4024,23 @@ class NNApp {
 
 
 
+
+
+
+
             avgByDayType[dt] = st.byDayTypeCount[dt] > 0 ? Math.round(st.byDayTypeSum[dt] / st.byDayTypeCount[dt]) : 0;
 
 
 
+
+
+
+
           });
+
+
+
+
 
 
 
@@ -2060,7 +4048,15 @@ class NNApp {
 
 
 
+
+
+
+
           const monthlyImd = st.months.map(mObj => {
+
+
+
+
 
 
 
@@ -2068,7 +4064,15 @@ class NNApp {
 
 
 
+
+
+
+
             const d2 = mObj['2'] || 0;
+
+
+
+
 
 
 
@@ -2076,7 +4080,15 @@ class NNApp {
 
 
 
+
+
+
+
             const d4 = mObj['4'] || 0;
+
+
+
+
 
 
 
@@ -2084,7 +4096,15 @@ class NNApp {
 
 
 
+
+
+
+
             let num = 0;
+
+
+
+
 
 
 
@@ -2092,7 +4112,15 @@ class NNApp {
 
 
 
+
+
+
+
             if (d1 > 0) { num += 1 * d1; den += 1; }
+
+
+
+
 
 
 
@@ -2100,7 +4128,15 @@ class NNApp {
 
 
 
+
+
+
+
             if (d3 > 0) { num += 1 * d3; den += 1; }
+
+
+
+
 
 
 
@@ -2108,7 +4144,15 @@ class NNApp {
 
 
 
+
+
+
+
             if (d5 > 0) { num += 1 * d5; den += 1; }
+
+
+
+
 
 
 
@@ -2116,7 +4160,15 @@ class NNApp {
 
 
 
+
+
+
+
           });
+
+
+
+
 
 
 
@@ -2124,7 +4176,15 @@ class NNApp {
 
 
 
+
+
+
+
           const monthlyByDayType = { '1': [], '2': [], '3': [], '4': [], '5': [] };
+
+
+
+
 
 
 
@@ -2132,7 +4192,15 @@ class NNApp {
 
 
 
+
+
+
+
             ['1', '2', '3', '4', '5'].forEach(dt => {
+
+
+
+
 
 
 
@@ -2140,11 +4208,23 @@ class NNApp {
 
 
 
+
+
+
+
             });
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -2152,7 +4232,15 @@ class NNApp {
 
 
 
+
+
+
+
             monthlyImd,
+
+
+
+
 
 
 
@@ -2160,7 +4248,15 @@ class NNApp {
 
 
 
+
+
+
+
             avgByDayType
+
+
+
+
 
 
 
@@ -2168,7 +4264,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -2176,7 +4280,15 @@ class NNApp {
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -2184,7 +4296,15 @@ class NNApp {
 
 
 
+
+
+
+
       const series24 = buildStationSeries(records24);
+
+
+
+
 
 
 
@@ -2192,7 +4312,15 @@ class NNApp {
 
 
 
+
+
+
+
       const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+
+
+
 
 
 
@@ -2200,7 +4328,15 @@ class NNApp {
 
 
 
+
+
+
+
       // Estados: 1=Molt fluid (0.94), 2=Fluid (1.00), 3=Dens (1.05), 4=Molt dens (1.10), 5=Congestió (1.14)
+
+
+
+
 
 
 
@@ -2208,7 +4344,15 @@ class NNApp {
 
 
 
+
+
+
+
       // Paso D: Asignar a cada aparcamiento sus 2 estaciones reales y calcular la serie trianual completa
+
+
+
+
 
 
 
@@ -2216,7 +4360,15 @@ class NNApp {
 
 
 
+
+
+
+
         const top2 = parkingClosestMap.get(p.id) || [];
+
+
+
+
 
 
 
@@ -2224,7 +4376,15 @@ class NNApp {
 
 
 
+
+
+
+
           const st = item.station;
+
+
+
+
 
 
 
@@ -2232,7 +4392,15 @@ class NNApp {
 
 
 
+
+
+
+
           const s24 = series24[st.id] || { monthlyImd: new Array(12).fill(0), monthlyByDayType: {}, avgByDayType: {} };
+
+
+
+
 
 
 
@@ -2240,7 +4408,15 @@ class NNApp {
 
 
 
+
+
+
+
           const s26 = series26Real ? (series26Real[st.id] || null) : null;
+
+
+
+
 
 
 
@@ -2248,7 +4424,15 @@ class NNApp {
 
 
 
+
+
+
+
           const prevMonthlyImd = s25.monthlyImd;
+
+
+
+
 
 
 
@@ -2256,7 +4440,15 @@ class NNApp {
 
 
 
+
+
+
+
           let curMonthlyImd = [];
+
+
+
+
 
 
 
@@ -2264,7 +4456,15 @@ class NNApp {
 
 
 
+
+
+
+
           const curAvgByDayType = {};
+
+
+
+
 
 
 
@@ -2272,7 +4472,15 @@ class NNApp {
 
 
 
+
+
+
+
             // Caso Futuro: Datos reales de 2026 ya cargados en Open Data Barcelona
+
+
+
+
 
 
 
@@ -2280,7 +4488,15 @@ class NNApp {
 
 
 
+
+
+
+
             ['1', '2', '3', '4', '5'].forEach(dt => {
+
+
+
+
 
 
 
@@ -2288,7 +4504,15 @@ class NNApp {
 
 
 
+
+
+
+
               curAvgByDayType[dt] = s26.avgByDayType[dt] || 0;
+
+
+
+
 
 
 
@@ -2296,7 +4520,15 @@ class NNApp {
 
 
 
+
+
+
+
           } else {
+
+
+
+
 
 
 
@@ -2304,7 +4536,15 @@ class NNApp {
 
 
 
+
+
+
+
             // Para cada mes m: IMD_2026(m) = IMD_2025(m) * (1 + delta_2024->2025) * factor_fluidez_trams(m)
+
+
+
+
 
 
 
@@ -2312,7 +4552,15 @@ class NNApp {
 
 
 
+
+
+
+
               const val24 = prev2MonthlyImd[m] || 0;
+
+
+
+
 
 
 
@@ -2320,7 +4568,15 @@ class NNApp {
 
 
 
+
+
+
+
               if (val24 > 0 && val25 > 0) {
+
+
+
+
 
 
 
@@ -2328,7 +4584,15 @@ class NNApp {
 
 
 
+
+
+
+
                 // Acotación prudencial de variación estructural a +/- 15% para estabilidad
+
+
+
+
 
 
 
@@ -2336,7 +4600,15 @@ class NNApp {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -2344,7 +4616,15 @@ class NNApp {
 
 
 
+
+
+
+
               const estVal = Math.round(val25 * (1 + (growth24to25 * 0.75)) * fluencyFactor);
+
+
+
+
 
 
 
@@ -2352,7 +4632,15 @@ class NNApp {
 
 
 
+
+
+
+
             });
+
+
+
+
 
 
 
@@ -2360,7 +4648,15 @@ class NNApp {
 
 
 
+
+
+
+
             ['1', '2', '3', '4', '5'].forEach(dt => {
+
+
+
+
 
 
 
@@ -2368,7 +4664,15 @@ class NNApp {
 
 
 
+
+
+
+
               const arr24 = s24.monthlyByDayType[dt] || [];
+
+
+
+
 
 
 
@@ -2376,7 +4680,15 @@ class NNApp {
 
 
 
+
+
+
+
                 const v24 = arr24[m] || 0;
+
+
+
+
 
 
 
@@ -2384,7 +4696,15 @@ class NNApp {
 
 
 
+
+
+
+
                 const f = FLUENCY_FACTORS_BY_MONTH[m] || 1.02;
+
+
+
+
 
 
 
@@ -2392,7 +4712,15 @@ class NNApp {
 
 
 
+
+
+
+
               });
+
+
+
+
 
 
 
@@ -2400,7 +4728,15 @@ class NNApp {
 
 
 
+
+
+
+
               const avg24 = s24.avgByDayType[dt] || 0;
+
+
+
+
 
 
 
@@ -2408,7 +4744,15 @@ class NNApp {
 
 
 
+
+
+
+
               curAvgByDayType[dt] = Math.max(0, Math.round(avg25 * (1 + (gAvg * 0.75)) * 1.02));
+
+
+
+
 
 
 
@@ -2416,7 +4760,15 @@ class NNApp {
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -2424,7 +4776,15 @@ class NNApp {
 
 
 
+
+
+
+
           const annualPrev = prevMonthlyImd.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+
+
+
+
 
 
 
@@ -2432,7 +4792,15 @@ class NNApp {
 
 
 
+
+
+
+
           const yoyPct = annualPrev > 0 ? +(((annualCur - annualPrev) / annualPrev) * 100).toFixed(1) : 0;
+
+
+
+
 
 
 
@@ -2440,7 +4808,15 @@ class NNApp {
 
 
 
+
+
+
+
           // Parámetros auditables de la fórmula
+
+
+
+
 
 
 
@@ -2448,7 +4824,15 @@ class NNApp {
 
 
 
+
+
+
+
           return {
+
+
+
+
 
 
 
@@ -2456,7 +4840,15 @@ class NNApp {
 
 
 
+
+
+
+
             stationId: st.id,
+
+
+
+
 
 
 
@@ -2464,7 +4856,15 @@ class NNApp {
 
 
 
+
+
+
+
             street: st.desc,
+
+
+
+
 
 
 
@@ -2472,7 +4872,15 @@ class NNApp {
 
 
 
+
+
+
+
             lat: st.lat,
+
+
+
+
 
 
 
@@ -2480,7 +4888,15 @@ class NNApp {
 
 
 
+
+
+
+
             lanes: st.lanes,
+
+
+
+
 
 
 
@@ -2488,7 +4904,15 @@ class NNApp {
 
 
 
+
+
+
+
             speedLimit: 50,
+
+
+
+
 
 
 
@@ -2496,7 +4920,15 @@ class NNApp {
 
 
 
+
+
+
+
             annualCarsPrevYear: annualPrev,
+
+
+
+
 
 
 
@@ -2504,7 +4936,15 @@ class NNApp {
 
 
 
+
+
+
+
             yoyGrowthPct: yoyPct,
+
+
+
+
 
 
 
@@ -2512,7 +4952,15 @@ class NNApp {
 
 
 
+
+
+
+
             monthlyPrev2Year: prev2MonthlyImd,
+
+
+
+
 
 
 
@@ -2520,7 +4968,15 @@ class NNApp {
 
 
 
+
+
+
+
             monthlyCurrentYear: curMonthlyImd,
+
+
+
+
 
 
 
@@ -2528,7 +4984,15 @@ class NNApp {
 
 
 
+
+
+
+
             monthlyByDayTypePrev: s25.monthlyByDayType,
+
+
+
+
 
 
 
@@ -2536,7 +5000,15 @@ class NNApp {
 
 
 
+
+
+
+
             avgByDayTypePrev2: s24.avgByDayType,
+
+
+
+
 
 
 
@@ -2544,7 +5016,15 @@ class NNApp {
 
 
 
+
+
+
+
             avgByDayTypeCur: curAvgByDayType,
+
+
+
+
 
 
 
@@ -2552,7 +5032,15 @@ class NNApp {
 
 
 
+
+
+
+
             inferenceDetails: {
+
+
+
+
 
 
 
@@ -2560,7 +5048,15 @@ class NNApp {
 
 
 
+
+
+
+
               formulaProse: `IMD(${typeof ACTIVE_DATA_YEARS !== 'undefined' ? ACTIVE_DATA_YEARS.estYear : 2026}) = IMD(${typeof ACTIVE_DATA_YEARS !== 'undefined' ? ACTIVE_DATA_YEARS.prevYear : 2025}) × [1 + 0.75 × Var(${typeof ACTIVE_DATA_YEARS !== 'undefined' ? ACTIVE_DATA_YEARS.prev2Year : 2024}→${typeof ACTIVE_DATA_YEARS !== 'undefined' ? ACTIVE_DATA_YEARS.prevYear : 2025})] × Φ(fluidez trams)`,
+
+
+
+
 
 
 
@@ -2568,7 +5064,15 @@ class NNApp {
 
 
 
+
+
+
+
               annual2025: annualPrev,
+
+
+
+
 
 
 
@@ -2576,7 +5080,15 @@ class NNApp {
 
 
 
+
+
+
+
               growth24to25Pct: yoy24to25Pct,
+
+
+
+
 
 
 
@@ -2584,7 +5096,15 @@ class NNApp {
 
 
 
+
+
+
+
               isProjected: !s26
+
+
+
+
 
 
 
@@ -2592,11 +5112,23 @@ class NNApp {
 
 
 
+
+
+
+
           };
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -2604,7 +5136,15 @@ class NNApp {
 
 
 
+
+
+
+
           p.trafficPoints = builtPoints;
+
+
+
+
 
 
 
@@ -2612,7 +5152,15 @@ class NNApp {
 
 
 
+
+
+
+
           const lanes = mainSt.lanes || 2;
+
+
+
+
 
 
 
@@ -2620,7 +5168,15 @@ class NNApp {
 
 
 
+
+
+
+
           if (lanes >= 4) {
+
+
+
+
 
 
 
@@ -2628,7 +5184,15 @@ class NNApp {
 
 
 
+
+
+
+
             p.passThroughBase = 0.72;
+
+
+
+
 
 
 
@@ -2636,7 +5200,15 @@ class NNApp {
 
 
 
+
+
+
+
             p.roadType = `Vía Distribuidora (${lanes} carriles · Estación #${mainSt.stationId})`;
+
+
+
+
 
 
 
@@ -2644,7 +5216,15 @@ class NNApp {
 
 
 
+
+
+
+
           } else if (lanes === 2) {
+
+
+
+
 
 
 
@@ -2652,11 +5232,23 @@ class NNApp {
 
 
 
+
+
+
+
             p.passThroughBase = 0.52;
 
 
 
+
+
+
+
           } else {
+
+
+
+
 
 
 
@@ -2664,11 +5256,23 @@ class NNApp {
 
 
 
+
+
+
+
             p.passThroughBase = 0.38;
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -2676,7 +5280,15 @@ class NNApp {
 
 
 
+
+
+
+
           const totalPrev = builtPoints.reduce((a, b) => a + (b.annualCarsPrevYear || 0), 0);
+
+
+
+
 
 
 
@@ -2684,7 +5296,15 @@ class NNApp {
 
 
 
+
+
+
+
           p.totalAnnualTrafficPrev2Year = totalPrev2;
+
+
+
+
 
 
 
@@ -2692,7 +5312,15 @@ class NNApp {
 
 
 
+
+
+
+
           p.totalAnnualTrafficCurrentYear = totalCur;
+
+
+
+
 
 
 
@@ -2700,7 +5328,15 @@ class NNApp {
 
 
 
+
+
+
+
           p.trafficYoyGrowthUnits = totalCur - totalPrev;
+
+
+
+
 
 
 
@@ -2708,7 +5344,15 @@ class NNApp {
 
 
 
+
+
+
+
           const c1 = builtPoints[1]?.annualCarsCurrentYear || 0;
+
+
+
+
 
 
 
@@ -2716,7 +5360,15 @@ class NNApp {
 
 
 
+
+
+
+
           p.zoneOutflow = Math.min(c0, c1);
+
+
+
+
 
 
 
@@ -2724,7 +5376,15 @@ class NNApp {
 
 
 
+
+
+
+
           p.zoneInflowDaily = Math.round(p.zoneInflow / 365);
+
+
+
+
 
 
 
@@ -2732,7 +5392,15 @@ class NNApp {
 
 
 
+
+
+
+
           p.zoneNetDiffDaily = p.zoneInflowDaily - p.zoneOutflowDaily;
+
+
+
+
 
 
 
@@ -2740,7 +5408,15 @@ class NNApp {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -2748,7 +5424,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -2756,11 +5440,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -2768,7 +5464,15 @@ class NNApp {
 
 
 
+
+
+
+
     const count = this.parkings.length;
+
+
+
+
 
 
 
@@ -2776,7 +5480,15 @@ class NNApp {
 
 
 
+
+
+
+
     const activeSensors = this.parkings.reduce((acc, p) => {
+
+
+
+
 
 
 
@@ -2784,7 +5496,15 @@ class NNApp {
 
 
 
+
+
+
+
     }, 0);
+
+
+
+
 
 
 
@@ -2792,7 +5512,15 @@ class NNApp {
 
 
 
+
+
+
+
     const withElevation = this.parkings.filter(p => (p.elevation || 0) > 0).length;
+
+
+
+
 
 
 
@@ -2800,7 +5528,15 @@ class NNApp {
 
 
 
+
+
+
+
     const apiDown = (this.openDataConnected === false);
+
+
+
+
 
 
 
@@ -2808,7 +5544,15 @@ class NNApp {
 
 
 
+
+
+
+
     const dotEl = document.getElementById("dataHealthDot");
+
+
+
+
 
 
 
@@ -2816,7 +5560,15 @@ class NNApp {
 
 
 
+
+
+
+
     const bannerEl = document.getElementById("dataHealthWarningBanner");
+
+
+
+
 
 
 
@@ -2824,7 +5576,15 @@ class NNApp {
 
 
 
+
+
+
+
     const bannerDescEl = document.getElementById("dataHealthBannerDesc");
+
+
+
+
 
 
 
@@ -2832,7 +5592,15 @@ class NNApp {
 
 
 
+
+
+
+
     const modalSummaryEl = document.getElementById("modalDataAuditSummary");
+
+
+
+
 
 
 
@@ -2840,7 +5608,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (apiDown) {
+
+
+
+
 
 
 
@@ -2848,11 +5624,23 @@ class NNApp {
 
 
 
+
+
+
+
       if (dotEl) dotEl.className = "w-2 h-2 rounded-full bg-rose-600 animate-ping";
 
 
 
+
+
+
+
       if (statusEl) {
+
+
+
+
 
 
 
@@ -2860,11 +5648,23 @@ class NNApp {
 
 
 
+
+
+
+
         statusEl.innerText = "¡Alerta API Offline!";
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -2872,7 +5672,15 @@ class NNApp {
 
 
 
+
+
+
+
         bannerEl.classList.remove("hidden");
+
+
+
+
 
 
 
@@ -2880,11 +5688,23 @@ class NNApp {
 
 
 
+
+
+
+
         if (bannerDescEl) bannerDescEl.innerText = "La API de Open Data Barcelona no ha respondido. Pulsa 'Reconectar / Auditar APIs' en el encabezado para reintentar la conexión.";
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -2892,7 +5712,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (cardEl) cardEl.className = "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#F8FAFB] hover:bg-[#E6EFF3] border border-[#DFEAF0] text-slate-600 transition-all cursor-pointer";
+
+
+
+
 
 
 
@@ -2900,7 +5728,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (statusEl) {
+
+
+
+
 
 
 
@@ -2908,7 +5744,15 @@ class NNApp {
 
 
 
+
+
+
+
         statusEl.innerText = "Sin Cartera (0)";
+
+
+
+
 
 
 
@@ -2916,7 +5760,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (bannerEl) bannerEl.classList.add("hidden");
+
+
+
+
 
 
 
@@ -2924,7 +5776,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (modalSummaryEl) {
+
+
+
+
 
 
 
@@ -2932,11 +5792,23 @@ class NNApp {
 
 
 
+
+
+
+
         modalSummaryEl.innerText = `Cartera vacía (0 aparcamientos) · ${this.totalLiveStationsCount || 407} espiras municipales listas en Open Data BCN.`;
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -2944,7 +5816,15 @@ class NNApp {
 
 
 
+
+
+
+
         modalDetailsEl.innerHTML = "• Sube tu archivo Excel (.xlsx) o CSV para cruzar automáticamente cada coordenada con las APIs oficiales en vivo.<br>• Norma activa: 100% Datos Reales (0 datos inferidos o inventados).";
+
+
+
+
 
 
 
@@ -2952,11 +5832,23 @@ class NNApp {
 
 
 
+
+
+
+
       return;
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -2964,7 +5856,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (dotEl) dotEl.className = "w-2 h-2 rounded-full bg-[#10B981] pulsing-dot";
+
+
+
+
 
 
 
@@ -2972,7 +5872,15 @@ class NNApp {
 
 
 
+
+
+
+
         statusEl.className = "font-mono-num font-bold text-emerald-700";
+
+
+
+
 
 
 
@@ -2980,7 +5888,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -2988,7 +5904,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -2996,7 +5920,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (modalSummaryEl) {
+
+
+
+
 
 
 
@@ -3004,11 +5936,23 @@ class NNApp {
 
 
 
+
+
+
+
       modalSummaryEl.innerText = "✓ Todas las APIs Oficiales Conectadas en Tiempo Real · 100% Datos Reales · 0 Inferidos.";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -3016,7 +5960,15 @@ class NNApp {
 
 
 
+
+
+
+
       modalDetailsEl.innerHTML = `
+
+
+
+
 
 
 
@@ -3024,7 +5976,15 @@ class NNApp {
 
 
 
+
+
+
+
         • <strong>Open Data BCN · Aforos (2024-2025):</strong> ${activeSensors}/${totalSensors} espiras vinculadas (${this.totalLiveStationsCount || 407} estaciones activas en red).<br>
+
+
+
+
 
 
 
@@ -3032,7 +5992,15 @@ class NNApp {
 
 
 
+
+
+
+
         • <strong>Open-Meteo Elevation DEM (Copernicus):</strong> ${withElevation}/${count} aparcamientos con cota (m) y pendiente (%) medidas por satélite.<br>
+
+
+
+
 
 
 
@@ -3040,7 +6008,15 @@ class NNApp {
 
 
 
+
+
+
+
       `;
+
+
+
+
 
 
 
@@ -3048,7 +6024,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -3056,7 +6040,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -3064,7 +6056,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -3072,7 +6072,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (!silent) alert(`Error al sincronizar con las APIs oficiales: ${err.message || err}`);
+
+
+
+
 
 
 
@@ -3080,11 +6088,23 @@ class NNApp {
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -3092,7 +6112,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -3100,7 +6128,15 @@ class NNApp {
 
 
 
+
+
+
+
     const badgeTextEl = document.getElementById("openDataStatusText");
+
+
+
+
 
 
 
@@ -3108,7 +6144,15 @@ class NNApp {
 
 
 
+
+
+
+
     const latencyEl = document.getElementById("openDataLatency");
+
+
+
+
 
 
 
@@ -3116,7 +6160,15 @@ class NNApp {
 
 
 
+
+
+
+
     const iconEl = document.getElementById("reconnectIcon");
+
+
+
+
 
 
 
@@ -3124,7 +6176,15 @@ class NNApp {
 
 
 
+
+
+
+
     const centerPingEl = document.getElementById("centerOpenDataPing");
+
+
+
+
 
 
 
@@ -3132,7 +6192,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (iconEl) iconEl.classList.add("animate-spin");
+
+
+
+
 
 
 
@@ -3140,7 +6208,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (badgeTextEl) badgeTextEl.innerText = "OPENDATA BCN: CONECTANDO...";
+
+
+
+
 
 
 
@@ -3148,7 +6224,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (centerStatusEl) {
+
+
+
+
 
 
 
@@ -3156,11 +6240,23 @@ class NNApp {
 
 
 
+
+
+
+
       centerStatusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Verificando...`;
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -3168,7 +6264,15 @@ class NNApp {
 
 
 
+
+
+
+
     let isConnected = false;
+
+
+
+
 
 
 
@@ -3176,11 +6280,23 @@ class NNApp {
 
 
 
+
+
+
+
     let totalDatasets = 0;
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -3188,7 +6304,15 @@ class NNApp {
 
 
 
+
+
+
+
       const controller = new AbortController();
+
+
+
+
 
 
 
@@ -3196,7 +6320,15 @@ class NNApp {
 
 
 
+
+
+
+
       const apiUrl = "https://opendata-ajuntament.barcelona.cat/data/api/3/action/package_search?q=aforaments&rows=1";
+
+
+
+
 
 
 
@@ -3204,7 +6336,15 @@ class NNApp {
 
 
 
+
+
+
+
         method: "GET",
+
+
+
+
 
 
 
@@ -3212,11 +6352,23 @@ class NNApp {
 
 
 
+
+
+
+
         signal: controller.signal
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -3224,7 +6376,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (resp.ok) {
+
+
+
+
 
 
 
@@ -3232,7 +6392,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (json && (json.success === true || json.result)) {
+
+
+
+
 
 
 
@@ -3240,7 +6408,15 @@ class NNApp {
 
 
 
+
+
+
+
           latencyMs = Math.round(performance.now() - t0);
+
+
+
+
 
 
 
@@ -3248,11 +6424,23 @@ class NNApp {
 
 
 
+
+
+
+
         }
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3260,7 +6448,15 @@ class NNApp {
 
 
 
+
+
+
+
       console.warn("[OpenData BCN] Intento directo no disponible, probando proxy local:", e1);
+
+
+
+
 
 
 
@@ -3268,7 +6464,15 @@ class NNApp {
 
 
 
+
+
+
+
       try {
+
+
+
+
 
 
 
@@ -3276,7 +6480,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (resp2.ok) {
+
+
+
+
 
 
 
@@ -3284,7 +6496,15 @@ class NNApp {
 
 
 
+
+
+
+
           if (json2 && json2.connected) {
+
+
+
+
 
 
 
@@ -3292,7 +6512,15 @@ class NNApp {
 
 
 
+
+
+
+
             latencyMs = json2.latency_ms || Math.round(performance.now() - t0);
+
+
+
+
 
 
 
@@ -3300,11 +6528,23 @@ class NNApp {
 
 
 
+
+
+
+
           }
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -3312,7 +6552,15 @@ class NNApp {
 
 
 
+
+
+
+
         console.warn("[OpenData BCN] Fallback local no respondió:", e2);
+
+
+
+
 
 
 
@@ -3320,7 +6568,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -3328,7 +6584,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (btnEl) btnEl.disabled = false;
+
+
+
+
 
 
 
@@ -3336,7 +6600,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.openDataConnected = true;
+
+
+
+
 
 
 
@@ -3344,11 +6616,23 @@ class NNApp {
 
 
 
+
+
+
+
       if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-[#10B981] pulsing-dot";
 
 
 
+
+
+
+
       if (latencyEl) {
+
+
+
+
 
 
 
@@ -3356,7 +6640,15 @@ class NNApp {
 
 
 
+
+
+
+
         latencyEl.classList.remove("hidden");
+
+
+
+
 
 
 
@@ -3364,7 +6656,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (centerStatusEl) {
+
+
+
+
 
 
 
@@ -3372,7 +6672,15 @@ class NNApp {
 
 
 
+
+
+
+
         centerStatusEl.innerText = "Conectado OK";
+
+
+
+
 
 
 
@@ -3380,7 +6688,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (centerPingEl) {
+
+
+
+
 
 
 
@@ -3388,7 +6704,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3396,7 +6720,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (modalOpenDataEl) {
+
+
+
+
 
 
 
@@ -3404,7 +6736,15 @@ class NNApp {
 
 
 
+
+
+
+
         modalOpenDataEl.innerText = `Conectado OK (${latencyMs} ms)`;
+
+
+
+
 
 
 
@@ -3412,7 +6752,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (userTriggered) {
+
+
+
+
 
 
 
@@ -3420,7 +6768,15 @@ class NNApp {
 
 
 
+
+
+
+
 • Servicio: Open Data Ajuntament de Barcelona
+
+
+
+
 
 
 
@@ -3428,7 +6784,15 @@ class NNApp {
 
 
 
+
+
+
+
 • Latencia de respuesta: ${latencyMs} ms
+
+
+
+
 
 
 
@@ -3436,11 +6800,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -3448,7 +6824,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (badgeTextEl) badgeTextEl.innerText = "OPENDATA BCN · SIN CONEXIÓN";
+
+
+
+
 
 
 
@@ -3456,7 +6840,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (latencyEl) {
+
+
+
+
 
 
 
@@ -3464,11 +6856,23 @@ class NNApp {
 
 
 
+
+
+
+
         latencyEl.classList.remove("hidden");
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3476,7 +6880,15 @@ class NNApp {
 
 
 
+
+
+
+
         centerStatusEl.className = "font-mono-num font-semibold text-rose-600";
+
+
+
+
 
 
 
@@ -3484,7 +6896,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3492,11 +6912,23 @@ class NNApp {
 
 
 
+
+
+
+
         centerPingEl.innerText = "(Sin respuesta)";
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3504,7 +6936,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (modalOpenDataEl) {
+
+
+
+
 
 
 
@@ -3512,11 +6952,23 @@ class NNApp {
 
 
 
+
+
+
+
         modalOpenDataEl.innerText = "Sin Conexión (Offline)";
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3524,7 +6976,15 @@ class NNApp {
 
 
 
+
+
+
+
         alert("Aviso de Conexión:\n\nNo se ha podido conectar con la API de Open Data Ajuntament de Barcelona (tiempo de espera agotado o modo local sin Internet).\n\nPuedes pulsar 'Reconectar' para reintentar cuando dispongas de conexión.");
+
+
+
+
 
 
 
@@ -3532,7 +6992,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -3540,7 +7008,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -3548,7 +7024,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -3556,7 +7040,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -3564,7 +7056,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (stored) {
+
+
+
+
 
 
 
@@ -3572,7 +7072,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (parsed && Array.isArray(parsed.parkings) && parsed.parkings.length > 0) {
+
+
+
+
 
 
 
@@ -3580,7 +7088,15 @@ class NNApp {
 
 
 
+
+
+
+
           this.parkings = this.mergeWithKnownPortfolio(parsed.parkings);
+
+
+
+
 
 
 
@@ -3588,11 +7104,23 @@ class NNApp {
 
 
 
+
+
+
+
             this.selectedAssetId = parsed.selectedAssetId;
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -3600,7 +7128,15 @@ class NNApp {
 
 
 
+
+
+
+
           console.log(`[Persistencia] Cartera restaurada desde localStorage con 0 datos inferidos (${this.parkings.length} aparcamientos).`);
+
+
+
+
 
 
 
@@ -3608,7 +7144,15 @@ class NNApp {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -3616,7 +7160,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (e) {
+
+
+
+
 
 
 
@@ -3624,7 +7176,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -3632,7 +7192,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.selectedAssetId = null;
+
+
+
+
 
 
 
@@ -3640,7 +7208,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -3648,7 +7224,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -3656,7 +7240,15 @@ class NNApp {
 
 
 
+
+
+
+
         parkings: this.parkings,
+
+
+
+
 
 
 
@@ -3664,7 +7256,15 @@ class NNApp {
 
 
 
+
+
+
+
         selectedAssetId: this.selectedAssetId,
+
+
+
+
 
 
 
@@ -3672,7 +7272,15 @@ class NNApp {
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -3680,7 +7288,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (e) {
+
+
+
+
 
 
 
@@ -3688,11 +7304,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -3700,7 +7328,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -3708,7 +7344,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.sliders = {
+
+
+
+
 
 
 
@@ -3716,7 +7360,15 @@ class NNApp {
 
 
 
+
+
+
+
         sat: 0,
+
+
+
+
 
 
 
@@ -3724,11 +7376,23 @@ class NNApp {
 
 
 
+
+
+
+
         tariff: 0.0
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -3736,7 +7400,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.selectedAssetId = null;
+
+
+
+
 
 
 
@@ -3744,7 +7416,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.recalcAllParkings();
+
+
+
+
 
 
 
@@ -3752,7 +7432,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.renderTable();
+
+
+
+
 
 
 
@@ -3760,7 +7448,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.updateGlobalKPIs();
+
+
+
+
 
 
 
@@ -3768,11 +7464,23 @@ class NNApp {
 
 
 
+
+
+
+
       this.auditDataHealth();
 
 
 
+
+
+
+
       this.switchState("A");
+
+
+
+
 
 
 
@@ -3780,7 +7488,15 @@ class NNApp {
 
 
 
+
+
+
+
         const { curMonthly, prevMonthly } = this.calculatePortfolioSensorsTrafficMonthly();
+
+
+
+
 
 
 
@@ -3788,7 +7504,15 @@ class NNApp {
 
 
 
+
+
+
+
         this.chartGlobalMonthlyDL.data.datasets[1].data = prevMonthly;
+
+
+
+
 
 
 
@@ -3796,7 +7520,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3804,7 +7536,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -3812,11 +7552,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -3824,7 +7576,15 @@ class NNApp {
 
 
 
+
+
+
+
     // Regla estricta Real-Data-Only: NO se cruza con ningún catálogo inferido.
+
+
+
+
 
 
 
@@ -3832,7 +7592,15 @@ class NNApp {
 
 
 
+
+
+
+
     return (incomingList || []).map((item, idx) => {
+
+
+
+
 
 
 
@@ -3840,7 +7608,15 @@ class NNApp {
 
 
 
+
+
+
+
       const isFromApi = item.fromApi === true;
+
+
+
+
 
 
 
@@ -3848,7 +7624,15 @@ class NNApp {
 
 
 
+
+
+
+
         ...item,
+
+
+
+
 
 
 
@@ -3856,7 +7640,15 @@ class NNApp {
 
 
 
+
+
+
+
         obraAnterior: item.obraAnterior || String(item.id || ""),
+
+
+
+
 
 
 
@@ -3864,7 +7656,15 @@ class NNApp {
 
 
 
+
+
+
+
         key: item.key || `obra_${item.obraActual || item.id || idx}_${idx}`,
+
+
+
+
 
 
 
@@ -3872,7 +7672,15 @@ class NNApp {
 
 
 
+
+
+
+
         address: item.address || "",
+
+
+
+
 
 
 
@@ -3880,7 +7688,15 @@ class NNApp {
 
 
 
+
+
+
+
         lat: !isNaN(parseFloat(item.lat)) ? parseFloat(item.lat) : 0,
+
+
+
+
 
 
 
@@ -3888,7 +7704,15 @@ class NNApp {
 
 
 
+
+
+
+
         statusType: item.statusType || "P",
+
+
+
+
 
 
 
@@ -3896,7 +7720,15 @@ class NNApp {
 
 
 
+
+
+
+
         tariff: isFromExcel ? (parseFloat(item.tariff) || 0) : 0,
+
+
+
+
 
 
 
@@ -3904,7 +7736,15 @@ class NNApp {
 
 
 
+
+
+
+
         slope: (isFromApi || isFromExcel) ? (parseFloat(item.slope) || 0) : 0,
+
+
+
+
 
 
 
@@ -3912,7 +7752,15 @@ class NNApp {
 
 
 
+
+
+
+
         roadType: (isFromApi || isFromExcel) ? (item.roadType || "Sin datos en archivo") : "Sin datos en archivo",
+
+
+
+
 
 
 
@@ -3920,7 +7768,15 @@ class NNApp {
 
 
 
+
+
+
+
         fromExcel: isFromExcel,
+
+
+
+
 
 
 
@@ -3928,7 +7784,15 @@ class NNApp {
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -3936,11 +7800,23 @@ class NNApp {
 
 
 
+
+
+
+
     });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -3948,7 +7824,15 @@ class NNApp {
 
 
 
+
+
+
+
     const file = event.target.files?.[0];
+
+
+
+
 
 
 
@@ -3956,7 +7840,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -3964,7 +7856,15 @@ class NNApp {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -3972,7 +7872,15 @@ class NNApp {
 
 
 
+
+
+
+
       alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
+
+
+
+
 
 
 
@@ -3980,7 +7888,15 @@ class NNApp {
 
 
 
+
+
+
+
       event.target.value = "";
+
+
+
+
 
 
 
@@ -3988,7 +7904,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -3996,7 +7920,15 @@ class NNApp {
 
 
 
+
+
+
+
     const cacheKey = `${lat.toFixed(2)}_${lon.toFixed(2)}`;
+
+
+
+
 
 
 
@@ -4004,7 +7936,15 @@ class NNApp {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -4012,7 +7952,15 @@ class NNApp {
 
 
 
+
+
+
+
       const resp = await fetch(url);
+
+
+
+
 
 
 
@@ -4020,7 +7968,15 @@ class NNApp {
 
 
 
+
+
+
+
       const data = await resp.json();
+
+
+
+
 
 
 
@@ -4028,7 +7984,15 @@ class NNApp {
 
 
 
+
+
+
+
         this.liveWeatherCache[cacheKey] = data.daily;
+
+
+
+
 
 
 
@@ -4036,7 +8000,15 @@ class NNApp {
 
 
 
+
+
+
+
         const todayTemp = data.daily.temperature_2m_max?.[0] !== undefined ? `${Math.round(data.daily.temperature_2m_max[0])}°C` : "OK";
+
+
+
+
 
 
 
@@ -4044,7 +8016,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (centerMeteoEl) {
+
+
+
+
 
 
 
@@ -4052,11 +8032,23 @@ class NNApp {
 
 
 
+
+
+
+
           centerMeteoEl.innerText = `OK (${todayTemp})`;
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -4064,7 +8056,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (modalMeteoEl) {
+
+
+
+
 
 
 
@@ -4072,11 +8072,23 @@ class NNApp {
 
 
 
+
+
+
+
           modalMeteoEl.innerText = `Conectado OK (${todayTemp})`;
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -4084,7 +8096,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (this.currentState === "B" && this.selectedAssetId) {
+
+
+
+
 
 
 
@@ -4092,11 +8112,23 @@ class NNApp {
 
 
 
+
+
+
+
           if (p) this.updateZoneTrafficForecast(p);
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -4104,11 +8136,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -4116,7 +8160,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -4124,7 +8176,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4132,7 +8192,15 @@ class NNApp {
 
 
 
+
+
+
+
     const t = tempMax !== undefined ? Math.round(tempMax) : 19;
+
+
+
+
 
 
 
@@ -4140,7 +8208,15 @@ class NNApp {
 
 
 
+
+
+
+
     let condition = "Soleado y despejado";
+
+
+
+
 
 
 
@@ -4148,7 +8224,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (code === 0) {
+
+
+
+
 
 
 
@@ -4156,7 +8240,15 @@ class NNApp {
 
 
 
+
+
+
+
       iconName = "sun";
+
+
+
+
 
 
 
@@ -4164,7 +8256,15 @@ class NNApp {
 
 
 
+
+
+
+
       condition = "Nubes y claros";
+
+
+
+
 
 
 
@@ -4172,7 +8272,15 @@ class NNApp {
 
 
 
+
+
+
+
     } else if (code === 3 || code === 45 || code === 48) {
+
+
+
+
 
 
 
@@ -4180,7 +8288,15 @@ class NNApp {
 
 
 
+
+
+
+
       iconName = "cloud";
+
+
+
+
 
 
 
@@ -4188,7 +8304,15 @@ class NNApp {
 
 
 
+
+
+
+
       condition = "Llovizna débil";
+
+
+
+
 
 
 
@@ -4196,7 +8320,15 @@ class NNApp {
 
 
 
+
+
+
+
     } else if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
+
+
+
+
 
 
 
@@ -4204,7 +8336,15 @@ class NNApp {
 
 
 
+
+
+
+
       iconName = "cloud-rain";
+
+
+
+
 
 
 
@@ -4212,7 +8352,15 @@ class NNApp {
 
 
 
+
+
+
+
       condition = "Tormenta y chubascos";
+
+
+
+
 
 
 
@@ -4220,7 +8368,15 @@ class NNApp {
 
 
 
+
+
+
+
     } else if (r > 0.5) {
+
+
+
+
 
 
 
@@ -4228,11 +8384,23 @@ class NNApp {
 
 
 
+
+
+
+
       iconName = "cloud-rain";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -4240,11 +8408,23 @@ class NNApp {
 
 
 
+
+
+
+
     const factorRain = +(1.0 + Math.min(0.38, (r > 0.3 ? 0.05 : 0) + (r * 0.022))).toFixed(2);
 
 
 
+
+
+
+
     return {
+
+
+
+
 
 
 
@@ -4252,7 +8432,15 @@ class NNApp {
 
 
 
+
+
+
+
       condition,
+
+
+
+
 
 
 
@@ -4260,7 +8448,15 @@ class NNApp {
 
 
 
+
+
+
+
       tempMax: t,
+
+
+
+
 
 
 
@@ -4268,7 +8464,15 @@ class NNApp {
 
 
 
+
+
+
+
       factorRain
+
+
+
+
 
 
 
@@ -4276,7 +8480,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4284,7 +8496,15 @@ class NNApp {
 
 
 
+
+
+
+
     return {
+
+
+
+
 
 
 
@@ -4292,7 +8512,15 @@ class NNApp {
 
 
 
+
+
+
+
       title: "Sin eventos en archivo",
+
+
+
+
 
 
 
@@ -4300,7 +8528,15 @@ class NNApp {
 
 
 
+
+
+
+
       type: "none",
+
+
+
+
 
 
 
@@ -4308,7 +8544,15 @@ class NNApp {
 
 
 
+
+
+
+
       factorEvent: 1.00
+
+
+
+
 
 
 
@@ -4316,7 +8560,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4324,7 +8576,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.parkings.forEach((p, idx) => {
+
+
+
+
 
 
 
@@ -4332,7 +8592,15 @@ class NNApp {
 
 
 
+
+
+
+
         rain: this.sliders.rain,
+
+
+
+
 
 
 
@@ -4340,7 +8608,15 @@ class NNApp {
 
 
 
+
+
+
+
         event: this.sliders.event,
+
+
+
+
 
 
 
@@ -4348,7 +8624,15 @@ class NNApp {
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -4356,7 +8640,15 @@ class NNApp {
 
 
 
+
+
+
+
       p.cruising = calc.cruising;
+
+
+
+
 
 
 
@@ -4364,11 +8656,23 @@ class NNApp {
 
 
 
+
+
+
+
       p.calc = calc;
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -4376,7 +8680,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.parkings.sort((a, b) => b.dl - a.dl);
+
+
+
+
 
 
 
@@ -4384,7 +8696,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -4392,7 +8712,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -4400,7 +8728,15 @@ class NNApp {
 
 
 
+
+
+
+
     const tabsContainer = document.getElementById("parkingTabsContainer");
+
+
+
+
 
 
 
@@ -4408,7 +8744,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (!tabsContainer || !quickSelect) return;
+
+
+
+
 
 
 
@@ -4416,7 +8760,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (this.parkings.length === 0) {
+
+
+
+
 
 
 
@@ -4424,7 +8776,15 @@ class NNApp {
 
 
 
+
+
+
+
         <div class="text-xs text-slate-400 italic px-3 py-1 flex items-center gap-2">
+
+
+
+
 
 
 
@@ -4432,7 +8792,15 @@ class NNApp {
 
 
 
+
+
+
+
           <button onclick="app.openModal('uploadModal')" class="text-[#164250] font-bold underline hover:text-[#10B981] not-italic cursor-pointer">
+
+
+
+
 
 
 
@@ -4440,7 +8808,15 @@ class NNApp {
 
 
 
+
+
+
+
           </button>
+
+
+
+
 
 
 
@@ -4448,11 +8824,23 @@ class NNApp {
 
 
 
+
+
+
+
       `;
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -4460,7 +8848,15 @@ class NNApp {
 
 
 
+
+
+
+
         const isActive = (this.currentState === "B" && p.id === this.selectedAssetId);
+
+
+
+
 
 
 
@@ -4468,11 +8864,23 @@ class NNApp {
 
 
 
+
+
+
+
         const obraTag = p.obraActual ? `[${p.obraActual}] ` : "";
 
 
 
+
+
+
+
         return `
+
+
+
+
 
 
 
@@ -4480,7 +8888,15 @@ class NNApp {
 
 
 
+
+
+
+
             class="parking-tab shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 border ${
+
+
+
+
 
 
 
@@ -4488,7 +8904,15 @@ class NNApp {
 
 
 
+
+
+
+
                 ? 'bg-[#164250] text-white border-[#164250] shadow-sm ring-2 ring-[#10B981]'
+
+
+
+
 
 
 
@@ -4496,7 +8920,15 @@ class NNApp {
 
 
 
+
+
+
+
             }">
+
+
+
+
 
 
 
@@ -4504,7 +8936,15 @@ class NNApp {
 
 
 
+
+
+
+
             <span class="truncate max-w-[180px]">${obraTag}${p.name}</span>
+
+
+
+
 
 
 
@@ -4512,7 +8952,15 @@ class NNApp {
 
 
 
+
+
+
+
               isActive ? 'bg-white/20 text-white' : 'bg-[#E6EFF3] text-[#164250]'
+
+
+
+
 
 
 
@@ -4520,7 +8968,15 @@ class NNApp {
 
 
 
+
+
+
+
           </button>
+
+
+
+
 
 
 
@@ -4528,11 +8984,23 @@ class NNApp {
 
 
 
+
+
+
+
       }).join("");
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -4540,7 +9008,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (this.parkings.length === 0) {
+
+
+
+
 
 
 
@@ -4548,7 +9024,15 @@ class NNApp {
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -4556,7 +9040,15 @@ class NNApp {
 
 
 
+
+
+
+
         <option value="" disabled ${this.currentState === 'A' || this.currentState === 'C' ? 'selected' : ''}>-- Seleccionar o buscar aparcamiento --</option>
+
+
+
+
 
 
 
@@ -4564,7 +9056,15 @@ class NNApp {
 
 
 
+
+
+
+
           <option value="${p.id}" ${this.currentState === 'B' && p.id === this.selectedAssetId ? 'selected' : ''}>
+
+
+
+
 
 
 
@@ -4572,7 +9072,15 @@ class NNApp {
 
 
 
+
+
+
+
           </option>
+
+
+
+
 
 
 
@@ -4580,11 +9088,23 @@ class NNApp {
 
 
 
+
+
+
+
       `;
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -4592,7 +9112,15 @@ class NNApp {
 
 
 
+
+
+
+
     const btnGlobal = document.getElementById("tabGlobalBtn");
+
+
+
+
 
 
 
@@ -4600,7 +9128,15 @@ class NNApp {
 
 
 
+
+
+
+
       const labelSpan = btnGlobal.querySelector("span");
+
+
+
+
 
 
 
@@ -4608,11 +9144,23 @@ class NNApp {
 
 
 
+
+
+
+
         labelSpan.innerText = `Visión Global (${this.parkings.length} Aparcamiento${this.parkings.length === 1 ? '' : 's'})`;
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -4620,11 +9168,23 @@ class NNApp {
 
 
 
+
+
+
+
         btnGlobal.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#164250] text-white shadow-sm flex items-center gap-2 shrink-0 ring-2 ring-[#10B981]";
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -4632,11 +9192,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -4644,7 +9216,15 @@ class NNApp {
 
 
 
+
+
+
+
     const btnMethodology = document.getElementById("tabMethodologyBtn");
+
+
+
+
 
 
 
@@ -4652,7 +9232,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (this.currentState === "C") {
+
+
+
+
 
 
 
@@ -4660,7 +9248,15 @@ class NNApp {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -4668,7 +9264,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -4676,7 +9280,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4684,7 +9296,15 @@ class NNApp {
 
 
 
+
+
+
+
     const el = document.getElementById(id);
+
+
+
+
 
 
 
@@ -4692,7 +9312,15 @@ class NNApp {
 
 
 
+
+
+
+
     const iconEl = document.getElementById(iconId);
+
+
+
+
 
 
 
@@ -4700,7 +9328,15 @@ class NNApp {
 
 
 
+
+
+
+
     const isHidden = el.classList.contains("hidden");
+
+
+
+
 
 
 
@@ -4708,7 +9344,15 @@ class NNApp {
 
 
 
+
+
+
+
       el.classList.remove("hidden");
+
+
+
+
 
 
 
@@ -4716,7 +9360,15 @@ class NNApp {
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -4724,7 +9376,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (iconEl) iconEl.style.transform = "rotate(0deg)";
+
+
+
+
 
 
 
@@ -4732,7 +9392,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4740,7 +9408,15 @@ class NNApp {
 
 
 
+
+
+
+
     const container = document.getElementById("parkingTabsContainer");
+
+
+
+
 
 
 
@@ -4748,7 +9424,15 @@ class NNApp {
 
 
 
+
+
+
+
       container.scrollBy({ left: direction * 280, behavior: 'smooth' });
+
+
+
+
 
 
 
@@ -4756,7 +9440,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4764,7 +9456,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.currentState = state;
+
+
+
+
 
 
 
@@ -4772,11 +9472,23 @@ class NNApp {
 
 
 
+
+
+
+
       this.selectedAssetId = assetId;
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -4784,7 +9496,15 @@ class NNApp {
 
 
 
+
+
+
+
     const viewB = document.getElementById("stateBView");
+
+
+
+
 
 
 
@@ -4792,7 +9512,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (state === "A") {
+
+
+
+
 
 
 
@@ -4800,7 +9528,15 @@ class NNApp {
 
 
 
+
+
+
+
       viewB.classList.add("hidden");
+
+
+
+
 
 
 
@@ -4808,7 +9544,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.renderTabsBar();
+
+
+
+
 
 
 
@@ -4816,7 +9560,15 @@ class NNApp {
 
 
 
+
+
+
+
       setTimeout(() => {
+
+
+
+
 
 
 
@@ -4824,7 +9576,15 @@ class NNApp {
 
 
 
+
+
+
+
         if (this.chartGlobalMonthlyDL) {
+
+
+
+
 
 
 
@@ -4832,7 +9592,15 @@ class NNApp {
 
 
 
+
+
+
+
           this.chartGlobalMonthlyDL.update();
+
+
+
+
 
 
 
@@ -4840,7 +9608,15 @@ class NNApp {
 
 
 
+
+
+
+
       }, 100);
+
+
+
+
 
 
 
@@ -4848,7 +9624,15 @@ class NNApp {
 
 
 
+
+
+
+
       viewA.classList.add("hidden");
+
+
+
+
 
 
 
@@ -4856,11 +9640,23 @@ class NNApp {
 
 
 
+
+
+
+
       if (viewC) viewC.classList.remove("hidden");
 
 
 
+
+
+
+
       this.renderTabsBar();
+
+
+
+
 
 
 
@@ -4868,7 +9664,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (window.lucide) {
+
+
+
+
 
 
 
@@ -4876,11 +9680,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -4888,7 +9704,15 @@ class NNApp {
 
 
 
+
+
+
+
       viewB.classList.remove("hidden");
+
+
+
+
 
 
 
@@ -4896,7 +9720,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.renderTabsBar();
+
+
+
+
 
 
 
@@ -4904,7 +9736,15 @@ class NNApp {
 
 
 
+
+
+
+
       setTimeout(() => {
+
+
+
+
 
 
 
@@ -4912,7 +9752,15 @@ class NNApp {
 
 
 
+
+
+
+
       }, 100);
+
+
+
+
 
 
 
@@ -4920,7 +9768,15 @@ class NNApp {
 
 
 
+
+
+
+
       const activeTabEl = document.getElementById(`tabParking_${this.selectedAssetId}`);
+
+
+
+
 
 
 
@@ -4928,7 +9784,15 @@ class NNApp {
 
 
 
+
+
+
+
         activeTabEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+
+
+
 
 
 
@@ -4936,11 +9800,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4948,11 +9824,23 @@ class NNApp {
 
 
 
+
+
+
+
     this.switchState("B", assetId);
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4960,7 +9848,15 @@ class NNApp {
 
 
 
+
+
+
+
     const currentIndex = this.parkings.findIndex(p => p.id === this.selectedAssetId);
+
+
+
+
 
 
 
@@ -4968,7 +9864,15 @@ class NNApp {
 
 
 
+
+
+
+
     let newIndex = currentIndex + direction;
+
+
+
+
 
 
 
@@ -4976,7 +9880,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (newIndex >= this.parkings.length) newIndex = 0;
+
+
+
+
 
 
 
@@ -4984,11 +9896,23 @@ class NNApp {
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -4996,7 +9920,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -5004,7 +9936,15 @@ class NNApp {
 
 
 
+
+
+
+
     const bcnCenter = [41.3920, 2.1620];
+
+
+
+
 
 
 
@@ -5012,7 +9952,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (this.leafletMap) {
+
+
+
+
 
 
 
@@ -5020,11 +9968,23 @@ class NNApp {
 
 
 
+
+
+
+
       this.leafletMap = null;
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5032,7 +9992,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (mapEl && mapEl._leaflet_id) {
+
+
+
+
 
 
 
@@ -5040,7 +10008,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5048,7 +10024,15 @@ class NNApp {
 
 
 
+
+
+
+
       center: bcnCenter,
+
+
+
+
 
 
 
@@ -5056,7 +10040,15 @@ class NNApp {
 
 
 
+
+
+
+
       zoomControl: true,
+
+
+
+
 
 
 
@@ -5064,7 +10056,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -5072,11 +10072,23 @@ class NNApp {
 
 
 
+
+
+
+
       maxZoom: 19,
 
 
 
+
+
+
+
       attribution: '&copy; OpenStreetMap contributors'
+
+
+
+
 
 
 
@@ -5084,7 +10096,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.markersLayer = L.layerGroup().addTo(this.leafletMap);
+
+
+
+
 
 
 
@@ -5092,11 +10112,23 @@ class NNApp {
 
 
 
+
+
+
+
     // 2. Mapa Quirúrgico Individual (Estado B)
 
 
 
+
+
+
+
     if (this.detailLeafletMap) {
+
+
+
+
 
 
 
@@ -5104,11 +10136,23 @@ class NNApp {
 
 
 
+
+
+
+
       this.detailLeafletMap = null;
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5116,7 +10160,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (detailMapEl && detailMapEl._leaflet_id) {
+
+
+
+
 
 
 
@@ -5124,7 +10176,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5132,7 +10192,15 @@ class NNApp {
 
 
 
+
+
+
+
       center: bcnCenter,
+
+
+
+
 
 
 
@@ -5140,7 +10208,15 @@ class NNApp {
 
 
 
+
+
+
+
       zoomControl: true,
+
+
+
+
 
 
 
@@ -5148,7 +10224,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -5156,7 +10240,15 @@ class NNApp {
 
 
 
+
+
+
+
       maxZoom: 19,
+
+
+
+
 
 
 
@@ -5164,7 +10256,15 @@ class NNApp {
 
 
 
+
+
+
+
     }).addTo(this.detailLeafletMap);
+
+
+
+
 
 
 
@@ -5172,7 +10272,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.detailPointsLayer = L.layerGroup().addTo(this.detailLeafletMap);
+
+
+
+
 
 
 
@@ -5180,11 +10288,23 @@ class NNApp {
 
 
 
+
+
+
+
     this.renderGlobalMapMarkers();
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -5192,7 +10312,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (!this.leafletMap || !this.markersLayer) return;
+
+
+
+
 
 
 
@@ -5200,7 +10328,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.isochronesLayer.clearLayers();
+
+
+
+
 
 
 
@@ -5208,7 +10344,15 @@ class NNApp {
 
 
 
+
+
+
+
     const mapCountEl = document.getElementById("mapCount");
+
+
+
+
 
 
 
@@ -5216,7 +10360,15 @@ class NNApp {
 
 
 
+
+
+
+
     const bounds = [];
+
+
+
+
 
 
 
@@ -5224,7 +10376,15 @@ class NNApp {
 
 
 
+
+
+
+
       const isSelected = p.id === this.selectedAssetId;
+
+
+
+
 
 
 
@@ -5232,7 +10392,15 @@ class NNApp {
 
 
 
+
+
+
+
       bounds.push([p.lat, p.lon]);
+
+
+
+
 
 
 
@@ -5240,11 +10408,23 @@ class NNApp {
 
 
 
+
+
+
+
         className: 'custom-nn-marker',
 
 
 
+
+
+
+
         html: `
+
+
+
+
 
 
 
@@ -5252,7 +10432,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="w-8 h-8 rounded-full ${isSelected ? 'bg-[#0D2730] ring-4 ring-emerald-400 scale-110' : 'bg-[#164250]'} text-white shadow-md flex items-center justify-center font-bold text-[11px] border-2 border-white transition-transform group-hover:scale-110">
+
+
+
+
 
 
 
@@ -5260,7 +10448,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -5268,7 +10464,15 @@ class NNApp {
 
 
 
+
+
+
+
               <span class="w-1.5 h-1.5 rounded-full ${isHigh ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
+
+
+
+
 
 
 
@@ -5276,7 +10480,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -5284,7 +10496,15 @@ class NNApp {
 
 
 
+
+
+
+
         `,
+
+
+
+
 
 
 
@@ -5292,11 +10512,23 @@ class NNApp {
 
 
 
+
+
+
+
         iconAnchor: [16, 16]
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -5304,7 +10536,15 @@ class NNApp {
 
 
 
+
+
+
+
       marker.bindPopup(`
+
+
+
+
 
 
 
@@ -5312,7 +10552,15 @@ class NNApp {
 
 
 
+
+
+
+
           ${p.obraActual ? `<div class="text-[10px] font-mono font-bold text-[#0284C7]">Obra Act.: #${p.obraActual}${p.obraAnterior && p.obraAnterior !== p.obraActual ? ` (Ant.: #${p.obraAnterior})` : ''}</div>` : ''}
+
+
+
+
 
 
 
@@ -5320,7 +10568,15 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="text-slate-500">${p.address}</div>
+
+
+
+
 
 
 
@@ -5328,7 +10584,15 @@ class NNApp {
 
 
 
+
+
+
+
             <span class="text-emerald-600 font-bold">${p.dl} veh/h latente</span>
+
+
+
+
 
 
 
@@ -5336,7 +10600,15 @@ class NNApp {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -5344,7 +10616,15 @@ class NNApp {
 
 
 
+
+
+
+
             Abrir Pestaña Individual →
+
+
+
+
 
 
 
@@ -5352,7 +10632,15 @@ class NNApp {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -5360,7 +10648,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.markersLayer.addLayer(marker);
+
+
+
+
 
 
 
@@ -5368,7 +10664,15 @@ class NNApp {
 
 
 
+
+
+
+
         const circle = L.circle([p.lat, p.lon], {
+
+
+
+
 
 
 
@@ -5376,7 +10680,15 @@ class NNApp {
 
 
 
+
+
+
+
           color: '#164250',
+
+
+
+
 
 
 
@@ -5384,7 +10696,15 @@ class NNApp {
 
 
 
+
+
+
+
           opacity: 0.15,
+
+
+
+
 
 
 
@@ -5392,11 +10712,23 @@ class NNApp {
 
 
 
+
+
+
+
           fillOpacity: 0.04
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -5404,11 +10736,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -5416,7 +10760,15 @@ class NNApp {
 
 
 
+
+
+
+
       try {
+
+
+
+
 
 
 
@@ -5424,7 +10776,15 @@ class NNApp {
 
 
 
+
+
+
+
       } catch (e) {}
+
+
+
+
 
 
 
@@ -5432,11 +10792,23 @@ class NNApp {
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -5444,7 +10816,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -5452,7 +10832,15 @@ class NNApp {
 
 
 
+
+
+
+
     const p = this.parkings.find(x => x.id === this.selectedAssetId) || this.parkings[0];
+
+
+
+
 
 
 
@@ -5460,7 +10848,15 @@ class NNApp {
 
 
 
+
+
+
+
     // Asegurar que el objeto tiene todos los puntos y series calculadas
+
+
+
+
 
 
 
@@ -5468,7 +10864,15 @@ class NNApp {
 
 
 
+
+
+
+
     // 1. Cabecera y Datos Generales
+
+
+
+
 
 
 
@@ -5476,7 +10880,15 @@ class NNApp {
 
 
 
+
+
+
+
     document.getElementById("detailTitle").innerText = enriched.name;
+
+
+
+
 
 
 
@@ -5484,7 +10896,15 @@ class NNApp {
 
 
 
+
+
+
+
     document.getElementById("detailRoadType").innerText = enriched.roadType || "Sin datos en archivo";
+
+
+
+
 
 
 
@@ -5492,7 +10912,15 @@ class NNApp {
 
 
 
+
+
+
+
     const slopeVal = enriched.slope || 0;
+
+
+
+
 
 
 
@@ -5500,7 +10928,15 @@ class NNApp {
 
 
 
+
+
+
+
     document.getElementById("detailElevation").innerText = `${elevVal} m`;
+
+
+
+
 
 
 
@@ -5508,7 +10944,15 @@ class NNApp {
 
 
 
+
+
+
+
     document.getElementById("detailPois").innerText = poisVal;
+
+
+
+
 
 
 
@@ -5516,7 +10960,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (elevDescEl) {
+
+
+
+
 
 
 
@@ -5524,7 +10976,15 @@ class NNApp {
 
 
 
+
+
+
+
         ? `<strong>¿Qué significa?:</strong> Altitud real de <strong>${elevVal} metros</strong> sobre el nivel del mar (medida por satélite Copernicus DEM / Open-Meteo en las coordenadas del parking).`
+
+
+
+
 
 
 
@@ -5532,7 +10992,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5540,7 +11008,15 @@ class NNApp {
 
 
 
+
+
+
+
     const slopeDescEl = document.getElementById("detailSlopeDesc");
+
+
+
+
 
 
 
@@ -5548,7 +11024,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (slopeTagEl) {
+
+
+
+
 
 
 
@@ -5556,7 +11040,15 @@ class NNApp {
 
 
 
+
+
+
+
         slopeTagEl.innerText = "Pendiente de sincronizar API";
+
+
+
+
 
 
 
@@ -5564,7 +11056,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (slopeDescEl) {
+
+
+
+
 
 
 
@@ -5572,7 +11072,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -5580,7 +11088,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (slopeTagEl) {
+
+
+
+
 
 
 
@@ -5588,7 +11104,15 @@ class NNApp {
 
 
 
+
+
+
+
         slopeTagEl.innerText = "Tobler neutra (Terreno llano)";
+
+
+
+
 
 
 
@@ -5596,7 +11120,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (slopeDescEl) {
+
+
+
+
 
 
 
@@ -5604,11 +11136,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -5616,7 +11160,15 @@ class NNApp {
 
 
 
+
+
+
+
         slopeTagEl.className = "text-[10px] font-semibold text-amber-700 block";
+
+
+
+
 
 
 
@@ -5624,7 +11176,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -5632,7 +11192,15 @@ class NNApp {
 
 
 
+
+
+
+
         slopeDescEl.innerHTML = `<strong>¿Qué significa?:</strong> La calle presenta una inclinación real de <strong>${slopeVal} m cada 100 m</strong> (DEM Copernicus), reduciendo el radio peatonal aceptado.`;
+
+
+
+
 
 
 
@@ -5640,7 +11208,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5648,7 +11224,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (poisDescEl) {
+
+
+
+
 
 
 
@@ -5656,7 +11240,15 @@ class NNApp {
 
 
 
+
+
+
+
         ? `<strong>¿Qué significa?:</strong> Hay <strong>${poisVal} locales activos</strong> en planta baja a menos de 5 min a pie (~300 m) según el Censo Oficial de Open Data Ajuntament de Barcelona.`
+
+
+
+
 
 
 
@@ -5664,7 +11256,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5672,7 +11272,15 @@ class NNApp {
 
 
 
+
+
+
+
     const trafficCur = enriched.totalAnnualTrafficCurrentYear || 0;
+
+
+
+
 
 
 
@@ -5680,7 +11288,15 @@ class NNApp {
 
 
 
+
+
+
+
     const trafficGrowth = enriched.trafficYoyGrowthPct || 0;
+
+
+
+
 
 
 
@@ -5688,7 +11304,15 @@ class NNApp {
 
 
 
+
+
+
+
     document.getElementById("kpiAnnualTrafficCurrent").innerText = trafficCur.toLocaleString("es-ES");
+
+
+
+
 
 
 
@@ -5696,7 +11320,15 @@ class NNApp {
 
 
 
+
+
+
+
     
+
+
+
+
 
 
 
@@ -5704,7 +11336,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (badgeGrowthEl) {
+
+
+
+
 
 
 
@@ -5712,7 +11352,15 @@ class NNApp {
 
 
 
+
+
+
+
         badgeGrowthEl.className = "text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#10B981] border border-emerald-200 inline-flex items-center gap-1";
+
+
+
+
 
 
 
@@ -5720,7 +11368,15 @@ class NNApp {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -5728,7 +11384,15 @@ class NNApp {
 
 
 
+
+
+
+
         badgeGrowthEl.innerHTML = `▼ ${trafficGrowth}% Decrecimiento`;
+
+
+
+
 
 
 
@@ -5736,7 +11400,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5744,7 +11416,15 @@ class NNApp {
 
 
 
+
+
+
+
     document.getElementById("assetKpiDL").innerText = enriched.dl || 0;
+
+
+
+
 
 
 
@@ -5752,7 +11432,15 @@ class NNApp {
 
 
 
+
+
+
+
     document.getElementById("kpiDemandGrowthBadge").innerText = enriched.demandHistory?.annualGrowthPct !== undefined
+
+
+
+
 
 
 
@@ -5760,7 +11448,15 @@ class NNApp {
 
 
 
+
+
+
+
       : `0.0% interanual`;
+
+
+
+
 
 
 
@@ -5768,7 +11464,15 @@ class NNApp {
 
 
 
+
+
+
+
     const nowStr = new Date().toLocaleString("es-ES", {
+
+
+
+
 
 
 
@@ -5776,7 +11480,15 @@ class NNApp {
 
 
 
+
+
+
+
       month: "2-digit",
+
+
+
+
 
 
 
@@ -5784,7 +11496,15 @@ class NNApp {
 
 
 
+
+
+
+
       hour: "2-digit",
+
+
+
+
 
 
 
@@ -5792,7 +11512,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -5800,7 +11528,15 @@ class NNApp {
 
 
 
+
+
+
+
       const el = document.getElementById(id);
+
+
+
+
 
 
 
@@ -5808,7 +11544,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -5816,7 +11560,15 @@ class NNApp {
 
 
 
+
+
+
+
     const entryPoints = enriched.entryPoints || [];
+
+
+
+
 
 
 
@@ -5824,7 +11576,15 @@ class NNApp {
 
 
 
+
+
+
+
       document.getElementById("kpiEntryCount").innerText = `${entryPoints.length} accesos`;
+
+
+
+
 
 
 
@@ -5832,7 +11592,15 @@ class NNApp {
 
 
 
+
+
+
+
       const epCurTotal = entryPoints.reduce((acc, e) => acc + (e.currentVolume || 0), 0);
+
+
+
+
 
 
 
@@ -5840,11 +11608,23 @@ class NNApp {
 
 
 
+
+
+
+
       document.getElementById("kpiEntryCurrent").innerText = `${epCurTotal.toLocaleString("es-ES")} v/m`;
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -5852,7 +11632,15 @@ class NNApp {
 
 
 
+
+
+
+
       document.getElementById("kpiEntryStart1Year").innerText = `Sin datos`;
+
+
+
+
 
 
 
@@ -5860,7 +11648,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5868,7 +11664,15 @@ class NNApp {
 
 
 
+
+
+
+
     const exitPoints = enriched.exitPoints || [];
+
+
+
+
 
 
 
@@ -5876,7 +11680,15 @@ class NNApp {
 
 
 
+
+
+
+
       document.getElementById("kpiExitCount").innerText = `${exitPoints.length} salidas`;
+
+
+
+
 
 
 
@@ -5884,7 +11696,15 @@ class NNApp {
 
 
 
+
+
+
+
       document.getElementById("kpiExitMonthly").innerText = `${xpCurTotal.toLocaleString("es-ES")} v/m`;
+
+
+
+
 
 
 
@@ -5892,7 +11712,15 @@ class NNApp {
 
 
 
+
+
+
+
       const turnoverRate = ((epCurTotal / 30) / Math.max(1, enriched.capacity || 250)).toFixed(1);
+
+
+
+
 
 
 
@@ -5900,7 +11728,15 @@ class NNApp {
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -5908,7 +11744,15 @@ class NNApp {
 
 
 
+
+
+
+
       document.getElementById("kpiExitMonthly").innerText = `Sin datos`;
+
+
+
+
 
 
 
@@ -5916,7 +11760,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -5924,7 +11776,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.renderIdentifiedPointsCards(enriched);
+
+
+
+
 
 
 
@@ -5932,7 +11792,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.updateDetailMicroMap(enriched);
+
+
+
+
 
 
 
@@ -5940,7 +11808,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.updateFourCharts(enriched);
+
+
+
+
 
 
 
@@ -5948,7 +11824,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.updateZoneTrafficForecast(enriched);
+
+
+
+
 
 
 
@@ -5956,7 +11840,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.updateWaterfall(enriched);
+
+
+
+
 
 
 
@@ -5964,7 +11856,15 @@ class NNApp {
 
 
 
+
+
+
+
       lucide.createIcons();
+
+
+
+
 
 
 
@@ -5972,7 +11872,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -5980,7 +11888,15 @@ class NNApp {
 
 
 
+
+
+
+
     const containerTraffic = document.getElementById("trafficPointsList");
+
+
+
+
 
 
 
@@ -5988,7 +11904,15 @@ class NNApp {
 
 
 
+
+
+
+
     const containerExit = document.getElementById("exitPointsList");
+
+
+
+
 
 
 
@@ -5996,7 +11920,15 @@ class NNApp {
 
 
 
+
+
+
+
       containerTraffic.innerHTML = (p.trafficPoints || []).map((tp, idx) => {
+
+
+
+
 
 
 
@@ -6004,7 +11936,15 @@ class NNApp {
 
 
 
+
+
+
+
         return `
+
+
+
+
 
 
 
@@ -6012,11 +11952,23 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="flex items-start justify-between gap-2">
 
 
 
+
+
+
+
               <div class="flex items-center gap-2">
+
+
+
+
 
 
 
@@ -6024,7 +11976,15 @@ class NNApp {
 
 
 
+
+
+
+
                   #${idx + 1}
+
+
+
+
 
 
 
@@ -6032,7 +11992,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <div>
+
+
+
+
 
 
 
@@ -6040,7 +12008,15 @@ class NNApp {
 
 
 
+
+
+
+
                   <span class="text-[10px] text-slate-400 font-mono">${tp.direction} • ${tp.lanes} carriles</span>
+
+
+
+
 
 
 
@@ -6048,7 +12024,15 @@ class NNApp {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -6056,11 +12040,23 @@ class NNApp {
 
 
 
+
+
+
+
                 isUp ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
 
 
 
+
+
+
+
               }">
+
+
+
+
 
 
 
@@ -6068,7 +12064,15 @@ class NNApp {
 
 
 
+
+
+
+
               </span>
+
+
+
+
 
 
 
@@ -6076,11 +12080,23 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 text-[11px] font-mono-num">
 
 
 
+
+
+
+
               <div>
+
+
+
+
 
 
 
@@ -6088,7 +12104,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <span class="font-bold text-slate-700">${tp.annualCarsPrevYear.toLocaleString("es-ES")} veh</span>
+
+
+
+
 
 
 
@@ -6096,7 +12120,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div>
+
+
+
+
 
 
 
@@ -6104,7 +12136,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <span class="font-bold text-[#0284C7]">${tp.annualCarsCurrentYear.toLocaleString("es-ES")} veh</span>
+
+
+
+
 
 
 
@@ -6112,7 +12152,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -6120,7 +12168,15 @@ class NNApp {
 
 
 
+
+
+
+
         `;
+
+
+
+
 
 
 
@@ -6128,7 +12184,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -6136,7 +12200,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (p.entryPoints && p.entryPoints.length > 0) {
+
+
+
+
 
 
 
@@ -6144,7 +12216,15 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="p-3.5 rounded-2xl bg-white border border-[#DFEAF0] shadow-xs hover:border-[#10B981] transition-all space-y-2">
+
+
+
+
 
 
 
@@ -6152,7 +12232,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div class="flex items-center gap-2">
+
+
+
+
 
 
 
@@ -6160,7 +12248,15 @@ class NNApp {
 
 
 
+
+
+
+
                   E${idx + 1}
+
+
+
+
 
 
 
@@ -6168,7 +12264,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <div>
+
+
+
+
 
 
 
@@ -6176,7 +12280,15 @@ class NNApp {
 
 
 
+
+
+
+
                   <span class="text-[10px] text-slate-400 font-mono">${ep.type} • Cuota: ${ep.sharePct}%</span>
+
+
+
+
 
 
 
@@ -6184,7 +12296,15 @@ class NNApp {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -6192,7 +12312,15 @@ class NNApp {
 
 
 
+
+
+
+
                 ▲ +${ep.growthPct}%
+
+
+
+
 
 
 
@@ -6200,7 +12328,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -6208,7 +12344,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div>
+
+
+
+
 
 
 
@@ -6216,7 +12360,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <span class="font-bold text-slate-700">${ep.startVolume1YearAgo.toLocaleString("es-ES")} v/m</span>
+
+
+
+
 
 
 
@@ -6224,7 +12376,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div>
+
+
+
+
 
 
 
@@ -6232,7 +12392,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <span class="font-bold text-[#10B981]">${ep.currentVolume.toLocaleString("es-ES")} v/m</span>
+
+
+
+
 
 
 
@@ -6240,7 +12408,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -6248,11 +12424,23 @@ class NNApp {
 
 
 
+
+
+
+
         `).join("");
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -6260,11 +12448,23 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] text-slate-400 text-xs italic flex items-center gap-2">
 
 
 
+
+
+
+
             <i data-lucide="info" class="w-4 h-4 text-slate-400 shrink-0"></i>
+
+
+
+
 
 
 
@@ -6272,7 +12472,15 @@ class NNApp {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -6280,11 +12488,23 @@ class NNApp {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -6292,7 +12512,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (p.exitPoints && p.exitPoints.length > 0) {
+
+
+
+
 
 
 
@@ -6300,7 +12528,15 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="p-3.5 rounded-2xl bg-white border border-[#DFEAF0] shadow-xs hover:border-[#F97316] transition-all space-y-2">
+
+
+
+
 
 
 
@@ -6308,7 +12544,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div class="flex items-center gap-2">
+
+
+
+
 
 
 
@@ -6316,11 +12560,23 @@ class NNApp {
 
 
 
+
+
+
+
                   S${idx + 1}
 
 
 
+
+
+
+
                 </span>
+
+
+
+
 
 
 
@@ -6328,7 +12584,15 @@ class NNApp {
 
 
 
+
+
+
+
                   <h4 class="text-xs font-bold text-[#1A4B5B]">${xp.name}</h4>
+
+
+
+
 
 
 
@@ -6336,11 +12600,23 @@ class NNApp {
 
 
 
+
+
+
+
                 </div>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -6348,7 +12624,15 @@ class NNApp {
 
 
 
+
+
+
+
                 Evacuación OK
+
+
+
+
 
 
 
@@ -6356,7 +12640,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -6364,7 +12656,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div>
+
+
+
+
 
 
 
@@ -6372,11 +12672,23 @@ class NNApp {
 
 
 
+
+
+
+
                 <span class="font-bold text-slate-700">${xp.currentVolume.toLocaleString("es-ES")} v/m</span>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -6384,7 +12696,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <span class="text-slate-400 block text-[9px] uppercase">Carriles</span>
+
+
+
+
 
 
 
@@ -6392,7 +12712,15 @@ class NNApp {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -6400,7 +12728,15 @@ class NNApp {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -6408,7 +12744,15 @@ class NNApp {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -6416,7 +12760,15 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] text-slate-400 text-xs italic flex items-center gap-2">
+
+
+
+
 
 
 
@@ -6424,7 +12776,15 @@ class NNApp {
 
 
 
+
+
+
+
             <span>Sin datos de salidas registrados para este activo.</span>
+
+
+
+
 
 
 
@@ -6432,7 +12792,15 @@ class NNApp {
 
 
 
+
+
+
+
         `;
+
+
+
+
 
 
 
@@ -6440,7 +12808,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -6448,7 +12824,15 @@ class NNApp {
 
 
 
+
+
+
+
     const containerNearby = document.getElementById("nearbySensorsList");
+
+
+
+
 
 
 
@@ -6456,7 +12840,15 @@ class NNApp {
 
 
 
+
+
+
+
     const nearbyList = this.getNearbyTrafficSensors(p, 750);
+
+
+
+
 
 
 
@@ -6464,11 +12856,23 @@ class NNApp {
 
 
 
+
+
+
+
       badgeNearby.innerText = `${nearbyList.length} en radio < 750 m`;
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -6476,7 +12880,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (nearbyList.length === 0) {
+
+
+
+
 
 
 
@@ -6484,7 +12896,15 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="p-3 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] text-slate-400 text-xs italic text-center">
+
+
+
+
 
 
 
@@ -6492,7 +12912,15 @@ class NNApp {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -6500,7 +12928,15 @@ class NNApp {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -6508,7 +12944,15 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="p-2.5 rounded-xl bg-purple-50/50 border border-purple-100 hover:border-purple-300 transition-all space-y-1.5 text-xs">
+
+
+
+
 
 
 
@@ -6516,7 +12960,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div class="min-w-0">
+
+
+
+
 
 
 
@@ -6524,11 +12976,23 @@ class NNApp {
 
 
 
+
+
+
+
                 <div class="text-[10px] text-slate-500 truncate">${s.street}</div>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -6536,7 +13000,15 @@ class NNApp {
 
 
 
+
+
+
+
                 ${distMeters} m
+
+
+
+
 
 
 
@@ -6544,7 +13016,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -6552,7 +13032,15 @@ class NNApp {
 
 
 
+
+
+
+
               <span class="text-slate-600 font-mono-num text-[10px]">
+
+
+
+
 
 
 
@@ -6560,7 +13048,15 @@ class NNApp {
 
 
 
+
+
+
+
               </span>
+
+
+
+
 
 
 
@@ -6568,7 +13064,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <i data-lucide="map-pin" class="w-3 h-3"></i> Ver en mapa
+
+
+
+
 
 
 
@@ -6576,11 +13080,23 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -6588,7 +13104,15 @@ class NNApp {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -6596,7 +13120,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -6604,7 +13136,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (!p || isNaN(p.lat) || isNaN(p.lon)) return [];
+
+
+
+
 
 
 
@@ -6612,7 +13152,15 @@ class NNApp {
 
 
 
+
+
+
+
     const ownSensors = p.trafficPoints || [];
+
+
+
+
 
 
 
@@ -6620,7 +13168,15 @@ class NNApp {
 
 
 
+
+
+
+
     const municipalSensors = (typeof BCN_MUNICIPAL_TRAFFIC_SENSORS !== 'undefined') ? BCN_MUNICIPAL_TRAFFIC_SENSORS : [];
+
+
+
+
 
 
 
@@ -6628,7 +13184,15 @@ class NNApp {
 
 
 
+
+
+
+
       candidates.push({
+
+
+
+
 
 
 
@@ -6636,7 +13200,15 @@ class NNApp {
 
 
 
+
+
+
+
         name: s.name,
+
+
+
+
 
 
 
@@ -6644,7 +13216,15 @@ class NNApp {
 
 
 
+
+
+
+
         lat: s.lat,
+
+
+
+
 
 
 
@@ -6652,7 +13232,15 @@ class NNApp {
 
 
 
+
+
+
+
         lanes: s.lanes || 2,
+
+
+
+
 
 
 
@@ -6660,7 +13248,15 @@ class NNApp {
 
 
 
+
+
+
+
         avgDailyCars: s.avgDailyCars || 0,
+
+
+
+
 
 
 
@@ -6668,7 +13264,15 @@ class NNApp {
 
 
 
+
+
+
+
         type: "municipal"
+
+
+
+
 
 
 
@@ -6676,7 +13280,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -6684,7 +13296,15 @@ class NNApp {
 
 
 
+
+
+
+
     (this.parkings || []).forEach(otherP => {
+
+
+
+
 
 
 
@@ -6692,7 +13312,15 @@ class NNApp {
 
 
 
+
+
+
+
       (otherP.trafficPoints || []).forEach(tp => {
+
+
+
+
 
 
 
@@ -6700,7 +13328,15 @@ class NNApp {
 
 
 
+
+
+
+
           id: tp.id,
+
+
+
+
 
 
 
@@ -6708,7 +13344,15 @@ class NNApp {
 
 
 
+
+
+
+
           street: tp.exactSensorSpot || tp.street,
+
+
+
+
 
 
 
@@ -6716,7 +13360,15 @@ class NNApp {
 
 
 
+
+
+
+
           lon: tp.lon,
+
+
+
+
 
 
 
@@ -6724,7 +13376,15 @@ class NNApp {
 
 
 
+
+
+
+
           direction: tp.direction || "Calzada",
+
+
+
+
 
 
 
@@ -6732,7 +13392,15 @@ class NNApp {
 
 
 
+
+
+
+
           source: `Sensor activo en entorno de ${otherP.name.split(',')[0]}`,
+
+
+
+
 
 
 
@@ -6740,7 +13408,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -6748,7 +13424,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -6756,7 +13440,15 @@ class NNApp {
 
 
 
+
+
+
+
     const results = [];
+
+
+
+
 
 
 
@@ -6764,7 +13456,15 @@ class NNApp {
 
 
 
+
+
+
+
     // Registrar primero los sensores propios del parking para no duplicar
+
+
+
+
 
 
 
@@ -6772,11 +13472,23 @@ class NNApp {
 
 
 
+
+
+
+
       seenLocations.push({ lat: op.lat, lon: op.lon });
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -6784,7 +13496,15 @@ class NNApp {
 
 
 
+
+
+
+
       const distKm = calculateHaversineKm(p.lat, p.lon, cand.lat, cand.lon);
+
+
+
+
 
 
 
@@ -6792,7 +13512,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (distMeters > maxDistanceMeters) return;
+
+
+
+
 
 
 
@@ -6800,7 +13528,15 @@ class NNApp {
 
 
 
+
+
+
+
       const isDuplicate = seenLocations.some(loc => {
+
+
+
+
 
 
 
@@ -6808,11 +13544,23 @@ class NNApp {
 
 
 
+
+
+
+
         return d < 25;
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -6820,7 +13568,15 @@ class NNApp {
 
 
 
+
+
+
+
       seenLocations.push({ lat: cand.lat, lon: cand.lon });
+
+
+
+
 
 
 
@@ -6828,7 +13584,15 @@ class NNApp {
 
 
 
+
+
+
+
         sensor: cand,
+
+
+
+
 
 
 
@@ -6836,11 +13600,23 @@ class NNApp {
 
 
 
+
+
+
+
       });
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -6848,7 +13624,15 @@ class NNApp {
 
 
 
+
+
+
+
     results.sort((a, b) => a.distMeters - b.distMeters);
+
+
+
+
 
 
 
@@ -6856,7 +13640,15 @@ class NNApp {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -6864,7 +13656,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (!this.detailLeafletMap || !this.detailPointsLayer) return;
+
+
+
+
 
 
 
@@ -6872,7 +13672,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.detailPointsLayer.clearLayers();
+
+
+
+
 
 
 
@@ -6880,11 +13688,23 @@ class NNApp {
 
 
 
+
+
+
+
       this.detailNearbySensorsLayer.clearLayers();
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -6892,7 +13712,15 @@ class NNApp {
 
 
 
+
+
+
+
     // 1. Isocronas Tobler (3, 5 y 8 min)
+
+
+
+
 
 
 
@@ -6900,7 +13728,15 @@ class NNApp {
 
 
 
+
+
+
+
       const isochrones = DemandEngine.generateIsochrones(p.lat, p.lon, p.slope);
+
+
+
+
 
 
 
@@ -6908,7 +13744,15 @@ class NNApp {
 
 
 
+
+
+
+
         const polygon = L.polygon(iso.polygon, {
+
+
+
+
 
 
 
@@ -6916,7 +13760,15 @@ class NNApp {
 
 
 
+
+
+
+
           weight: 1.5,
+
+
+
+
 
 
 
@@ -6924,7 +13776,15 @@ class NNApp {
 
 
 
+
+
+
+
           fillColor: iso.color,
+
+
+
+
 
 
 
@@ -6932,7 +13792,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -6940,7 +13808,15 @@ class NNApp {
 
 
 
+
+
+
+
         this.detailIsochronesLayer.addLayer(polygon);
+
+
+
+
 
 
 
@@ -6948,7 +13824,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -6956,7 +13840,15 @@ class NNApp {
 
 
 
+
+
+
+
     const centerIcon = L.divIcon({
+
+
+
+
 
 
 
@@ -6964,7 +13856,15 @@ class NNApp {
 
 
 
+
+
+
+
       html: `
+
+
+
+
 
 
 
@@ -6972,11 +13872,23 @@ class NNApp {
 
 
 
+
+
+
+
           NN
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -6984,7 +13896,15 @@ class NNApp {
 
 
 
+
+
+
+
       iconSize: [40, 40],
+
+
+
+
 
 
 
@@ -6992,7 +13912,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -7000,7 +13928,15 @@ class NNApp {
 
 
 
+
+
+
+
       .bindPopup(`<strong class="text-sm">${p.name}</strong><br>${p.address}<br>Capacidad: <strong>${p.capacity} plazas</strong>`);
+
+
+
+
 
 
 
@@ -7008,7 +13944,15 @@ class NNApp {
 
 
 
+
+
+
+
     // 3. Marcadores de Puntos de Aforo Viario Seleccionados (Coches que pasan en la calle)
+
+
+
+
 
 
 
@@ -7016,7 +13960,15 @@ class NNApp {
 
 
 
+
+
+
+
       const trafficIcon = L.divIcon({
+
+
+
+
 
 
 
@@ -7024,7 +13976,15 @@ class NNApp {
 
 
 
+
+
+
+
         html: `
+
+
+
+
 
 
 
@@ -7032,7 +13992,15 @@ class NNApp {
 
 
 
+
+
+
+
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+
+
+
+
 
 
 
@@ -7040,7 +14008,15 @@ class NNApp {
 
 
 
+
+
+
+
         `,
+
+
+
+
 
 
 
@@ -7048,11 +14024,23 @@ class NNApp {
 
 
 
+
+
+
+
         iconAnchor: [14, 14]
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -7060,11 +14048,23 @@ class NNApp {
 
 
 
+
+
+
+
         .bindPopup(`
 
 
 
+
+
+
+
           <div class="text-xs space-y-1">
+
+
+
+
 
 
 
@@ -7072,7 +14072,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="font-bold text-slate-800">${tp.name}</div>
+
+
+
+
 
 
 
@@ -7080,7 +14088,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="font-mono text-slate-700 pt-1 border-t border-slate-100">
+
+
+
+
 
 
 
@@ -7088,7 +14104,15 @@ class NNApp {
 
 
 
+
+
+
+
               Año Anterior: ${tp.annualCarsPrevYear.toLocaleString("es-ES")} veh<br>
+
+
+
+
 
 
 
@@ -7096,7 +14120,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -7104,7 +14136,15 @@ class NNApp {
 
 
 
+
+
+
+
         `);
+
+
+
+
 
 
 
@@ -7112,7 +14152,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -7120,7 +14168,15 @@ class NNApp {
 
 
 
+
+
+
+
     (p.entryPoints || []).forEach((ep, idx) => {
+
+
+
+
 
 
 
@@ -7128,11 +14184,23 @@ class NNApp {
 
 
 
+
+
+
+
         className: 'marker-entry-point',
 
 
 
+
+
+
+
         html: `
+
+
+
+
 
 
 
@@ -7140,7 +14208,15 @@ class NNApp {
 
 
 
+
+
+
+
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+
+
+
+
 
 
 
@@ -7148,7 +14224,15 @@ class NNApp {
 
 
 
+
+
+
+
         `,
+
+
+
+
 
 
 
@@ -7156,11 +14240,23 @@ class NNApp {
 
 
 
+
+
+
+
         iconAnchor: [14, 14]
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -7168,11 +14264,23 @@ class NNApp {
 
 
 
+
+
+
+
         .bindPopup(`
 
 
 
+
+
+
+
           <div class="text-xs space-y-1">
+
+
+
+
 
 
 
@@ -7180,7 +14288,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="font-bold text-slate-800">${ep.name}</div>
+
+
+
+
 
 
 
@@ -7188,7 +14304,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="font-mono text-slate-700 pt-1 border-t border-slate-100">
+
+
+
+
 
 
 
@@ -7196,7 +14320,15 @@ class NNApp {
 
 
 
+
+
+
+
               Volumen Actual: <strong>${ep.currentVolume.toLocaleString("es-ES")} veh/mes</strong><br>
+
+
+
+
 
 
 
@@ -7204,7 +14336,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -7212,7 +14352,15 @@ class NNApp {
 
 
 
+
+
+
+
         `);
+
+
+
+
 
 
 
@@ -7220,7 +14368,15 @@ class NNApp {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -7228,7 +14384,15 @@ class NNApp {
 
 
 
+
+
+
+
     (p.exitPoints || []).forEach((xp, idx) => {
+
+
+
+
 
 
 
@@ -7236,7 +14400,15 @@ class NNApp {
 
 
 
+
+
+
+
         className: 'marker-exit-point',
+
+
+
+
 
 
 
@@ -7244,7 +14416,15 @@ class NNApp {
 
 
 
+
+
+
+
           <div class="flex items-center justify-center w-7 h-7 rounded-full bg-[#F97316] text-white shadow-md border-2 border-white cursor-pointer hover:scale-125 transition-transform" title="${xp.name}">
+
+
+
+
 
 
 
@@ -7252,7 +14432,15 @@ class NNApp {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -7260,7 +14448,15 @@ class NNApp {
 
 
 
+
+
+
+
         iconSize: [28, 28],
+
+
+
+
 
 
 
@@ -7268,7 +14464,15 @@ class NNApp {
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -7276,7 +14480,15 @@ class NNApp {
 
 
 
+
+
+
+
         .bindPopup(`
+
+
+
+
 
 
 
@@ -7284,7 +14496,15 @@ class NNApp {
 
 
 
+
+
+
+
             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-800">PUNTO DE SALIDA</span>
+
+
+
+
 
 
 
@@ -7292,7 +14512,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="text-slate-500">Hacia: ${xp.streetOut}</div>
+
+
+
+
 
 
 
@@ -7300,7 +14528,15 @@ class NNApp {
 
 
 
+
+
+
+
               Flujo evacuado: <strong>${xp.currentVolume.toLocaleString("es-ES")} veh/mes</strong><br>
+
+
+
+
 
 
 
@@ -7308,11 +14544,23 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -7320,11 +14568,23 @@ class NNApp {
 
 
 
+
+
+
+
       this.detailPointsLayer.addLayer(m);
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -7332,7 +14592,15 @@ class NNApp {
 
 
 
+
+
+
+
     const nearbyList = this.getNearbyTrafficSensors(p, 750);
+
+
+
+
 
 
 
@@ -7340,7 +14608,15 @@ class NNApp {
 
 
 
+
+
+
+
       nearbyList.forEach(({ sensor: s, distMeters }) => {
+
+
+
+
 
 
 
@@ -7348,7 +14624,15 @@ class NNApp {
 
 
 
+
+
+
+
           className: 'marker-nearby-sensor',
+
+
+
+
 
 
 
@@ -7356,7 +14640,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="flex items-center justify-center w-6 h-6 rounded-full bg-[#7C3AED] text-white shadow-md border-2 border-white ring-2 ring-purple-300 cursor-pointer hover:scale-125 transition-transform" title="${s.name} (A ${distMeters} m)">
+
+
+
+
 
 
 
@@ -7364,7 +14656,15 @@ class NNApp {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -7372,7 +14672,15 @@ class NNApp {
 
 
 
+
+
+
+
           iconSize: [24, 24],
+
+
+
+
 
 
 
@@ -7380,7 +14688,15 @@ class NNApp {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -7388,7 +14704,15 @@ class NNApp {
 
 
 
+
+
+
+
           .bindTooltip(`Sensor cercano: ${s.name} (${distMeters} m)`, { direction: 'top', offset: [0, -10] })
+
+
+
+
 
 
 
@@ -7396,7 +14720,15 @@ class NNApp {
 
 
 
+
+
+
+
             <div class="text-xs space-y-1.5 p-1 min-w-[220px]">
+
+
+
+
 
 
 
@@ -7404,7 +14736,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">SENSOR CERCANO · RED</span>
+
+
+
+
 
 
 
@@ -7412,7 +14752,15 @@ class NNApp {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -7420,7 +14768,15 @@ class NNApp {
 
 
 
+
+
+
+
               <div class="text-slate-500 text-[11px]">${s.street}</div>
+
+
+
+
 
 
 
@@ -7428,7 +14784,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <div class="flex justify-between text-slate-600">
+
+
+
+
 
 
 
@@ -7436,7 +14800,15 @@ class NNApp {
 
 
 
+
+
+
+
                   <span class="font-semibold text-slate-800">${s.direction}</span>
+
+
+
+
 
 
 
@@ -7444,7 +14816,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <div class="flex justify-between text-slate-600">
+
+
+
+
 
 
 
@@ -7452,11 +14832,23 @@ class NNApp {
 
 
 
+
+
+
+
                   <span class="font-mono font-bold text-purple-700">${(s.avgDailyCars || 0).toLocaleString('es-ES')} veh/día</span>
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -7464,7 +14856,15 @@ class NNApp {
 
 
 
+
+
+
+
                   <span>Tecnología:</span>
+
+
+
+
 
 
 
@@ -7472,11 +14872,23 @@ class NNApp {
 
 
 
+
+
+
+
                 </div>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -7484,11 +14896,23 @@ class NNApp {
 
 
 
+
+
+
+
                 Sensor complementario de la red viaria. No computado en el waterfall directo de este activo.
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -7496,7 +14920,15 @@ class NNApp {
 
 
 
+
+
+
+
                 <a href="https://www.google.com/maps?q=${s.lat},${s.lon}" target="_blank" rel="noopener" class="text-[#0284C7] hover:underline font-bold text-[10px] inline-flex items-center gap-0.5">
+
+
+
+
 
 
 
@@ -7504,7 +14936,15 @@ class NNApp {
 
 
 
+
+
+
+
                 </a>
+
+
+
+
 
 
 
@@ -7512,11 +14952,23 @@ class NNApp {
 
 
 
+
+
+
+
               </div>
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -7524,7 +14976,15 @@ class NNApp {
 
 
 
+
+
+
+
         this.detailNearbySensorsLayer.addLayer(m);
+
+
+
+
 
 
 
@@ -7532,11 +14992,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -7544,7 +15016,15 @@ class NNApp {
 
 
 
+
+
+
+
     this.showNearbySensors = !!show;
+
+
+
+
 
 
 
@@ -7552,7 +15032,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (current) {
+
+
+
+
 
 
 
@@ -7560,11 +15048,23 @@ class NNApp {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -7572,7 +15072,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (this.detailLeafletMap) {
+
+
+
+
 
 
 
@@ -7580,7 +15088,15 @@ class NNApp {
 
 
 
+
+
+
+
       const mapEl = document.getElementById("detailLeafletMap");
+
+
+
+
 
 
 
@@ -7588,7 +15104,15 @@ class NNApp {
 
 
 
+
+
+
+
         mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+
+
+
 
 
 
@@ -7596,7 +15120,15 @@ class NNApp {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -7604,7 +15136,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -7612,7 +15152,15 @@ class NNApp {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -7620,7 +15168,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (typeof Chart === 'undefined') return;
+
+
+
+
 
 
 
@@ -7628,7 +15184,15 @@ class NNApp {
 
 
 
+
+
+
+
     const elGlobalDL = document.getElementById('chartGlobalMonthlyDL');
+
+
+
+
 
 
 
@@ -7636,11 +15200,23 @@ class NNApp {
 
 
 
+
+
+
+
       const existing = Chart.getChart(elGlobalDL);
 
 
 
+
+
+
+
       if (existing) existing.destroy();
+
+
+
+
 
 
 
@@ -7648,7 +15224,15 @@ class NNApp {
 
 
 
+
+
+
+
       const yPrev2 = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prev2Year : 2024;
+
+
+
+
 
 
 
@@ -7656,11 +15240,23 @@ class NNApp {
 
 
 
+
+
+
+
       const yEst = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
 
 
 
-      const isEstProj = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.isEstYearProjected : true;
+
+
+
+
+      const isEstProj = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? (ACTIVE_DATA_YEARS.isEstYearProjected !== false && !ACTIVE_DATA_YEARS.isEstYearReal) : true;
+
+
+
+
 
 
 
@@ -7668,7 +15264,15 @@ class NNApp {
 
 
 
+
+
+
+
       this.chartGlobalMonthlyDL = new Chart(elGlobalDL.getContext('2d'), {
+
+
+
+
 
 
 
@@ -7676,11 +15280,23 @@ class NNApp {
 
 
 
+
+
+
+
         data: {
 
 
 
+
+
+
+
           labels: MONTHS_LABELS,
+
+
+
+
 
 
 
@@ -7688,7 +15304,15 @@ class NNApp {
 
 
 
+
+
+
+
             {
+
+
+
+
 
 
 
@@ -7696,7 +15320,15 @@ class NNApp {
 
 
 
+
+
+
+
               data: monthlyPrev2Total,
+
+
+
+
 
 
 
@@ -7704,7 +15336,15 @@ class NNApp {
 
 
 
+
+
+
+
               borderWidth: 1.8,
+
+
+
+
 
 
 
@@ -7712,11 +15352,23 @@ class NNApp {
 
 
 
+
+
+
+
               backgroundColor: 'transparent',
 
 
 
+
+
+
+
               tension: 0.35,
+
+
+
+
 
 
 
@@ -7724,7 +15376,15 @@ class NNApp {
 
 
 
+
+
+
+
               pointBackgroundColor: '#94A3B8'
+
+
+
+
 
 
 
@@ -7732,7 +15392,15 @@ class NNApp {
 
 
 
+
+
+
+
             {
+
+
+
+
 
 
 
@@ -7740,7 +15408,15 @@ class NNApp {
 
 
 
+
+
+
+
               data: monthlyPrevTotal,
+
+
+
+
 
 
 
@@ -7748,7 +15424,15 @@ class NNApp {
 
 
 
+
+
+
+
               borderWidth: 2.2,
+
+
+
+
 
 
 
@@ -7756,7 +15440,15 @@ class NNApp {
 
 
 
+
+
+
+
               tension: 0.35,
+
+
+
+
 
 
 
@@ -7764,11 +15456,23 @@ class NNApp {
 
 
 
+
+
+
+
               pointBackgroundColor: '#10B981'
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -7776,7 +15480,15 @@ class NNApp {
 
 
 
+
+
+
+
               label: `Suma Sensores ${yEst} ${estTag} (t)`,
+
+
+
+
 
 
 
@@ -7784,7 +15496,15 @@ class NNApp {
 
 
 
+
+
+
+
               borderColor: '#164250',
+
+
+
+
 
 
 
@@ -7792,7 +15512,15 @@ class NNApp {
 
 
 
+
+
+
+
               backgroundColor: 'rgba(22, 66, 80, 0.08)',
+
+
+
+
 
 
 
@@ -7800,7 +15528,15 @@ class NNApp {
 
 
 
+
+
+
+
               tension: 0.35,
+
+
+
+
 
 
 
@@ -7808,11 +15544,23 @@ class NNApp {
 
 
 
+
+
+
+
               pointBackgroundColor: '#164250'
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -7820,7 +15568,15 @@ class NNApp {
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -7828,7 +15584,15 @@ class NNApp {
 
 
 
+
+
+
+
           responsive: true,
+
+
+
+
 
 
 
@@ -7836,7 +15600,15 @@ class NNApp {
 
 
 
+
+
+
+
           interaction: { mode: 'index', intersect: false },
+
+
+
+
 
 
 
@@ -7844,7 +15616,15 @@ class NNApp {
 
 
 
+
+
+
+
             legend: {
+
+
+
+
 
 
 
@@ -7852,7 +15632,15 @@ class NNApp {
 
 
 
+
+
+
+
               labels: { boxWidth: 12, font: { family: 'Inter', size: 10, weight: '600' } }
+
+
+
+
 
 
 
@@ -7860,7 +15648,15 @@ class NNApp {
 
 
 
+
+
+
+
             tooltip: {
+
+
+
+
 
 
 
@@ -7868,7 +15664,15 @@ class NNApp {
 
 
 
+
+
+
+
               cornerRadius: 8,
+
+
+
+
 
 
 
@@ -7876,7 +15680,15 @@ class NNApp {
 
 
 
+
+
+
+
               callbacks: {
+
+
+
+
 
 
 
@@ -7884,7 +15696,15 @@ class NNApp {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -7892,7 +15712,15 @@ class NNApp {
 
 
 
+
+
+
+
           },
+
+
+
+
 
 
 
@@ -7900,7 +15728,15 @@ class NNApp {
 
 
 
+
+
+
+
             x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 9 }, color: '#94A3B8' } },
+
+
+
+
 
 
 
@@ -7908,7 +15744,15 @@ class NNApp {
 
 
 
+
+
+
+
               grid: { color: '#F1F5F9' },
+
+
+
+
 
 
 
@@ -7916,11 +15760,23 @@ class NNApp {
 
 
 
+
+
+
+
                 font: { family: 'JetBrains Mono', size: 9 },
 
 
 
+
+
+
+
                 color: '#94A3B8',
+
+
+
+
 
 
 
@@ -7928,7 +15784,15 @@ class NNApp {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -7936,7 +15800,15 @@ class NNApp {
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -7944,11 +15816,23 @@ class NNApp {
 
 
 
+
+
+
+
       });
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -7956,7 +15840,15 @@ class NNApp {
 
 
 
+
+
+
+
     if (elTraffic) {
+
+
+
+
 
 
 
@@ -7964,7 +15856,15 @@ class NNApp {
 
 
 
+
+
+
+
       if (existing) existing.destroy();
+
+
+
+
 
 
 
@@ -7972,7 +15872,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         type: 'line',
+
+
+
+
 
 
 
@@ -7980,7 +15888,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           labels: MONTHS_LABELS,
+
+
+
+
 
 
 
@@ -7988,7 +15904,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -7996,7 +15920,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         responsive: true,
+
+
+
+
 
 
 
@@ -8004,7 +15936,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         interaction: { mode: 'index', intersect: false },
+
+
+
+
 
 
 
@@ -8012,7 +15952,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           legend: {
+
+
+
+
 
 
 
@@ -8020,11 +15968,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             labels: { boxWidth: 12, font: { family: 'Inter', size: 10 } }
 
 
 
+
+
+
+
           },
+
+
+
+
 
 
 
@@ -8032,7 +15992,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             backgroundColor: '#0D2730',
+
+
+
+
 
 
 
@@ -8040,7 +16008,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             padding: 10,
+
+
+
+
 
 
 
@@ -8048,7 +16024,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh`,
+
+
+
+
 
 
 
@@ -8056,7 +16040,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 if (!items || items.length === 0) return [];
+
+
+
+
 
 
 
@@ -8064,7 +16056,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 const idx = items[0].dataIndex;
+
+
+
+
 
 
 
@@ -8072,7 +16072,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 const curVal = chart.data.datasets[1]?.data?.[idx] || 0;
+
+
+
+
 
 
 
@@ -8080,7 +16088,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 const pct = prevVal > 0 ? ((diffUnits / prevVal) * 100).toFixed(1) : '0.0';
+
+
+
+
 
 
 
@@ -8088,7 +16104,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 const sign = isUp ? '+' : '';
+
+
+
+
 
 
 
@@ -8096,7 +16120,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 return [
+
+
+
+
 
 
 
@@ -8104,7 +16136,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   `-----------------------------------------`,
+
+
+
+
 
 
 
@@ -8112,7 +16152,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 ];
+
+
+
+
 
 
 
@@ -8120,7 +16168,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -8128,7 +16184,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -8136,7 +16200,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 9 }, color: '#94A3B8' } },
+
+
+
+
 
 
 
@@ -8144,7 +16216,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -8152,11 +16232,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -8164,7 +16256,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elBalance = document.getElementById('chartInOutBalance');
+
+
+
+
 
 
 
@@ -8172,11 +16272,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const existing = Chart.getChart(elBalance);
 
 
 
+
+
+
+
       if (existing) existing.destroy();
+
+
+
+
 
 
 
@@ -8184,11 +16296,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         type: 'bar',
 
 
 
+
+
+
+
         data: {
+
+
+
+
 
 
 
@@ -8196,7 +16320,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           datasets: []
+
+
+
+
 
 
 
@@ -8204,7 +16336,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         options: {
+
+
+
+
 
 
 
@@ -8212,7 +16352,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           maintainAspectRatio: false,
+
+
+
+
 
 
 
@@ -8220,7 +16368,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           plugins: {
+
+
+
+
 
 
 
@@ -8228,7 +16384,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               position: 'top',
+
+
+
+
 
 
 
@@ -8236,7 +16400,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -8244,7 +16416,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               backgroundColor: '#0D2730',
+
+
+
+
 
 
 
@@ -8252,11 +16432,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               padding: 10,
 
 
 
+
+
+
+
               callbacks: {
+
+
+
+
 
 
 
@@ -8264,7 +16456,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 afterBody: (items) => {
+
+
+
+
 
 
 
@@ -8272,7 +16472,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   const idx = items[0].dataIndex;
+
+
+
+
 
 
 
@@ -8280,7 +16488,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   const prevVal = monthlyPrevTotal[idx] || 0;
+
+
+
+
 
 
 
@@ -8288,7 +16504,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   const pct = prevVal > 0 ? ((diffUnits / prevVal) * 100).toFixed(1) : '0.0';
+
+
+
+
 
 
 
@@ -8296,7 +16520,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   const sign = isUp ? '+' : '';
+
+
+
+
 
 
 
@@ -8304,7 +16536,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   return [
+
+
+
+
 
 
 
@@ -8312,7 +16552,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     `-----------------------------------------`,
+
+
+
+
 
 
 
@@ -8320,7 +16568,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   ];
+
+
+
+
 
 
 
@@ -8328,7 +16584,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -8336,11 +16600,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           },
 
 
 
+
+
+
+
           scales: {
+
+
+
+
 
 
 
@@ -8348,7 +16624,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             y: { grid: { color: '#F1F5F9' }, ticks: { font: { family: 'JetBrains Mono', size: 9 }, color: '#94A3B8' } }
+
+
+
+
 
 
 
@@ -8356,7 +16640,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -8364,7 +16656,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -8372,7 +16672,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elZone7 = document.getElementById('chartZoneSevenDaysTraffic');
+
+
+
+
 
 
 
@@ -8380,11 +16688,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const existing = Chart.getChart(elZone7);
 
 
 
+
+
+
+
       if (existing) existing.destroy();
+
+
+
+
 
 
 
@@ -8392,11 +16712,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         type: 'line',
 
 
 
+
+
+
+
         data: {
+
+
+
+
 
 
 
@@ -8404,7 +16736,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           datasets: []
+
+
+
+
 
 
 
@@ -8412,7 +16752,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         options: {
+
+
+
+
 
 
 
@@ -8420,7 +16768,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           maintainAspectRatio: false,
+
+
+
+
 
 
 
@@ -8428,7 +16784,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           plugins: {
+
+
+
+
 
 
 
@@ -8436,7 +16800,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               position: 'top',
+
+
+
+
 
 
 
@@ -8444,7 +16816,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -8452,7 +16832,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               backgroundColor: '#0D2730',
+
+
+
+
 
 
 
@@ -8460,11 +16848,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               padding: 10,
 
 
 
+
+
+
+
               callbacks: {
+
+
+
+
 
 
 
@@ -8472,7 +16872,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -8480,7 +16888,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           },
+
+
+
+
 
 
 
@@ -8488,11 +16904,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             x: {
 
 
 
+
+
+
+
               grid: { display: false },
+
+
+
+
 
 
 
@@ -8500,7 +16928,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -8508,7 +16944,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               grid: { color: '#F1F5F9' },
+
+
+
+
 
 
 
@@ -8516,7 +16960,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 font: { family: 'JetBrains Mono', size: 9 },
+
+
+
+
 
 
 
@@ -8524,7 +16976,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 callback: (v) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : `${v} v`
+
+
+
+
 
 
 
@@ -8532,7 +16992,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -8540,7 +17008,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -8548,7 +17024,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -8556,7 +17040,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elIntraday = document.getElementById('chartIntradayTraffic');
+
+
+
+
 
 
 
@@ -8564,11 +17056,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const existing = Chart.getChart(elIntraday);
 
 
 
+
+
+
+
       if (existing) existing.destroy();
+
+
+
+
 
 
 
@@ -8576,11 +17080,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         type: 'line',
 
 
 
+
+
+
+
         data: {
+
+
+
+
 
 
 
@@ -8588,7 +17104,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           datasets: []
+
+
+
+
 
 
 
@@ -8596,7 +17120,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         options: {
+
+
+
+
 
 
 
@@ -8604,7 +17136,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           maintainAspectRatio: false,
+
+
+
+
 
 
 
@@ -8612,7 +17152,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           plugins: {
+
+
+
+
 
 
 
@@ -8620,7 +17168,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               position: 'top',
+
+
+
+
 
 
 
@@ -8628,7 +17184,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -8636,11 +17200,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               backgroundColor: '#0D2730',
 
 
 
+
+
+
+
               cornerRadius: 8,
+
+
+
+
 
 
 
@@ -8648,7 +17224,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               callbacks: {
+
+
+
+
 
 
 
@@ -8656,7 +17240,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -8664,11 +17256,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           },
 
 
 
+
+
+
+
           scales: {
+
+
+
+
 
 
 
@@ -8676,7 +17280,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               grid: { display: false },
+
+
+
+
 
 
 
@@ -8684,11 +17296,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 font: { family: 'JetBrains Mono', size: 9 },
 
 
 
+
+
+
+
                 color: '#64748B',
+
+
+
+
 
 
 
@@ -8696,7 +17320,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 autoSkip: true,
+
+
+
+
 
 
 
@@ -8704,11 +17336,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               }
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -8716,7 +17360,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               grid: { color: '#E2E8F0' },
+
+
+
+
 
 
 
@@ -8724,7 +17376,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 font: { family: 'JetBrains Mono', size: 9 },
+
+
+
+
 
 
 
@@ -8732,7 +17392,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 callback: (v) => `${v.toLocaleString("es-ES")} v/h`
+
+
+
+
 
 
 
@@ -8740,7 +17408,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -8748,7 +17424,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -8756,7 +17440,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -8764,7 +17456,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elRadar = document.getElementById('radarChart');
+
+
+
+
 
 
 
@@ -8772,7 +17472,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const existing = Chart.getChart(elRadar);
+
+
+
+
 
 
 
@@ -8780,7 +17488,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.radarChart = new Chart(elRadar.getContext('2d'), {
+
+
+
+
 
 
 
@@ -8788,7 +17504,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         data: {
+
+
+
+
 
 
 
@@ -8796,7 +17520,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             'Aforo Viario',
+
+
+
+
 
 
 
@@ -8804,7 +17536,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             'Déficit Calzada',
+
+
+
+
 
 
 
@@ -8812,7 +17552,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             'Facilidad Topográfica',
+
+
+
+
 
 
 
@@ -8820,7 +17568,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           ],
+
+
+
+
 
 
 
@@ -8828,7 +17584,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             label: 'Índice de Presión (0-100)',
+
+
+
+
 
 
 
@@ -8836,7 +17600,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             backgroundColor: 'rgba(0, 75, 87, 0.20)',
+
+
+
+
 
 
 
@@ -8844,7 +17616,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             pointBackgroundColor: '#10B981',
+
+
+
+
 
 
 
@@ -8852,7 +17632,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             pointHoverBackgroundColor: '#FFFFFF',
+
+
+
+
 
 
 
@@ -8860,7 +17648,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             borderWidth: 2,
+
+
+
+
 
 
 
@@ -8868,11 +17664,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           }]
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -8880,7 +17688,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           responsive: true,
+
+
+
+
 
 
 
@@ -8888,7 +17704,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           plugins: {
+
+
+
+
 
 
 
@@ -8896,7 +17720,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             tooltip: {
+
+
+
+
 
 
 
@@ -8904,7 +17736,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               cornerRadius: 8,
+
+
+
+
 
 
 
@@ -8912,7 +17752,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               callbacks: {
+
+
+
+
 
 
 
@@ -8920,7 +17768,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -8928,7 +17784,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           },
+
+
+
+
 
 
 
@@ -8936,7 +17800,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             r: {
+
+
+
+
 
 
 
@@ -8944,7 +17816,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               grid: { color: '#F1F5F9' },
+
+
+
+
 
 
 
@@ -8952,7 +17832,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               suggestedMax: 100,
+
+
+
+
 
 
 
@@ -8960,7 +17848,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               pointLabels: {
+
+
+
+
 
 
 
@@ -8968,7 +17864,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 color: '#475569'
+
+
+
+
 
 
 
@@ -8976,7 +17880,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -8984,7 +17896,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -8992,11 +17912,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9004,11 +17936,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (!this.radarChart || !p) return;
 
 
 
+
+
+
+
     const calc = p.calc || DemandEngine.calculate(p, this.sliders);
+
+
+
+
 
 
 
@@ -9016,7 +17960,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const hasCap = (p.capacity && p.capacity > 0);
+
+
+
+
 
 
 
@@ -9024,7 +17976,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const aforoIdx = hasCap ? Math.max(0, Math.min(100, Math.round((grossFlow / 2200) * 100))) : 0;
+
+
+
+
 
 
 
@@ -9032,7 +17992,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const deficitIdx = hasCap ? Math.max(0, Math.min(100, Math.round(((calc.deficit || 0) / 120) * 100))) : 0;
+
+
+
+
 
 
 
@@ -9040,7 +18008,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const topoEaseIdx = (p.slope && p.slope > 0) ? Math.max(0, Math.min(100, Math.round(100 - p.slope * 15))) : 0;
+
+
+
+
 
 
 
@@ -9048,7 +18024,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.radarChart.data.datasets[0].data = [
+
+
+
+
 
 
 
@@ -9056,7 +18040,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       poisIdx,
+
+
+
+
 
 
 
@@ -9064,7 +18056,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       cruisingIdx,
+
+
+
+
 
 
 
@@ -9072,7 +18072,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       huffIdx
+
+
+
+
 
 
 
@@ -9080,11 +18088,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.radarChart.update();
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9092,7 +18112,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.sliders[key] = val;
+
+
+
+
 
 
 
@@ -9100,7 +18128,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.recalcAllParkings();
+
+
+
+
 
 
 
@@ -9108,7 +18144,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const current = this.parkings.find(p => p.id === this.selectedAssetId) || this.parkings[0];
+
+
+
+
 
 
 
@@ -9116,7 +18160,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.updateWaterfall(current);
+
+
+
+
 
 
 
@@ -9124,7 +18176,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const dlEl = document.getElementById("assetKpiDL");
+
+
+
+
 
 
 
@@ -9132,11 +18192,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9144,7 +18216,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elRain = document.getElementById("sliderRainVal");
+
+
+
+
 
 
 
@@ -9152,7 +18232,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elEvent = document.getElementById("sliderEventVal");
+
+
+
+
 
 
 
@@ -9160,7 +18248,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elRain) elRain.innerText = `${(this.sliders.rain || 0).toFixed(1)} mm/h`;
+
+
+
+
 
 
 
@@ -9168,7 +18264,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elEvent) {
+
+
+
+
 
 
 
@@ -9176,7 +18280,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         none: "Normal (Día Ordinario)",
+
+
+
+
 
 
 
@@ -9184,7 +18296,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         fcb: "Partido FC Barcelona (+55%)",
+
+
+
+
 
 
 
@@ -9192,11 +18312,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         festivo: "Campaña Festiva (+35%)"
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -9204,7 +18336,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -9212,7 +18352,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const inpRain = document.getElementById("sliderRain");
+
+
+
+
 
 
 
@@ -9220,7 +18368,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const inpEvent = document.getElementById("sliderEvent");
+
+
+
+
 
 
 
@@ -9228,7 +18384,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (inpRain && inpRain.value !== String(this.sliders.rain)) inpRain.value = this.sliders.rain;
+
+
+
+
 
 
 
@@ -9236,7 +18400,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (inpEvent && inpEvent.value !== String(this.sliders.event)) inpEvent.value = this.sliders.event;
+
+
+
+
 
 
 
@@ -9244,7 +18416,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9252,7 +18432,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const current = this.parkings.find(p => p.id === this.selectedAssetId);
+
+
+
+
 
 
 
@@ -9260,7 +18448,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       rain: 0.0,
+
+
+
+
 
 
 
@@ -9268,7 +18464,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       event: "none",
+
+
+
+
 
 
 
@@ -9276,7 +18480,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     };
+
+
+
+
 
 
 
@@ -9284,7 +18496,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.recalcAllParkings();
+
+
+
+
 
 
 
@@ -9292,7 +18512,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (current && this.currentState === "B") {
+
+
+
+
 
 
 
@@ -9300,7 +18528,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.updateRadarChart(current);
+
+
+
+
 
 
 
@@ -9308,7 +18544,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (dlEl) dlEl.innerText = current.dl || 0;
+
+
+
+
 
 
 
@@ -9316,7 +18560,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9324,7 +18576,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.chart1Unit = unit;
+
+
+
+
 
 
 
@@ -9332,7 +18592,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (btn.getAttribute('data-unit') === unit) {
+
+
+
+
 
 
 
@@ -9340,7 +18608,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -9348,7 +18624,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -9356,7 +18640,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const dayTabsContainer = document.getElementById("chart1DayTabsContainer");
+
+
+
+
 
 
 
@@ -9364,7 +18656,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (unit === 'hour') {
+
+
+
+
 
 
 
@@ -9372,7 +18672,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -9380,7 +18688,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -9388,11 +18704,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const current = this.parkings.find(p => p.id === this.selectedAssetId) || this.parkings[0];
 
 
 
+
+
+
+
     if (current) {
+
+
+
+
 
 
 
@@ -9400,11 +18728,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
     if (window.lucide) {
+
+
+
+
 
 
 
@@ -9412,11 +18752,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9424,7 +18776,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const container = document.getElementById("chart1DayButtons");
+
+
+
+
 
 
 
@@ -9432,7 +18792,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (!container) return;
+
+
+
+
 
 
 
@@ -9440,7 +18808,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (!this.chart1SelectedDays || this.chart1SelectedDays.length === 0) {
+
+
+
+
 
 
 
@@ -9448,7 +18824,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -9456,7 +18840,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const isSelected = this.chart1SelectedDays.includes(d.id);
+
+
+
+
 
 
 
@@ -9464,7 +18856,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         return `
+
+
+
+
 
 
 
@@ -9472,7 +18872,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+
+
+
+
 
 
 
@@ -9480,7 +18888,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </button>
+
+
+
+
 
 
 
@@ -9488,7 +18904,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -9496,7 +18920,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <button type="button" onclick="app.toggleChart1Day('${d.id}')" class="px-3 py-1.5 rounded-xl font-medium text-xs bg-white hover:bg-[#E6EFF3] text-slate-600 border border-[#DFEAF0] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer">
+
+
+
+
 
 
 
@@ -9504,7 +18936,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <span>${d.name}</span>
+
+
+
+
 
 
 
@@ -9512,7 +18952,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         `;
+
+
+
+
 
 
 
@@ -9520,7 +18968,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }).join("");
+
+
+
+
 
 
 
@@ -9528,7 +18984,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (this.chart1SelectedDays.length === 7) {
+
+
+
+
 
 
 
@@ -9536,7 +19000,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else if (this.chart1SelectedDays.length === 5 && !this.chart1SelectedDays.includes('sabado') && !this.chart1SelectedDays.includes('domingo')) {
+
+
+
+
 
 
 
@@ -9544,7 +19016,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else if (this.chart1SelectedDays.length === 2 && this.chart1SelectedDays.includes('sabado') && this.chart1SelectedDays.includes('domingo')) {
+
+
+
+
 
 
 
@@ -9552,7 +19032,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -9560,7 +19048,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         labelEl.innerText = `${names.join(", ")} (${this.chart1SelectedDays.length} día${this.chart1SelectedDays.length === 1 ? '' : 's'})`;
+
+
+
+
 
 
 
@@ -9568,11 +19064,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9580,7 +19088,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (!this.chart1SelectedDays) this.chart1SelectedDays = [];
+
+
+
+
 
 
 
@@ -9588,7 +19104,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (this.chart1SelectedDays.length <= 1) {
+
+
+
+
 
 
 
@@ -9596,7 +19120,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -9604,7 +19136,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -9612,7 +19152,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK.map(d => d.id) : [];
+
+
+
+
 
 
 
@@ -9620,7 +19168,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -9628,11 +19184,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (current) this.renderChart1(current);
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9640,7 +19208,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK.map(d => d.id) : [];
+
+
+
+
 
 
 
@@ -9648,7 +19224,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.chart1SelectedDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+
+
+
+
 
 
 
@@ -9656,11 +19240,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.chart1SelectedDays = ['sabado', 'domingo'];
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -9668,7 +19264,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -9676,11 +19280,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (current) this.renderChart1(current);
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -9688,7 +19304,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const mainTraffic = p.trafficPoints?.[0] || {};
+
+
+
+
 
 
 
@@ -9696,7 +19320,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const rawPrev = mainTraffic.monthlyPrevYear || [];
+
+
+
+
 
 
 
@@ -9704,7 +19336,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const isGrowing = (mainTraffic.yoyGrowthPct || 0) >= 0;
+
+
+
+
 
 
 
@@ -9712,7 +19352,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const yPrev = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prevYear : 2025;
+
+
+
+
 
 
 
@@ -9720,11 +19368,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-    const isEstProj = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.isEstYearProjected : true;
+
+
+
+
+    const isEstProj = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? (ACTIVE_DATA_YEARS.isEstYearProjected !== false && !ACTIVE_DATA_YEARS.isEstYearReal) : true;
+
+
+
+
 
 
 
     const estTag = isEstProj ? "Estimado" : "Real";
+
+
+
+
 
 
 
@@ -9732,7 +19392,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const badgeEl = document.getElementById("trafficStatusBadge");
+
+
+
+
 
 
 
@@ -9740,7 +19408,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (isGrowing) {
+
+
+
+
 
 
 
@@ -9748,11 +19424,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         badgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#10B981]"></span> CRECIMIENTO DE PASO (+${mainTraffic.yoyGrowthPct}%)`;
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -9760,7 +19448,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         badgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> DECRECIMIENTO DE PASO (${mainTraffic.yoyGrowthPct}%)`;
+
+
+
+
 
 
 
@@ -9768,7 +19464,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -9776,7 +19480,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (textExplanationEl) {
+
+
+
+
 
 
 
@@ -9784,11 +19496,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         textExplanationEl.innerHTML = `El flujo vehicular exterior en ${mainTraffic.street || 'el tramo'} registra una previsión de <strong>aumento de +${mainTraffic.yoyGrowthPct}%</strong> para ${yEst} (${estTag}) respecto a ${yPrev} (Real: ${mainTraffic.yoyGrowthPct24to25 >= 0 ? '+' : ''}${mainTraffic.yoyGrowthPct24to25}% entre ${yPrev2} y ${yPrev}), aumentando la presión de vehículos en busca de estacionamiento rotatorio.`;
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -9796,11 +19520,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -9808,7 +19544,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+
+
+
 
 
 
@@ -9816,7 +19560,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const subEl = document.getElementById("chart1GridSubtitle");
+
+
+
+
 
 
 
@@ -9824,11 +19576,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const dayTabsContainer = document.getElementById("chart1DayTabsContainer");
 
 
 
+
+
+
+
     // =========================================================================
+
+
+
+
 
 
 
@@ -9836,7 +19600,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // =========================================================================
+
+
+
+
 
 
 
@@ -9844,7 +19616,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (dayTabsContainer) dayTabsContainer.classList.remove('hidden');
+
+
+
+
 
 
 
@@ -9852,7 +19632,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK : [];
+
+
+
+
 
 
 
@@ -9860,7 +19648,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const safeActiveDays = activeDays.length > 0 ? activeDays : allDays;
+
+
+
+
 
 
 
@@ -9868,7 +19664,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         lunes: '1',
+
+
+
+
 
 
 
@@ -9876,7 +19680,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         miercoles: '2',
+
+
+
+
 
 
 
@@ -9884,7 +19696,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         viernes: '3',
+
+
+
+
 
 
 
@@ -9892,11 +19712,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         domingo: '5'
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -9904,7 +19736,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const byDayPrev = mainTraffic.monthlyByDayTypePrev || {};
+
+
+
+
 
 
 
@@ -9912,7 +19752,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const monthlyHourlyPrev2 = MONTHS_LABELS.map((_, mIdx) => {
+
+
+
+
 
 
 
@@ -9920,7 +19768,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         let count = 0;
+
+
+
+
 
 
 
@@ -9928,7 +19784,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const code = dayIdToOpenDataCode[d.id] || '2';
+
+
+
+
 
 
 
@@ -9936,7 +19800,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           if (val > 0) { sumImd += val; count += 1; }
+
+
+
+
 
 
 
@@ -9944,11 +19816,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         return count > 0 ? Math.round((sumImd / count) / 24) : 0;
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -9956,7 +19840,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         let sumImd = 0;
+
+
+
+
 
 
 
@@ -9964,11 +19856,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         safeActiveDays.forEach(d => {
 
 
 
+
+
+
+
           const code = dayIdToOpenDataCode[d.id] || '2';
+
+
+
+
 
 
 
@@ -9976,7 +19880,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           if (val > 0) { sumImd += val; count += 1; }
+
+
+
+
 
 
 
@@ -9984,11 +19896,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         return count > 0 ? Math.round((sumImd / count) / 24) : 0;
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -9996,7 +19920,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         let sumImd = 0;
+
+
+
+
 
 
 
@@ -10004,7 +19936,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         safeActiveDays.forEach(d => {
+
+
+
+
 
 
 
@@ -10012,7 +19952,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const val = byDayCur[code]?.[mIdx] || rawCur[mIdx] || 0;
+
+
+
+
 
 
 
@@ -10020,7 +19968,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -10028,7 +19984,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -10036,7 +20000,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (titleEl) titleEl.innerText = `Caudal Horario Medio (IMD / 24h) · ${activeDaysNames}`;
+
+
+
+
 
 
 
@@ -10044,7 +20016,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (this.chartTrafficPassing) {
+
+
+
+
 
 
 
@@ -10052,11 +20032,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.chartTrafficPassing.data.datasets = [
 
 
 
+
+
+
+
           {
+
+
+
+
 
 
 
@@ -10064,7 +20056,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             data: monthlyHourlyPrev2,
+
+
+
+
 
 
 
@@ -10072,7 +20072,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             borderDash: [5, 4],
+
+
+
+
 
 
 
@@ -10080,11 +20088,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             backgroundColor: 'transparent',
 
 
 
+
+
+
+
             tension: 0.35,
+
+
+
+
 
 
 
@@ -10092,7 +20112,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             pointBackgroundColor: '#94A3B8'
+
+
+
+
 
 
 
@@ -10100,7 +20128,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           {
+
+
+
+
 
 
 
@@ -10108,11 +20144,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             data: monthlyHourlyPrev,
 
 
 
+
+
+
+
             borderColor: '#10B981',
+
+
+
+
 
 
 
@@ -10120,7 +20168,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             backgroundColor: 'transparent',
+
+
+
+
 
 
 
@@ -10128,7 +20184,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             pointRadius: 3,
+
+
+
+
 
 
 
@@ -10136,11 +20200,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           },
 
 
 
+
+
+
+
           {
+
+
+
+
 
 
 
@@ -10148,7 +20224,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             data: monthlyHourlyCur,
+
+
+
+
 
 
 
@@ -10156,7 +20240,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             borderWidth: 2.8,
+
+
+
+
 
 
 
@@ -10164,7 +20256,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             fill: true,
+
+
+
+
 
 
 
@@ -10172,7 +20272,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             pointRadius: 3.5,
+
+
+
+
 
 
 
@@ -10180,11 +20288,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           }
 
 
 
+
+
+
+
         ];
+
+
+
+
 
 
 
@@ -10192,7 +20312,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           this.chartTrafficPassing.options.plugins.tooltip.callbacks.title = (items) => `Mes: ${items[0]?.label} · ${safeActiveDays.map(d => d.short).join(", ")}`;
+
+
+
+
 
 
 
@@ -10200,7 +20328,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
+
+
+
+
 
 
 
@@ -10208,7 +20344,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             const idx = items[0].dataIndex;
+
+
+
+
 
 
 
@@ -10216,7 +20360,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             const pVal = monthlyHourlyPrev[idx] || 0;
+
+
+
+
 
 
 
@@ -10224,7 +20376,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             const diffVsPrev = cVal - pVal;
+
+
+
+
 
 
 
@@ -10232,7 +20392,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             const diffReal = pVal - p2Val;
+
+
+
+
 
 
 
@@ -10240,7 +20408,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             return [
+
+
+
+
 
 
 
@@ -10248,7 +20424,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               `-----------------------------------------`,
+
+
+
+
 
 
 
@@ -10256,7 +20440,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} veh/h (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
+
+
+
+
 
 
 
@@ -10264,11 +20456,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           };
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -10276,7 +20480,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -10284,7 +20496,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         chart1DiffGridEl.innerHTML = MONTHS_LABELS.map((mLabel, mIdx) => {
+
+
+
+
 
 
 
@@ -10292,7 +20512,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const v25 = monthlyHourlyPrev[mIdx] || 0;
+
+
+
+
 
 
 
@@ -10300,7 +20528,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const diffUnits = v26 - v25;
+
+
+
+
 
 
 
@@ -10308,7 +20544,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const isUp = diffUnits >= 0;
+
+
+
+
 
 
 
@@ -10316,7 +20560,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return `
+
+
+
+
 
 
 
@@ -10324,7 +20576,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
+
+
+
+
 
 
 
@@ -10332,7 +20592,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <div class="text-[8.5px] text-slate-400 font-mono space-y-0.5 mb-1 leading-tight text-left">
+
+
+
+
 
 
 
@@ -10340,7 +20608,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="flex justify-between"><span>${yPrev}:</span><strong class="text-emerald-700">${v25}</strong></div>
+
+
+
+
 
 
 
@@ -10348,7 +20624,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -10356,7 +20640,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+
+
+
+
 
 
 
@@ -10364,7 +20656,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 ${isUp ? '▲' : '▼'} ${sign}${pct}%
+
+
+
+
 
 
 
@@ -10372,7 +20672,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -10380,11 +20688,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }).join("");
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -10392,7 +20712,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       return;
+
+
+
+
 
 
 
@@ -10400,7 +20728,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // =========================================================================
+
+
+
+
 
 
 
@@ -10408,7 +20744,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // =========================================================================
+
+
+
+
 
 
 
@@ -10416,7 +20760,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     let monthlyPrev2 = [];
+
+
+
+
 
 
 
@@ -10424,7 +20776,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     let monthlyCur = [];
+
+
+
+
 
 
 
@@ -10432,7 +20792,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     let unitLabelShort = 'veh/día';
+
+
+
+
 
 
 
@@ -10440,7 +20808,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       monthlyPrev2 = rawPrev2.map((v, idx) => Math.round(v * (DAYS_IN_MONTH[MONTHS_INDEXES[idx]] || 30)));
+
+
+
+
 
 
 
@@ -10448,7 +20824,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       monthlyCur = rawCur.map((v, idx) => Math.round(v * (DAYS_IN_MONTH[MONTHS_INDEXES[idx]] || 30)));
+
+
+
+
 
 
 
@@ -10456,11 +20840,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       unitLabelShort = 'veh/mes';
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -10468,7 +20864,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       monthlyPrev = [...rawPrev];
+
+
+
+
 
 
 
@@ -10476,7 +20880,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       unitLabel = 'veh/día';
+
+
+
+
 
 
 
@@ -10484,7 +20896,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -10492,7 +20912,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (subEl) subEl.innerText = `${yPrev2} Real vs. ${yPrev} Real vs. ${yEst} ${estTag} (Open Data BCN)`;
+
+
+
+
 
 
 
@@ -10500,7 +20928,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.chartTrafficPassing.data.labels = MONTHS_LABELS;
+
+
+
+
 
 
 
@@ -10508,7 +20944,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -10516,7 +20960,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: monthlyPrev2,
+
+
+
+
 
 
 
@@ -10524,7 +20976,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           borderDash: [5, 4],
+
+
+
+
 
 
 
@@ -10532,7 +20992,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           backgroundColor: 'transparent',
+
+
+
+
 
 
 
@@ -10540,7 +21008,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointRadius: 2,
+
+
+
+
 
 
 
@@ -10548,11 +21024,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         },
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -10560,7 +21048,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: monthlyPrev,
+
+
+
+
 
 
 
@@ -10568,7 +21064,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           borderWidth: 2.2,
+
+
+
+
 
 
 
@@ -10576,7 +21080,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           tension: 0.35,
+
+
+
+
 
 
 
@@ -10584,7 +21096,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointBackgroundColor: '#10B981'
+
+
+
+
 
 
 
@@ -10592,7 +21112,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -10600,7 +21128,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: monthlyCur,
+
+
+
+
 
 
 
@@ -10608,7 +21144,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           borderWidth: 2.8,
+
+
+
+
 
 
 
@@ -10616,7 +21160,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           fill: true,
+
+
+
+
 
 
 
@@ -10624,7 +21176,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointRadius: 3.5,
+
+
+
+
 
 
 
@@ -10632,11 +21192,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
 
 
 
+
+
+
+
       ];
+
+
+
+
 
 
 
@@ -10644,7 +21216,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.chartTrafficPassing.options.plugins.tooltip.callbacks.title = (items) => `Mes: ${items[0]?.label}`;
+
+
+
+
 
 
 
@@ -10652,7 +21232,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
+
+
+
+
 
 
 
@@ -10660,7 +21248,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const idx = items[0].dataIndex;
+
+
+
+
 
 
 
@@ -10668,7 +21264,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const pVal = monthlyPrev[idx] || 0;
+
+
+
+
 
 
 
@@ -10676,7 +21280,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const diffVsPrev = cVal - pVal;
+
+
+
+
 
 
 
@@ -10684,7 +21296,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const diffReal = pVal - p2Val;
+
+
+
+
 
 
 
@@ -10692,7 +21312,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return [
+
+
+
+
 
 
 
@@ -10700,7 +21328,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             `-----------------------------------------`,
+
+
+
+
 
 
 
@@ -10708,7 +21344,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} ${unitLabelShort} (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
+
+
+
+
 
 
 
@@ -10716,11 +21360,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         };
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -10728,7 +21384,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -10736,7 +21400,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (monthlyCur.length === 0 || monthlyPrev.length === 0) {
+
+
+
+
 
 
 
@@ -10744,7 +21416,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="col-span-full p-2.5 rounded-xl bg-white border border-[#DFEAF0] text-slate-400 text-center text-xs">
+
+
+
+
 
 
 
@@ -10752,7 +21432,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -10760,7 +21448,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -10768,7 +21464,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const v24 = monthlyPrev2[mIdx] || 0;
+
+
+
+
 
 
 
@@ -10776,7 +21480,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const v26 = monthlyCur[mIdx] || 0;
+
+
+
+
 
 
 
@@ -10784,7 +21496,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const pct = v25 > 0 ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
+
+
+
+
 
 
 
@@ -10792,7 +21512,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const sign = isUp ? "+" : "";
+
+
+
+
 
 
 
@@ -10800,7 +21528,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all">
+
+
+
+
 
 
 
@@ -10808,7 +21544,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               
+
+
+
+
 
 
 
@@ -10816,7 +21560,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="flex justify-between"><span>${yPrev2}:</span><strong class="text-slate-600">${v24.toLocaleString("es-ES")}</strong></div>
+
+
+
+
 
 
 
@@ -10824,7 +21576,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="flex justify-between"><span>${yEst}:</span><strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong></div>
+
+
+
+
 
 
 
@@ -10832,7 +21592,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+
+
+
+
 
 
 
@@ -10840,7 +21608,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               }">
+
+
+
+
 
 
 
@@ -10848,7 +21624,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               </span>
+
+
+
+
 
 
 
@@ -10856,7 +21640,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           `;
+
+
+
+
 
 
 
@@ -10864,11 +21656,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -10876,7 +21680,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -10884,7 +21696,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const formulaContainer = document.getElementById("chart1FormulaContainer");
+
+
+
+
 
 
 
@@ -10892,7 +21712,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const mainTraffic = p.trafficPoints?.[0] || {};
+
+
+
+
 
 
 
@@ -10900,7 +21728,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const yPrev2 = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prev2Year : 2024;
+
+
+
+
 
 
 
@@ -10908,7 +21744,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const yEst = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
+
+
+
+
 
 
 
@@ -10916,7 +21760,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const ann24 = (inf.annual2024 || mainTraffic.annualCarsPrev2Year || 0).toLocaleString("es-ES");
+
+
+
+
 
 
 
@@ -10924,7 +21776,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const ann26 = (inf.annual2026Est || mainTraffic.annualCarsCurrentYear || 0).toLocaleString("es-ES");
+
+
+
+
 
 
 
@@ -10932,7 +21792,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const growthSign = growth2425 >= 0 ? "+" : "";
+
+
+
+
 
 
 
@@ -10940,7 +21808,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-2 border-b border-amber-200/60">
+
+
+
+
 
 
 
@@ -10948,7 +21824,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <span class="p-1 rounded-md bg-amber-500 text-white font-mono text-[10px] font-bold">FÓRMULA AUDITABLE</span>
+
+
+
+
 
 
 
@@ -10956,7 +21840,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -10964,7 +21856,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <span class="w-1.5 h-1.5 rounded-full ${isProjected ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}"></span>
+
+
+
+
 
 
 
@@ -10972,11 +21872,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         </span>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -10984,7 +21896,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         <div class="lg:col-span-7 space-y-2">
+
+
+
+
 
 
 
@@ -10992,7 +21912,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <div class="text-[9.5px] uppercase font-bold text-amber-800 mb-1">Ecuación Matemática Aplicada por Mes (m):</div>
+
+
+
+
 
 
 
@@ -11000,7 +21928,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               IMD_${yEst}(m) = IMD_${yPrev}(m) × [1 + 0.75 × ((IMD_${yPrev}(m) - IMD_${yPrev2}(m)) / IMD_${yPrev2}(m))] × Φ_trams(m)
+
+
+
+
 
 
 
@@ -11008,7 +21944,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -11016,7 +21960,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             Se calcula la tasa empírica observada entre el año base (${yPrev2}) y el año consolidado (${yPrev}) para la espira <strong>#${mainTraffic.stationId || 'Aforo'}</strong>, ajustando la inercia con el estado de congestión y fluidez de la red viaria de Barcelona (dataset <em>trams</em>: factores de 0.94x en flujo muy libre hasta 1.14x en congestión).
+
+
+
+
 
 
 
@@ -11024,7 +21976,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -11032,7 +21992,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="text-[10px] uppercase font-bold text-slate-500 pb-1 border-b border-slate-100">
+
+
+
+
 
 
 
@@ -11040,11 +22008,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
 
 
 
+
+
+
+
           <div class="flex justify-between items-center text-slate-600 font-mono">
+
+
+
+
 
 
 
@@ -11052,7 +22032,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <strong class="text-slate-800">${ann24} veh/año</strong>
+
+
+
+
 
 
 
@@ -11060,7 +22048,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="flex justify-between items-center text-slate-600 font-mono">
+
+
+
+
 
 
 
@@ -11068,11 +22064,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <strong class="text-emerald-700 font-bold">${ann25} veh/año</strong>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -11080,7 +22088,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <span>Variación ${yPrev2}→${yPrev}:</span>
+
+
+
+
 
 
 
@@ -11088,7 +22104,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -11096,7 +22120,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <span>Aforo ${yEst} (${estTag}):</span>
+
+
+
+
 
 
 
@@ -11104,7 +22136,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -11112,7 +22152,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -11120,7 +22168,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
+
+
+
+
 
 
 
@@ -11128,7 +22184,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -11136,7 +22200,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (window.lucide) {
+
+
+
+
 
 
 
@@ -11144,11 +22216,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -11156,7 +22240,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // -------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -11164,7 +22256,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // -------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -11172,7 +22272,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // Renderizar Ubicación Exacta de los Sensores de Aforo Viario bajo el Gráfico 1
+
+
+
+
 
 
 
@@ -11180,7 +22288,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (sensorsContainer) {
+
+
+
+
 
 
 
@@ -11188,7 +22304,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (trafficPoints.length === 0) {
+
+
+
+
 
 
 
@@ -11196,7 +22320,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="p-3 rounded-xl bg-white border border-[#DFEAF0] text-slate-500 text-center text-xs">
+
+
+
+
 
 
 
@@ -11204,7 +22336,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -11212,7 +22352,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -11220,7 +22368,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           // Distancia aproximada en metros al parking
+
+
+
+
 
 
 
@@ -11228,7 +22384,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const dLon = (tp.lon - p.lon) * Math.PI / 180;
+
+
+
+
 
 
 
@@ -11236,7 +22400,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     Math.cos(p.lat * Math.PI / 180) * Math.cos(tp.lat * Math.PI / 180) *
+
+
+
+
 
 
 
@@ -11244,11 +22416,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const distM = Math.round(6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 
 
 
+
+
+
+
           return `
+
+
+
+
 
 
 
@@ -11256,7 +22440,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <div class="flex items-start justify-between gap-2">
+
+
+
+
 
 
 
@@ -11264,7 +22456,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   <span class="w-6 h-6 rounded-lg bg-sky-50 text-[#0284C7] border border-sky-200 flex items-center justify-center font-bold text-xs shrink-0">
+
+
+
+
 
 
 
@@ -11272,11 +22472,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   </span>
 
 
 
+
+
+
+
                   <div>
+
+
+
+
 
 
 
@@ -11284,7 +22496,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     <span class="text-[11px] text-slate-500 font-medium">
+
+
+
+
 
 
 
@@ -11292,7 +22512,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     </span>
+
+
+
+
 
 
 
@@ -11300,7 +22528,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -11308,7 +22544,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   <i data-lucide="map-pin" class="w-3 h-3"></i>
+
+
+
+
 
 
 
@@ -11316,11 +22560,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 </button>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -11328,7 +22584,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 flex flex-col justify-between">
+
+
+
+
 
 
 
@@ -11336,7 +22600,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Coordenadas WGS84:</span>
+
+
+
+
 
 
 
@@ -11344,7 +22616,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   </div>
+
+
+
+
 
 
 
@@ -11352,7 +22632,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     <span class="text-slate-700 font-bold truncate" title="Ubicación exacta del sensor: ${tp.exactSensorSpot || tp.street}">
+
+
+
+
 
 
 
@@ -11360,7 +22648,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     </span>
+
+
+
+
 
 
 
@@ -11368,7 +22664,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                       <span>Google Maps ↗</span>
+
+
+
+
 
 
 
@@ -11376,7 +22680,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   </div>
+
+
+
+
 
 
 
@@ -11384,7 +22696,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
+
+
+
+
 
 
 
@@ -11392,11 +22712,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   <span class="text-slate-700">Espira electromagnética calzada</span>
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -11404,7 +22736,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Carriles y Sentido:</span>
+
+
+
+
 
 
 
@@ -11412,7 +22752,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -11420,7 +22768,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -11428,7 +22784,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }).join("");
+
+
+
+
 
 
 
@@ -11436,7 +22800,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           window.lucide.createIcons();
+
+
+
+
 
 
 
@@ -11444,7 +22816,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -11452,7 +22832,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // -------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -11460,7 +22848,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // -------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -11468,7 +22864,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const exitPoints = p.exitPoints || [];
+
+
+
+
 
 
 
@@ -11476,7 +22880,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const balanceBadgeEl = document.getElementById("balanceStatusBadge");
+
+
+
+
 
 
 
@@ -11484,11 +22896,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (!hasRealAccessData) {
 
 
 
+
+
+
+
       if (balanceBadgeEl) {
+
+
+
+
 
 
 
@@ -11496,7 +22920,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         balanceBadgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> SIN TELEMETRÍA DE BARRERA`;
+
+
+
+
 
 
 
@@ -11504,7 +22936,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (balanceExplanationEl) {
+
+
+
+
 
 
 
@@ -11512,11 +22952,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
       if (this.chartInOutBalance) {
+
+
+
+
 
 
 
@@ -11524,7 +22976,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.chartInOutBalance.update();
+
+
+
+
 
 
 
@@ -11532,7 +22992,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -11540,11 +23008,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         entryPoints.reduce((acc, ep) => acc + (ep.monthlyEntries?.[i] || 0), 0)
 
 
 
+
+
+
+
       );
+
+
+
+
 
 
 
@@ -11552,7 +23032,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         exitPoints.reduce((acc, xp) => acc + (xp.monthlyExits?.[i] || 0), 0)
+
+
+
+
 
 
 
@@ -11560,7 +23048,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const netDiffMonthly = totalEntriesMonthly.map((ent, i) => ent - totalExitsMonthly[i]);
+
+
+
+
 
 
 
@@ -11568,7 +23064,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const lastExits = totalExitsMonthly[11] || 0;
+
+
+
+
 
 
 
@@ -11576,7 +23080,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       // Actualizar Badge del Gráfico 2
+
+
+
+
 
 
 
@@ -11584,7 +23096,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         if (lastDiff >= 0) {
+
+
+
+
 
 
 
@@ -11592,7 +23112,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           balanceBadgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#10B981]"></span> AFLUENCIA NETA (+${lastDiff.toLocaleString("es-ES")} v/m)`;
+
+
+
+
 
 
 
@@ -11600,7 +23128,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           balanceBadgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-[#D97706] border border-amber-200 inline-flex items-center gap-1.5";
+
+
+
+
 
 
 
@@ -11608,11 +23144,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -11620,7 +23168,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (balanceExplanationEl) {
+
+
+
+
 
 
 
@@ -11628,7 +23184,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         balanceExplanationEl.innerHTML = `
+
+
+
+
 
 
 
@@ -11636,11 +23200,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         `;
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -11648,7 +23224,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.chartInOutBalance.data.datasets = [
+
+
+
+
 
 
 
@@ -11656,7 +23240,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             type: 'line',
+
+
+
+
 
 
 
@@ -11664,7 +23256,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             data: totalEntriesMonthly,
+
+
+
+
 
 
 
@@ -11672,7 +23272,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             borderWidth: 2.5,
+
+
+
+
 
 
 
@@ -11680,11 +23288,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             fill: true,
 
 
 
+
+
+
+
             tension: 0.35,
+
+
+
+
 
 
 
@@ -11692,7 +23312,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             pointBackgroundColor: '#10B981',
+
+
+
+
 
 
 
@@ -11700,11 +23328,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           },
 
 
 
+
+
+
+
           {
+
+
+
+
 
 
 
@@ -11712,7 +23352,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             label: 'Salidas Totales del Parking',
+
+
+
+
 
 
 
@@ -11720,7 +23368,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             borderColor: '#F97316',
+
+
+
+
 
 
 
@@ -11728,7 +23384,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             borderDash: [5, 4],
+
+
+
+
 
 
 
@@ -11736,7 +23400,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             tension: 0.35,
+
+
+
+
 
 
 
@@ -11744,7 +23416,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             pointBackgroundColor: '#F97316',
+
+
+
+
 
 
 
@@ -11752,7 +23432,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           },
+
+
+
+
 
 
 
@@ -11760,7 +23448,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             type: 'bar',
+
+
+
+
 
 
 
@@ -11768,7 +23464,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             data: netDiffMonthly,
+
+
+
+
 
 
 
@@ -11776,7 +23480,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             borderRadius: 4,
+
+
+
+
 
 
 
@@ -11784,11 +23496,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             order: 3
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -11796,7 +23520,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.chartInOutBalance.update();
+
+
+
+
 
 
 
@@ -11804,7 +23536,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -11812,7 +23552,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.renderEvents7Days(p);
+
+
+
+
 
 
 
@@ -11820,7 +23568,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -11828,7 +23584,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -11836,7 +23600,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.currentEventFilter = filter;
+
+
+
+
 
 
 
@@ -11844,7 +23616,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (btn.getAttribute('data-event-filter') === filter) {
+
+
+
+
 
 
 
@@ -11852,7 +23632,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -11860,11 +23648,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -11872,7 +23672,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (current) {
+
+
+
+
 
 
 
@@ -11880,11 +23688,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -11892,11 +23712,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const container = document.getElementById("events7DaysContainer");
 
 
 
+
+
+
+
     if (!container) return;
+
+
+
+
 
 
 
@@ -11904,7 +23736,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       container.innerHTML = `<div class="p-3 text-slate-400 text-xs text-center">Selecciona un aparcamiento para calcular el impacto vial.</div>`;
+
+
+
+
 
 
 
@@ -11912,7 +23752,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -11920,7 +23768,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const eventsList = (typeof BCN_EVENTS_7DAYS !== 'undefined') ? BCN_EVENTS_7DAYS : [];
+
+
+
+
 
 
 
@@ -11928,7 +23784,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       // Excluir partidos/eventos en Estadi Johan Cruyff (Sant Joan Despí - fuera de la trama urbana de Barcelona)
+
+
+
+
 
 
 
@@ -11936,7 +23800,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (filter === 'all') return true;
+
+
+
+
 
 
 
@@ -11944,7 +23816,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -11952,7 +23832,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       container.innerHTML = `<div class="p-3 text-slate-400 text-xs text-center">No hay eventos programados en esta categoría para los próximos 7 días.</div>`;
+
+
+
+
 
 
 
@@ -11960,7 +23848,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -11968,7 +23864,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (distBadgeText) {
+
+
+
+
 
 
 
@@ -11976,7 +23880,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -11984,22 +23896,45 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const eventsWithImpact = filtered.map(evt => {
+
       const knownVenue = (typeof BCN_MAJOR_VENUES !== 'undefined' && BCN_MAJOR_VENUES[evt.venueId]) ? BCN_MAJOR_VENUES[evt.venueId] : null;
+
       const evLat = evt.lat || knownVenue?.lat || p.lat;
+
       const evLon = evt.lon || knownVenue?.lon || p.lon;
+
       const venueName = evt.venueName || evt.venue || knownVenue?.name || "Barcelona";
+
       const complex = knownVenue?.complex || "Área Metropolitana";
 
+
+
       const distKm = calculateHaversineKm(p.lat, p.lon, evLat, evLon);
+
       const impact = evaluateEventImpact(distKm, evt.expectedAttendance, evt.category);
+
       return {
+
         evt,
+
         venue: { name: venueName, complex: complex, lat: evLat, lon: evLon },
+
         distKm,
+
         impact
+
       };
+
     });
+
+
+
+
 
 
 
@@ -12007,7 +23942,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const getSeverityWeight = (lvl) => {
+
+
+
+
 
 
 
@@ -12015,7 +23958,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const s = String(lvl).toUpperCase();
+
+
+
+
 
 
 
@@ -12023,7 +23974,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (s.includes('ALTO')) return 3;
+
+
+
+
 
 
 
@@ -12031,7 +23990,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       return 1;
+
+
+
+
 
 
 
@@ -12039,7 +24006,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     eventsWithImpact.sort((a, b) => {
+
+
+
+
 
 
 
@@ -12047,7 +24022,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const wB = getSeverityWeight(b.impact.level);
+
+
+
+
 
 
 
@@ -12055,7 +24038,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (a.distKm !== b.distKm) return a.distKm - b.distKm; // 2º Más cercano al parking
+
+
+
+
 
 
 
@@ -12063,7 +24054,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -12071,7 +24070,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       // Icono según categoría
+
+
+
+
 
 
 
@@ -12079,7 +24086,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (evt.category === 'fcb') catIcon = "trophy";
+
+
+
+
 
 
 
@@ -12087,11 +24102,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       else if (evt.category === 'fira') catIcon = "briefcase";
 
 
 
+
+
+
+
       return `
+
+
+
+
 
 
 
@@ -12099,7 +24126,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="flex items-start justify-between gap-2">
+
+
+
+
 
 
 
@@ -12107,7 +24142,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <div class="w-7 h-7 rounded-lg bg-sky-50 text-[#0284C7] border border-sky-100 flex items-center justify-center shrink-0 mt-0.5">
+
+
+
+
 
 
 
@@ -12115,7 +24158,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -12123,7 +24174,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="flex items-center gap-1.5 flex-wrap">
+
+
+
+
 
 
 
@@ -12131,7 +24190,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                     ${evt.dayLabel} · ${evt.time}
+
+
+
+
 
 
 
@@ -12139,11 +24206,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   <span class="text-[10px] text-slate-400 font-medium">${evt.categoryLabel}</span>
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -12151,7 +24230,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   ${evt.title}
+
+
+
+
 
 
 
@@ -12159,7 +24246,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="text-[10.5px] text-slate-500 flex items-center gap-1.5 flex-wrap mt-0.5">
+
+
+
+
 
 
 
@@ -12167,7 +24262,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   <span>•</span>
+
+
+
+
 
 
 
@@ -12175,7 +24278,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -12183,7 +24294,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -12191,7 +24310,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <div class="text-right shrink-0">
+
+
+
+
 
 
 
@@ -12199,7 +24326,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <span class="w-1.5 h-1.5 rounded-full ${impact.indicatorDot}"></span>
+
+
+
+
 
 
 
@@ -12207,7 +24342,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               </span>
+
+
+
+
 
 
 
@@ -12215,11 +24358,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </div>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -12227,7 +24382,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between gap-2 text-[10px]">
+
+
+
+
 
 
 
@@ -12235,11 +24398,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               ${impact.description} <strong class="text-[#164250]">(${impact.pressureEstimate})</strong>
 
 
 
+
+
+
+
             </span>
+
+
+
+
 
 
 
@@ -12247,7 +24422,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <i data-lucide="map-pin" class="w-3 h-3"></i> Recinto
+
+
+
+
 
 
 
@@ -12255,7 +24438,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -12263,11 +24454,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       `;
 
 
 
+
+
+
+
     }).join("");
+
+
+
+
 
 
 
@@ -12275,7 +24478,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       window.lucide.createIcons();
+
+
+
+
 
 
 
@@ -12283,11 +24494,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -12295,7 +24518,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -12303,7 +24534,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const calc = p.calc || DemandEngine.calculate(p, this.sliders);
+
+
+
+
 
 
 
@@ -12311,7 +24550,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elStep1 = document.getElementById("wfStep1Val");
+
+
+
+
 
 
 
@@ -12319,7 +24566,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elKappa = document.getElementById("wfKappa");
+
+
+
+
 
 
 
@@ -12327,7 +24582,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elStep3 = document.getElementById("wfStep3Val");
+
+
+
+
 
 
 
@@ -12335,7 +24598,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elBar = document.getElementById("waterfallDLBar");
+
+
+
+
 
 
 
@@ -12343,7 +24614,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elStep1) elStep1.innerText = `${wf.grossFlow} veh/h (100%)`;
+
+
+
+
 
 
 
@@ -12351,7 +24630,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elKappa) elKappa.innerText = `${wf.passThroughPct}%`;
+
+
+
+
 
 
 
@@ -12359,7 +24646,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elStep3) elStep3.innerText = `+${wf.cruising + wf.deficit + wf.pois} veh/h`;
+
+
+
+
 
 
 
@@ -12367,7 +24662,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elDLText) elDLText.innerText = `${calc.dl} veh/h`;
+
+
+
+
 
 
 
@@ -12375,7 +24678,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const pct = wf.grossFlow > 0 ? Math.min(100, Math.round((calc.dl / wf.grossFlow) * 100)) : 0;
+
+
+
+
 
 
 
@@ -12383,7 +24694,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -12391,7 +24710,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const roadType = p.roadType || "Sin datos en archivo";
+
+
+
+
 
 
 
@@ -12399,7 +24726,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const omega = kappaBase > 0 ? 1.05 : 0;
+
+
+
+
 
 
 
@@ -12407,7 +24742,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const localPct = (100 - kappaPct).toFixed(1);
+
+
+
+
 
 
 
@@ -12415,7 +24758,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elFormulaCalc = document.getElementById("wfFormulaCalc");
+
+
+
+
 
 
 
@@ -12423,7 +24774,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elKappaExplainVal = document.getElementById("wfKappaExplainVal");
+
+
+
+
 
 
 
@@ -12431,7 +24790,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elFormulaRoad) elFormulaRoad.innerText = roadType;
+
+
+
+
 
 
 
@@ -12439,7 +24806,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elLocalDestPct) elLocalDestPct.innerText = `${localPct}%`;
+
+
+
+
 
 
 
@@ -12447,7 +24822,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elWhyNot85Text) {
+
+
+
+
 
 
 
@@ -12455,7 +24838,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         El <strong>85%</strong> solo se aplica a autopistas urbanas o cinturones cerrados (Ronda de Dalt, Gran Via perimetral) sin comercio ni oficinas. En las calles donde opera <strong>${p.name}</strong> (${p.address.split(',')[0]}), el <strong>${localPct}%</strong> de los vehículos sí entra al tejido del barrio. Usar un 85% subestimaría la demanda real en más de un 60%.
+
+
+
+
 
 
 
@@ -12463,7 +24854,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -12471,7 +24870,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -12479,7 +24886,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -12487,7 +24902,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const shortDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+
+
+
 
 
 
@@ -12495,7 +24918,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const shortMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+
+
+
 
 
 
@@ -12503,7 +24934,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // Consulta meteorológica para las coordenadas del aparcamiento (Open-Meteo)
+
+
+
+
 
 
 
@@ -12511,7 +24950,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const liveDaily = this.liveWeatherCache[cacheKey] || this.liveWeatherCache['default'] || null;
+
+
+
+
 
 
 
@@ -12519,11 +24966,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.fetchLiveWeatherForBarcelona(p.lat || 41.3888, p.lon || 2.1590);
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -12531,7 +24990,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const mainTraffic = p.trafficPoints?.[0] || {};
+
+
+
+
 
 
 
@@ -12539,7 +25006,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const baseDailyCars = Math.round(annualCars / 365);
+
+
+
+
 
 
 
@@ -12547,7 +25022,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const today = new Date();
+
+
+
+
 
 
 
@@ -12555,7 +25038,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // Progresión lineal de coches que pasarán en los 7 siguientes días
+
+
+
+
 
 
 
@@ -12563,7 +25054,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const dObj = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+
+
+
+
 
 
 
@@ -12571,7 +25070,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const isWeekend = (dow === 0 || dow === 6);
+
+
+
+
 
 
 
@@ -12579,7 +25086,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const dayFullName = i === 0 ? `Hoy (${fullDays[dow]})` : (i === 1 ? `Mañana (${fullDays[dow]})` : fullDays[dow]);
+
+
+
+
 
 
 
@@ -12587,7 +25102,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       let weatherInfo;
+
+
+
+
 
 
 
@@ -12595,7 +25118,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const wCode = liveDaily.weather_code?.[i] ?? 0;
+
+
+
+
 
 
 
@@ -12603,7 +25134,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const tMax = liveDaily.temperature_2m_max?.[i] ?? 20;
+
+
+
+
 
 
 
@@ -12611,7 +25150,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -12619,7 +25166,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           iconName: "cloud",
+
+
+
+
 
 
 
@@ -12627,7 +25182,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           rainMm: 0,
+
+
+
+
 
 
 
@@ -12635,7 +25198,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           desc: "0 mm • 0°C",
+
+
+
+
 
 
 
@@ -12643,11 +25214,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         };
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -12655,7 +25238,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       // 0 (Dom) -> '5', 1 (Lun) -> '1', 2..4 (Mar-Jue) -> '2', 5 (Vie) -> '3', 6 (Sáb) -> '4'
+
+
+
+
 
 
 
@@ -12663,7 +25254,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const openDataDayCode = dowToOpenDataCode[dow] || '2';
+
+
+
+
 
 
 
@@ -12671,7 +25270,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       // Impacto meteorológico en vivo (Open-Meteo Forecast)
+
+
+
+
 
 
 
@@ -12679,7 +25286,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (weatherInfo.rainMm >= 10) rainImpact = 1.14;
+
+
+
+
 
 
 
@@ -12687,7 +25302,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       else if (weatherInfo.rainMm >= 0.5) rainImpact = 1.04;
+
+
+
+
 
 
 
@@ -12695,7 +25318,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const dailyCars = Math.round(realDayTypeImd * rainImpact);
+
+
+
+
 
 
 
@@ -12703,7 +25334,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const avgHourCars = Math.round(dailyCars / 24);
+
+
+
+
 
 
 
@@ -12711,7 +25350,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       forecastDays.push({
+
+
+
+
 
 
 
@@ -12719,7 +25366,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         dayKey,
+
+
+
+
 
 
 
@@ -12727,7 +25382,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         fullDateStr: `${fullDays[dow]}, ${dObj.getDate()} de ${fullMonths[dObj.getMonth()]}`,
+
+
+
+
 
 
 
@@ -12735,7 +25398,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         dow,
+
+
+
+
 
 
 
@@ -12743,7 +25414,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         weather: weatherInfo,
+
+
+
+
 
 
 
@@ -12751,7 +25430,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         hourlyCars,
+
+
+
+
 
 
 
@@ -12759,7 +25446,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         valleyHourStr: `Espira #${mainTraffic.stationId || 'BCN'} (Tipo día ${openDataDayCode})`
+
+
+
+
 
 
 
@@ -12767,7 +25462,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -12775,7 +25478,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // Actualizar Media diaria y Badge de Tendencia
+
+
+
+
 
 
 
@@ -12783,7 +25494,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const avgEl = document.getElementById("zoneAvgDailyTraffic");
+
+
+
+
 
 
 
@@ -12791,7 +25510,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const trendBadgeEl = document.getElementById("zoneTrafficTrendBadge");
+
+
+
+
 
 
 
@@ -12799,7 +25526,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       trendBadgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-[#0284C7] border border-sky-200 inline-flex items-center gap-1.5";
+
+
+
+
 
 
 
@@ -12807,7 +25542,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -12815,7 +25558,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (this.chartZoneSevenDaysTraffic) {
+
+
+
+
 
 
 
@@ -12823,11 +25574,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.chartZoneSevenDaysTraffic.data.datasets = [
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -12835,7 +25598,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: forecastDays.map(d => d.dailyCars),
+
+
+
+
 
 
 
@@ -12843,7 +25614,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           borderWidth: 2.5,
+
+
+
+
 
 
 
@@ -12851,7 +25630,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           fill: true,
+
+
+
+
 
 
 
@@ -12859,7 +25646,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointRadius: 5,
+
+
+
+
 
 
 
@@ -12867,7 +25662,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointBorderColor: '#ffffff',
+
+
+
+
 
 
 
@@ -12875,11 +25678,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
 
 
 
+
+
+
+
       ];
+
+
+
+
 
 
 
@@ -12887,7 +25702,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -12895,7 +25718,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.renderZoneSevenDaysCards();
+
+
+
+
 
 
 
@@ -12903,7 +25734,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const activeIdx = Math.min(this.selectedIntradayDayIdx || 0, 6);
+
+
+
+
 
 
 
@@ -12911,7 +25750,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -12919,7 +25766,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const container = document.getElementById("zoneSevenDaysCardsContainer");
+
+
+
+
 
 
 
@@ -12927,7 +25782,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     container.innerHTML = this.currentZoneForecastDays.map((d, idx) => {
+
+
+
+
 
 
 
@@ -12935,7 +25798,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       return `
+
+
+
+
 
 
 
@@ -12943,7 +25814,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           isSelected 
+
+
+
+
 
 
 
@@ -12951,7 +25830,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             : 'bg-[#F8FAFB] border-[#DFEAF0] hover:bg-white hover:border-[#0284C7] shadow-2xs'
+
+
+
+
 
 
 
@@ -12959,7 +25846,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
+
+
+
+
 
 
 
@@ -12967,7 +25862,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${
+
+
+
+
 
 
 
@@ -12975,7 +25878,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }">
+
+
+
+
 
 
 
@@ -12983,11 +25894,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </span>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -12995,7 +25918,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <div class="flex items-center justify-between text-[11px] text-slate-500">
+
+
+
+
 
 
 
@@ -13003,7 +25934,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <span class="font-mono text-[10px] ${d.weather.rainMm > 0 ? 'text-[#0284C7] font-bold' : ''}">
+
+
+
+
 
 
 
@@ -13011,11 +25950,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               </span>
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -13023,7 +25974,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <span class="text-[9px] uppercase text-slate-400 block font-bold">Coches previstos:</span>
+
+
+
+
 
 
 
@@ -13031,11 +25990,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 ${d.dailyCars.toLocaleString("es-ES")}
 
 
 
+
+
+
+
               </span>
+
+
+
+
 
 
 
@@ -13043,7 +26014,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -13051,7 +26030,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -13059,11 +26046,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }).join("");
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -13071,7 +26070,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.selectedIntradayDayIdx = idx;
+
+
+
+
 
 
 
@@ -13079,7 +26086,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (!d) return;
+
+
+
+
 
 
 
@@ -13087,7 +26102,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const labelEl = document.getElementById("intradaySelectedDayLabel");
+
+
+
+
 
 
 
@@ -13095,7 +26118,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const peakEl = document.getElementById("intradayPeakHour");
+
+
+
+
 
 
 
@@ -13103,7 +26134,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (labelEl) labelEl.innerText = `${d.dayFullName} · ${d.date}`;
+
+
+
+
 
 
 
@@ -13111,7 +26150,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (peakEl) peakEl.innerText = d.peakHourStr;
+
+
+
+
 
 
 
@@ -13119,7 +26166,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // Actualizar gráfico de 24 horas intradiario
+
+
+
+
 
 
 
@@ -13127,7 +26182,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const maxVal = Math.max(...d.hourlyCars);
+
+
+
+
 
 
 
@@ -13135,7 +26198,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.chartIntradayTraffic.data.labels = HOURS_24_LABELS;
+
+
+
+
 
 
 
@@ -13143,7 +26214,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -13151,11 +26230,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: d.hourlyCars,
 
 
 
+
+
+
+
           borderColor: '#164250',
+
+
+
+
 
 
 
@@ -13163,7 +26254,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           backgroundColor: 'rgba(22, 66, 80, 0.08)',
+
+
+
+
 
 
 
@@ -13171,7 +26270,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           tension: 0.35,
+
+
+
+
 
 
 
@@ -13179,7 +26286,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointBackgroundColor: d.hourlyCars.map(v => v === maxVal ? '#EF4444' : (v === minVal ? '#0284C7' : '#164250')),
+
+
+
+
 
 
 
@@ -13187,7 +26302,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointBorderWidth: 2
+
+
+
+
 
 
 
@@ -13195,7 +26318,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       ];
+
+
+
+
 
 
 
@@ -13203,7 +26334,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -13211,7 +26350,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.renderZoneSevenDaysCards();
+
+
+
+
 
 
 
@@ -13219,7 +26366,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -13227,7 +26382,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -13235,7 +26398,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const count = this.parkings.length;
+
+
+
+
 
 
 
@@ -13243,7 +26414,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const totalCruising = this.parkings.reduce((sum, p) => sum + p.cruising, 0);
+
+
+
+
 
 
 
@@ -13251,7 +26430,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const totalCapacity = this.parkings.reduce((sum, p) => sum + p.capacity, 0);
+
+
+
+
 
 
 
@@ -13259,7 +26446,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const kpiCruisingEl = document.getElementById("kpiTotalCruising");
+
+
+
+
 
 
 
@@ -13267,7 +26462,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const kpiCapEl = document.getElementById("kpiTotalCapacity");
+
+
+
+
 
 
 
@@ -13275,7 +26478,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (kpiCruisingEl) kpiCruisingEl.innerText = totalCruising.toLocaleString("es-ES");
+
+
+
+
 
 
 
@@ -13283,7 +26494,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (kpiCapEl) kpiCapEl.innerText = totalCapacity.toLocaleString("es-ES");
+
+
+
+
 
 
 
@@ -13291,7 +26510,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const kpiCapSubEl = document.getElementById("kpiCapSubtitle");
+
+
+
+
 
 
 
@@ -13299,11 +26526,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       kpiCapSubEl.innerText = totalCapacity === 0 ? "No informada en el archivo cargado" : "Capacidad nominal auditada";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -13311,7 +26550,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (kpiLatentSubEl) {
+
+
+
+
 
 
 
@@ -13319,7 +26566,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -13327,7 +26582,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (kpiCruisingSubEl) {
+
+
+
+
 
 
 
@@ -13335,7 +26598,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -13343,7 +26614,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elSubtitleCount = document.getElementById("portfolioCountSubtitle");
+
+
+
+
 
 
 
@@ -13351,7 +26630,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const elChartTitleCount = document.getElementById("chartPortfolioCountTitle");
+
+
+
+
 
 
 
@@ -13359,7 +26646,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elSubtitleCount) elSubtitleCount.innerText = `${count} Activo${count === 1 ? '' : 's'} Cargado${count === 1 ? '' : 's'} en Barcelona`;
+
+
+
+
 
 
 
@@ -13367,7 +26662,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const totalSensors = this.parkings.reduce((sum, p) => sum + (p.trafficPoints?.length || 2), 0);
+
+
+
+
 
 
 
@@ -13375,11 +26678,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (elChartFooterCount) elChartFooterCount.innerText = `Suma consolidada de ${totalSensors} sensores de aforo en los ${count} aparcamientos cargados en Barcelona (12 meses móviles)`;
 
 
 
+
+
+
+
     // -------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -13387,7 +26702,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     // -------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -13395,7 +26718,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const yPrev2 = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prev2Year : 2024;
+
+
+
+
 
 
 
@@ -13403,11 +26734,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const yEst = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
 
 
 
-    const isEstProj = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.isEstYearProjected : true;
+
+
+
+
+    const isEstProj = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? (ACTIVE_DATA_YEARS.isEstYearProjected !== false && !ACTIVE_DATA_YEARS.isEstYearReal) : true;
+
+
+
+
 
 
 
@@ -13415,7 +26758,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const peakBadgeEl = document.getElementById("globalPeakBadge");
+
+
+
+
 
 
 
@@ -13423,7 +26774,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (count === 0) {
+
+
+
+
 
 
 
@@ -13431,11 +26790,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (yoyBadgeEl) yoyBadgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> Esperando carga de archivo`;
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -13443,7 +26814,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const maxIdx = monthlyCurTotal.indexOf(maxVal);
+
+
+
+
 
 
 
@@ -13451,11 +26830,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         peakBadgeEl.innerText = `${MONTHS_LABELS[maxIdx]} (${maxVal.toLocaleString("es-ES")} veh/mes)`;
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -13463,7 +26854,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const totalPrev = monthlyPrevTotal.reduce((a, b) => a + b, 0);
+
+
+
+
 
 
 
@@ -13471,7 +26870,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (yoyBadgeEl) {
+
+
+
+
 
 
 
@@ -13479,11 +26886,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -13491,7 +26910,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const ctxGlobalDL = document.getElementById('chartGlobalMonthlyDL')?.getContext('2d');
+
+
+
+
 
 
 
@@ -13499,7 +26926,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.chartGlobalMonthlyDL = new Chart(ctxGlobalDL, {
+
+
+
+
 
 
 
@@ -13507,7 +26942,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: {
+
+
+
+
 
 
 
@@ -13515,7 +26958,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             datasets: []
+
+
+
+
 
 
 
@@ -13523,7 +26974,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           options: {
+
+
+
+
 
 
 
@@ -13531,7 +26990,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             maintainAspectRatio: false,
+
+
+
+
 
 
 
@@ -13539,7 +27006,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             plugins: {
+
+
+
+
 
 
 
@@ -13547,7 +27022,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 position: 'top',
+
+
+
+
 
 
 
@@ -13555,7 +27038,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               },
+
+
+
+
 
 
 
@@ -13563,7 +27054,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 backgroundColor: '#0D2730',
+
+
+
+
 
 
 
@@ -13571,7 +27070,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 padding: 10,
+
+
+
+
 
 
 
@@ -13579,7 +27086,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh/mes`
+
+
+
+
 
 
 
@@ -13587,7 +27102,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -13595,7 +27118,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             scales: {
+
+
+
+
 
 
 
@@ -13603,7 +27134,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               y: {
+
+
+
+
 
 
 
@@ -13611,7 +27150,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 ticks: {
+
+
+
+
 
 
 
@@ -13619,7 +27166,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   color: '#94A3B8',
+
+
+
+
 
 
 
@@ -13627,7 +27182,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 }
+
+
+
+
 
 
 
@@ -13635,11 +27198,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -13647,11 +27222,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -13659,11 +27246,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.chartGlobalMonthlyDL.data.datasets = [
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -13671,7 +27270,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: monthlyPrev2Total,
+
+
+
+
 
 
 
@@ -13679,7 +27286,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           borderWidth: 1.8,
+
+
+
+
 
 
 
@@ -13687,11 +27302,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           backgroundColor: 'transparent',
 
 
 
+
+
+
+
           tension: 0.35,
+
+
+
+
 
 
 
@@ -13699,7 +27326,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointBackgroundColor: '#94A3B8'
+
+
+
+
 
 
 
@@ -13707,7 +27342,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -13715,7 +27358,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: monthlyPrevTotal,
+
+
+
+
 
 
 
@@ -13723,7 +27374,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           borderWidth: 2.2,
+
+
+
+
 
 
 
@@ -13731,7 +27390,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           tension: 0.35,
+
+
+
+
 
 
 
@@ -13739,7 +27406,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointBackgroundColor: '#10B981'
+
+
+
+
 
 
 
@@ -13747,7 +27422,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         {
+
+
+
+
 
 
 
@@ -13755,7 +27438,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           data: monthlyCurTotal,
+
+
+
+
 
 
 
@@ -13763,7 +27454,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           borderWidth: 2.8,
+
+
+
+
 
 
 
@@ -13771,7 +27470,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           fill: true,
+
+
+
+
 
 
 
@@ -13779,7 +27486,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           pointRadius: 3.5,
+
+
+
+
 
 
 
@@ -13787,7 +27502,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -13795,11 +27518,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.chartGlobalMonthlyDL.update();
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -13807,7 +27542,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const diffGridEl = document.getElementById("globalMonthlyDiffGrid");
+
+
+
+
 
 
 
@@ -13815,7 +27558,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (count === 0) {
+
+
+
+
 
 
 
@@ -13823,7 +27574,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="col-span-full p-2.5 rounded-xl bg-white border border-[#DFEAF0] text-slate-400 text-center text-xs">
+
+
+
+
 
 
 
@@ -13831,7 +27590,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -13839,7 +27606,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -13847,7 +27622,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const v24 = monthlyPrev2Total[mIdx] || 0;
+
+
+
+
 
 
 
@@ -13855,7 +27638,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const v26 = monthlyCurTotal[mIdx] || 0;
+
+
+
+
 
 
 
@@ -13863,7 +27654,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const pct = v25 > 0 ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
+
+
+
+
 
 
 
@@ -13871,7 +27670,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           const sign = isUp ? "+" : "";
+
+
+
+
 
 
 
@@ -13879,7 +27686,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all">
+
+
+
+
 
 
 
@@ -13887,7 +27702,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               
+
+
+
+
 
 
 
@@ -13895,7 +27718,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="flex justify-between"><span>${yPrev2}:</span><strong class="text-slate-600">${v24.toLocaleString("es-ES")}</strong></div>
+
+
+
+
 
 
 
@@ -13903,11 +27734,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <div class="flex justify-between"><span>${yEst}:</span><strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong></div>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -13915,7 +27758,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+
+
+
+
 
 
 
@@ -13923,7 +27774,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 ${isUp ? '▲' : '▼'} ${sign}${pct}%
+
+
+
+
 
 
 
@@ -13931,7 +27790,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -13939,7 +27806,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }).join("");
+
+
+
+
 
 
 
@@ -13947,11 +27822,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -13959,7 +27846,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+
+
+
 
 
 
@@ -13967,7 +27862,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const days = DAYS_IN_MONTH[mIdx] || 30;
+
+
+
+
 
 
 
@@ -13975,7 +27878,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const pTrafficSum = (p.trafficPoints || []).reduce((tpSum, tp) => {
+
+
+
+
 
 
 
@@ -13983,7 +27894,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return tpSum + Math.round(imdVal * days);
+
+
+
+
 
 
 
@@ -13991,7 +27910,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         return sum + pTrafficSum;
+
+
+
+
 
 
 
@@ -13999,7 +27926,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -14007,7 +27942,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const days = DAYS_IN_MONTH[mIdx] || 30;
+
+
+
+
 
 
 
@@ -14015,7 +27958,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const pTrafficSum = (p.trafficPoints || []).reduce((tpSum, tp) => {
+
+
+
+
 
 
 
@@ -14023,7 +27974,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return tpSum + Math.round(imdVal * days);
+
+
+
+
 
 
 
@@ -14031,7 +27990,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         return sum + pTrafficSum;
+
+
+
+
 
 
 
@@ -14039,7 +28006,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -14047,7 +28022,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const days = DAYS_IN_MONTH[mIdx] || 30;
+
+
+
+
 
 
 
@@ -14055,7 +28038,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const pTrafficSum = (p.trafficPoints || []).reduce((tpSum, tp) => {
+
+
+
+
 
 
 
@@ -14063,7 +28054,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return tpSum + Math.round(imdVal * days);
+
+
+
+
 
 
 
@@ -14071,7 +28070,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         return sum + pTrafficSum;
+
+
+
+
 
 
 
@@ -14079,7 +28086,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -14087,7 +28102,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14095,7 +28118,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const filtered = this.parkings.filter(p => {
+
+
+
+
 
 
 
@@ -14103,7 +28134,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const matchSearch = !this.searchQuery || 
+
+
+
+
 
 
 
@@ -14111,7 +28150,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         p.district.toLowerCase().includes(this.searchQuery) ||
+
+
+
+
 
 
 
@@ -14119,7 +28166,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         String(p.obraActual || "").toLowerCase().includes(this.searchQuery) ||
+
+
+
+
 
 
 
@@ -14127,7 +28182,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       return matchDistrict && matchSearch;
+
+
+
+
 
 
 
@@ -14135,7 +28198,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const sortKey = this.rankingSortBy || 'growth_pct';
+
+
+
+
 
 
 
@@ -14143,7 +28214,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       switch (sortKey) {
+
+
+
+
 
 
 
@@ -14151,7 +28230,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return (b.trafficYoyGrowthPct ?? 0) - (a.trafficYoyGrowthPct ?? 0);
+
+
+
+
 
 
 
@@ -14159,7 +28246,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return (b.trafficYoyGrowthUnits ?? 0) - (a.trafficYoyGrowthUnits ?? 0);
+
+
+
+
 
 
 
@@ -14167,7 +28262,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return (b.zoneInflow ?? b.totalAnnualTrafficCurrentYear ?? 0) - (a.zoneInflow ?? a.totalAnnualTrafficCurrentYear ?? 0);
+
+
+
+
 
 
 
@@ -14175,7 +28278,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return (b.zoneOutflow ?? 0) - (a.zoneOutflow ?? 0);
+
+
+
+
 
 
 
@@ -14183,7 +28294,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return (b.zoneNetDiff ?? 0) - (a.zoneNetDiff ?? 0);
+
+
+
+
 
 
 
@@ -14191,7 +28310,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           return (b.trafficYoyGrowthPct ?? 0) - (a.trafficYoyGrowthPct ?? 0);
+
+
+
+
 
 
 
@@ -14199,11 +28326,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14211,7 +28350,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.rankingSortBy = sortBy;
+
+
+
+
 
 
 
@@ -14219,7 +28366,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (btn.getAttribute('data-sort') === sortBy) {
+
+
+
+
 
 
 
@@ -14227,7 +28382,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -14235,7 +28398,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -14243,11 +28414,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.renderTable();
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14255,7 +28438,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.currentDistrict = dist;
+
+
+
+
 
 
 
@@ -14263,7 +28454,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       if (btn.getAttribute('data-district') === dist) {
+
+
+
+
 
 
 
@@ -14271,7 +28470,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -14279,7 +28486,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -14287,7 +28502,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.renderTable();
+
+
+
+
 
 
 
@@ -14295,7 +28518,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14303,7 +28534,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.searchQuery = query.toLowerCase().trim();
+
+
+
+
 
 
 
@@ -14311,11 +28550,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.renderGlobalMapMarkers();
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14323,7 +28574,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const list = this.getFilteredData();
+
+
+
+
 
 
 
@@ -14331,7 +28590,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (!container) return;
+
+
+
+
 
 
 
@@ -14339,7 +28606,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       container.innerHTML = `
+
+
+
+
 
 
 
@@ -14347,7 +28622,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <div class="w-11 h-11 rounded-2xl bg-[#E6EFF3] text-[#164250] flex items-center justify-center mx-auto font-extrabold text-xs">
+
+
+
+
 
 
 
@@ -14355,7 +28638,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -14363,7 +28654,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           <p class="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+
+
+
+
 
 
 
@@ -14371,7 +28670,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </p>
+
+
+
+
 
 
 
@@ -14379,7 +28686,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <span>Cargar Excel / CSV / TXT</span>
+
+
+
+
 
 
 
@@ -14387,7 +28702,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -14395,11 +28718,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       return;
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -14407,7 +28742,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       container.innerHTML = `
+
+
+
+
 
 
 
@@ -14415,7 +28758,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           No se encontraron activos para los filtros seleccionados.
+
+
+
+
 
 
 
@@ -14423,7 +28774,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       `;
+
+
+
+
 
 
 
@@ -14431,7 +28790,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -14439,7 +28806,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     container.innerHTML = list.map((p, idx) => {
+
+
+
+
 
 
 
@@ -14447,7 +28822,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const isSelected = p.id === this.selectedAssetId;
+
+
+
+
 
 
 
@@ -14455,7 +28838,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const arrow = isGrowth ? '▲' : '▼';
+
+
+
+
 
 
 
@@ -14463,7 +28854,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const growthColor = isGrowth ? 'text-emerald-700' : 'text-rose-600';
+
+
+
+
 
 
 
@@ -14471,7 +28870,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const yoyUnits = p.trafficYoyGrowthUnits || 0;
+
+
+
+
 
 
 
@@ -14479,7 +28886,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const inflowDaily = (p.zoneInflowDaily || Math.round((p.zoneInflow || p.totalAnnualTrafficCurrentYear || 0) / 365));
+
+
+
+
 
 
 
@@ -14487,7 +28902,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const netDiffDaily = (p.zoneNetDiffDaily || Math.round((p.zoneNetDiff || 0) / 365));
+
+
+
+
 
 
 
@@ -14495,7 +28918,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       // Métrica destacada a la derecha según la ordenación elegida por el usuario
+
+
+
+
 
 
 
@@ -14503,7 +28934,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       let metricLabel = '';
+
+
+
+
 
 
 
@@ -14511,7 +28950,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         metricValueHtml = `<span class="font-mono-num font-extrabold text-sm ${growthColor}">${arrow} ${growthSign}${p.trafficYoyGrowthPct}%</span>`;
+
+
+
+
 
 
 
@@ -14519,7 +28966,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else if (sortKey === 'growth_units') {
+
+
+
+
 
 
 
@@ -14527,7 +28982,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         metricLabel = `${arrow} ${growthSign}${p.trafficYoyGrowthPct}% var.`;
+
+
+
+
 
 
 
@@ -14535,7 +28998,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         metricValueHtml = `<span class="font-mono-num font-extrabold text-sm text-[#164250]">${inflowDaily.toLocaleString('es-ES')}</span>`;
+
+
+
+
 
 
 
@@ -14543,7 +29014,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       } else if (sortKey === 'outflow') {
+
+
+
+
 
 
 
@@ -14551,7 +29030,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         metricLabel = `veh/día salen`;
+
+
+
+
 
 
 
@@ -14559,7 +29046,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         metricValueHtml = `<span class="font-mono-num font-extrabold text-sm text-[#0284C7]">${netDiffSign}${netDiffDaily.toLocaleString('es-ES')}</span>`;
+
+
+
+
 
 
 
@@ -14567,7 +29062,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -14575,7 +29078,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         <div onclick="app.selectParking(${p.id})" class="p-3.5 rounded-2xl hover:bg-[#F8FAFB] transition-all cursor-pointer flex items-center justify-between group border border-transparent hover:border-[#DFEAF0] ${isSelected ? 'bg-[#E6EFF3]/60 border-[#C8DFE8]' : ''}">
+
+
+
+
 
 
 
@@ -14583,7 +29094,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <span class="w-6 text-center font-mono-num font-bold text-xs shrink-0 ${rank <= 3 ? 'text-[#164250] font-extrabold' : 'text-slate-400'}">
+
+
+
+
 
 
 
@@ -14591,7 +29110,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </span>
+
+
+
+
 
 
 
@@ -14599,7 +29126,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <div class="font-bold text-xs text-[#1A4B5B] group-hover:text-[#164250] flex items-center gap-1.5 truncate">
+
+
+
+
 
 
 
@@ -14607,11 +29142,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <span class="truncate font-semibold">${p.name}</span>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -14619,7 +29166,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-medium">${p.district}</span>
+
+
+
+
 
 
 
@@ -14627,7 +29182,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                 <span>•</span>
+
+
+
+
 
 
 
@@ -14635,7 +29198,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   ${arrow} ${growthSign}${p.trafficYoyGrowthPct}% movimiento
+
+
+
+
 
 
 
@@ -14643,7 +29214,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -14651,7 +29230,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <div class="flex items-center gap-1.5 mt-1.5 text-[10px] font-mono">
+
+
+
+
 
 
 
@@ -14659,11 +29246,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   Entran: <strong class="text-slate-800">${inflowDaily.toLocaleString('es-ES')}</strong>/d
 
 
 
+
+
+
+
                 </span>
+
+
+
+
 
 
 
@@ -14671,11 +29270,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   Salen: <strong class="text-slate-800">${outflowDaily.toLocaleString('es-ES')}</strong>/d
 
 
 
+
+
+
+
                 </span>
+
+
+
+
 
 
 
@@ -14683,7 +29294,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
                   Dif: <strong>${netDiffSign}${netDiffDaily.toLocaleString('es-ES')}</strong>/d
+
+
+
+
 
 
 
@@ -14691,7 +29310,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -14699,7 +29326,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -14707,7 +29342,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <div class="text-right">
+
+
+
+
 
 
 
@@ -14715,7 +29358,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               <span class="text-[10px] text-slate-400 block">${metricLabel}</span>
+
+
+
+
 
 
 
@@ -14723,7 +29374,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             <button class="px-2.5 py-1 rounded-lg bg-[#E6EFF3] group-hover:bg-[#164250] text-[#164250] group-hover:text-white font-bold text-[10px] transition-colors">
+
+
+
+
 
 
 
@@ -14731,7 +29390,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             </button>
+
+
+
+
 
 
 
@@ -14739,7 +29406,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -14747,7 +29422,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }).join("");
+
+
+
+
 
 
 
@@ -14755,7 +29438,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -14763,7 +29454,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   // ===========================================================================
+
+
+
+
 
 
 
@@ -14771,11 +29470,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     document.getElementById(id)?.classList.remove("hidden");
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14783,11 +29494,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     document.getElementById(id)?.classList.add("hidden");
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14795,7 +29518,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const file = event.target.files?.[0];
+
+
+
+
 
 
 
@@ -14803,7 +29534,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -14811,7 +29550,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -14819,7 +29566,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
+
+
+
+
 
 
 
@@ -14827,7 +29582,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       event.target.value = "";
+
+
+
+
 
 
 
@@ -14835,7 +29598,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14843,7 +29614,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     event.preventDefault();
+
+
+
+
 
 
 
@@ -14851,7 +29630,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const file = event.dataTransfer?.files?.[0];
+
+
+
+
 
 
 
@@ -14859,7 +29646,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     try {
+
+
+
+
 
 
 
@@ -14867,7 +29662,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     } catch (err) {
+
+
+
+
 
 
 
@@ -14875,7 +29678,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       alert(`Error al procesar el archivo arrastrado: ${err.message || err}`);
+
+
+
+
 
 
 
@@ -14883,7 +29694,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -14891,7 +29710,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     return new Promise((resolve, reject) => {
+
+
+
+
 
 
 
@@ -14899,7 +29726,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const isExcelExt = fileName.endsWith(".xlsx") || fileName.endsWith(".xls");
+
+
+
+
 
 
 
@@ -14907,7 +29742,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       reader.onload = async (e) => {
+
+
+
+
 
 
 
@@ -14915,7 +29758,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const bytes = new Uint8Array(buffer);
+
+
+
+
 
 
 
@@ -14923,7 +29774,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         const isZipSignature = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04;
+
+
+
+
 
 
 
@@ -14931,7 +29790,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         try {
+
+
+
+
 
 
 
@@ -14939,7 +29806,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           if (isExcelExt || isZipSignature || isOleSignature) {
+
+
+
+
 
 
 
@@ -14947,7 +29822,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               const workbook = XLSX.read(bytes, { type: "array" });
+
+
+
+
 
 
 
@@ -14955,7 +29838,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
               const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "", raw: false });
+
+
+
+
 
 
 
@@ -14963,7 +29854,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             } else {
+
+
+
+
 
 
 
@@ -14971,7 +29870,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -14979,7 +29886,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             // Decodificar como texto UTF-8 (o Windows-1252 si proviene de Excel en español con acentos ANSI)
+
+
+
+
 
 
 
@@ -14987,7 +29902,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             if (text.includes("\uFFFD")) {
+
+
+
+
 
 
 
@@ -14995,7 +29918,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
             }
+
+
+
+
 
 
 
@@ -15003,7 +29934,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -15011,7 +29950,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           this.applyLoadedParkings(merged);
+
+
+
+
 
 
 
@@ -15019,7 +29966,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           resolve(merged);
+
+
+
+
 
 
 
@@ -15027,7 +29982,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
           alert(`Error al procesar el archivo (${file.name}): ${err.message || err}`);
+
+
+
+
 
 
 
@@ -15035,11 +29998,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         }
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -15047,7 +30022,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         alert(`Error al leer el archivo en disco: ${err}`);
+
+
+
+
 
 
 
@@ -15055,7 +30038,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       };
+
+
+
+
 
 
 
@@ -15063,11 +30054,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -15075,7 +30078,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const text = document.getElementById("pasteTextInput").value;
+
+
+
+
 
 
 
@@ -15083,7 +30094,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.processUploadedText(text);
+
+
+
+
 
 
 
@@ -15091,7 +30110,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -15099,7 +30126,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     const rawParkings = DemandEngine.parseInputText(content);
+
+
+
+
 
 
 
@@ -15107,11 +30142,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     this.applyLoadedParkings(merged);
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -15119,7 +30166,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     if (newParkings && newParkings.length > 0) {
+
+
+
+
 
 
 
@@ -15127,7 +30182,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.selectedAssetId = this.parkings[0].id;
+
+
+
+
 
 
 
@@ -15135,7 +30198,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.recalcAllParkings();
+
+
+
+
 
 
 
@@ -15143,7 +30214,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.renderTable();
+
+
+
+
 
 
 
@@ -15151,7 +30230,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       this.updateGlobalKPIs();
+
+
+
+
 
 
 
@@ -15159,7 +30246,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       // Conectar automáticamente con las APIs oficiales en vivo (Open Data BCN Aforos, Censo Comercial POIs y Open-Meteo DEM)
+
+
+
+
 
 
 
@@ -15167,7 +30262,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const totalCap = this.parkings.reduce((sum, p) => sum + (p.capacity || 0), 0);
+
+
+
+
 
 
 
@@ -15175,7 +30278,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
       const totalPois = this.parkings.reduce((sum, p) => sum + (p.pois || 0), 0);
+
+
+
+
 
 
 
@@ -15183,7 +30294,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     } else {
+
+
+
+
 
 
 
@@ -15191,11 +30310,23 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -15203,7 +30334,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     window.addEventListener("keydown", (e) => {
+
+
+
+
 
 
 
@@ -15211,7 +30350,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.closeModal("uploadModal");
+
+
+
+
 
 
 
@@ -15219,7 +30366,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.navigateParking(-1);
+
+
+
+
 
 
 
@@ -15227,7 +30382,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
         this.navigateParking(1);
+
+
+
+
 
 
 
@@ -15235,7 +30398,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
     });
+
+
+
+
 
 
 
@@ -15243,7 +30414,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 
@@ -15251,7 +30430,15 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+
+
+
+
 window.app = new NNApp();
+
+
+
+
 
 
 
@@ -15259,7 +30446,15 @@ if (document.readyState === "loading") {
 
 
 
+
+
+
+
   document.addEventListener("DOMContentLoaded", () => {
+
+
+
+
 
 
 
@@ -15267,7 +30462,15 @@ if (document.readyState === "loading") {
 
 
 
+
+
+
+
   });
+
+
+
+
 
 
 
@@ -15275,11 +30478,23 @@ if (document.readyState === "loading") {
 
 
 
+
+
+
+
   window.app.init();
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 
