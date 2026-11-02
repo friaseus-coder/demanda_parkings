@@ -3892,10 +3892,7 @@ class NNApp {
 
 
   mergeWithKnownPortfolio(incomingList) {
-
-
-
-    // Regla estricta Real-Data-Only: NO se cruza con ningún catálogo inferido.
+// Regla estricta Real-Data-Only: NO se cruza con ningún catálogo inferido.
 
 
 
@@ -3903,7 +3900,7 @@ class NNApp {
 
 
 
-    return (incomingList || []).map((item, idx) => {
+    const result = (incomingList || []).map((item, idx) => {
 
 
 
@@ -4011,6 +4008,34 @@ class NNApp {
 
 
 
+  return this.sortParkingsByCode(result);
+  }
+
+  sortParkingsByCode(parkingsList) {
+    if (!Array.isArray(parkingsList)) return parkingsList;
+    const getCode = (p) => {
+      if (!p) return 999999;
+      const rawCode = String(p.obraActual !== undefined && p.obraActual !== null ? p.obraActual : (p.obraAnterior || "")).trim();
+      const mCode = rawCode.match(/\d+/);
+      if (mCode) return parseInt(mCode[0], 10);
+
+      const rawName = String(p.name || "").trim();
+      const mName = rawName.match(/^\D*(\d+)/);
+      if (mName) return parseInt(mName[1], 10);
+
+      if (typeof p.id === "number" && !isNaN(p.id)) return p.id;
+      const mId = String(p.id || "").match(/\d+/);
+      if (mId) return parseInt(mId[0], 10);
+
+      return 999999;
+    };
+
+    return parkingsList.sort((a, b) => {
+      const codeA = getCode(a);
+      const codeB = getCode(b);
+      if (codeA !== codeB) return codeA - codeB;
+      return String(a.name || "").localeCompare(String(b.name || ""), undefined, { numeric: true, sensitivity: 'base' });
+    });
   }
 
 
@@ -4443,11 +4468,8 @@ class NNApp {
 
 
 
-    // Mantener orden coherente por Demanda Latente
-
-
-
-    this.parkings.sort((a, b) => b.dl - a.dl);
+    // Mantener orden coherente de cartera por código de obra / primeros números de menor a mayor
+    this.sortParkingsByCode(this.parkings);
 
 
 
@@ -14972,6 +14994,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+      this.sortParkingsByCode(newParkings);
       this.parkings = newParkings;
 
 

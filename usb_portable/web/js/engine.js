@@ -592,6 +592,27 @@ const DemandEngine = {
         : rawItem);
     }
 
+    // Ordenar de menor a mayor por los primeros números / código de obra
+    parsed.sort((a, b) => {
+      const getNum = (p) => {
+        if (!p) return 999999;
+        const rawCode = String(p.obraActual !== undefined && p.obraActual !== null ? p.obraActual : (p.obraAnterior || "")).trim();
+        const mCode = rawCode.match(/\d+/);
+        if (mCode) return parseInt(mCode[0], 10);
+
+        const rawName = String(p.name || "").trim();
+        const mName = rawName.match(/^\D*(\d+)/);
+        if (mName) return parseInt(mName[1], 10);
+
+        if (typeof p.id === "number" && !isNaN(p.id)) return p.id;
+        const mId = String(p.id || "").match(/\d+/);
+        return mId ? parseInt(mId[0], 10) : 999999;
+      };
+      const diff = getNum(a) - getNum(b);
+      if (diff !== 0) return diff;
+      return String(a.name || "").localeCompare(String(b.name || ""), undefined, { numeric: true, sensitivity: 'base' });
+    });
+
     return parsed;
   }
 };
