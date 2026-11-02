@@ -2,7 +2,7 @@
     NN PARKINGS · GRUP NÚÑEZ I NAVARRO · BARCELONA
     SISTEMA DE INTELIGENCIA DE MOVILIDAD: INFORME DE DEMANDA LATENTE
 ======================================================================================================================
-Fecha de emisión:        02/11/2026 17:29:57
+Fecha de emisión:        02/11/2026 17:34:14
 Archivo analizado:       aparcamientos_analizar.txt
 Aparcamientos auditados: 29 (0 de Cartera Oficial NN, 29 estimaciones deterministas)
 ----------------------------------------------------------------------------------------------------------------------
@@ -17,11 +17,11 @@ RESUMEN EJECUTIVO DE CARTERA:
 ----------------------------------------------------------------------------------------------------------------------
 1   NN VALENCIA, 307 - 313         Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 2   NN VALENCIA,511 - PGE.VILARE   Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
-3   NN DIAGONAL, 593 - 595         Les Corts        0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
+3   NN DIAGONAL, 593 - 595         Sants-Montjuïc   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 4   NN HERCEGOVINA, 19 - 23        Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 5   NN CISTER, 2- 18 -24% IND      Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 6   NN BONANOVA, 59 - ESCOLES PI   Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
-7   PK. GRAN VIA, 641              Les Corts        0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
+7   PK. GRAN VIA, 641              Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 8   PK. ARAGO, 182                 Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 9   NN VIA AUGUSTA, 281 - 285 -    Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 10  PK.URGELL,234-CORCEGA,171      Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
@@ -34,15 +34,15 @@ RESUMEN EJECUTIVO DE CARTERA:
 17  PK.BORRELL, 26-28              Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 18  NN ZONA FRANCA, 137-139        Sants-Montjuïc   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 19  PK.MORAGAS, 15                 Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
-20  PK.M.SENTMENAT, 6              Les Corts        0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
-21  NN ESPRONCEDA, 254 - 274       Sant Martí       0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
+20  PK.M.SENTMENAT, 6              Sants-Montjuïc   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
+21  NN ESPRONCEDA, 254 - 274       Sant Martí / 2   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 22  NN CORSEGA, 344 -352 (H)       Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 23  NN VIA AUGUSTA,349-355 -AVIO   Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 24  NN SANT GERVASI, 51-53 - AV.   Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 25  NN ESTEVE TERRADAS, 23-31 (U   Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
-26  NN ROSSELLO, 1 - 13            Eixample         0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
+26  NN ROSSELLO, 1 - 13            Les Corts        0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 27  NN TRAV. DE GRACIA, 183 - 18   Gràcia           0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
-28  PK. TARRAGONA, 141-157         Les Corts        0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
+28  PK. TARRAGONA, 141-157         Sants-Montjuïc   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 29  PK. LLUIS PERICOT, 12 JOSEL,   Sarrià-Sant Ge   0        0 v/h    0 v        0 €/d            SIN_DATOS  [ESTIMADO]  
 ----------------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ======================================================================================================================
 
 [1] NN VALENCIA, 307 - 313 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: VALENCIA, 307 08009 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: VALENCIA, 307 08009 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -69,7 +69,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [2] NN VALENCIA,511 - PGE.VILARET,11-15 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -87,8 +87,8 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
     Yield Advice (SIN_DATOS): Sin telemetría de capacidad física (0 plazas en archivo cargado)
 ----------------------------------------------------------------------------------------
 
-[3] NN DIAGONAL, 593 - 595 (Les Corts) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 54 msnm | Pendiente: 1.4%
+[3] NN DIAGONAL, 593 - 595 (Sants-Montjuïc) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
+    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 26.0 msnm | Pendiente: 1.1%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -107,7 +107,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [4] NN HERCEGOVINA, 19 - 23 (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -126,7 +126,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [5] NN CISTER, 2- 18 -24% IND (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -145,7 +145,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [6] NN BONANOVA, 59 - ESCOLES PIES (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -163,8 +163,8 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
     Yield Advice (SIN_DATOS): Sin telemetría de capacidad física (0 plazas en archivo cargado)
 ----------------------------------------------------------------------------------------
 
-[7] PK. GRAN VIA, 641 (Les Corts) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: Gran Via de les Corts Catalanes 641, 08010, Barcelona | Cota: 54 msnm | Pendiente: 1.4%
+[7] PK. GRAN VIA, 641 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
+    Dirección: Gran Via de les Corts Catalanes 641, 08010, Barcelona | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -183,7 +183,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [8] PK. ARAGO, 182 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: C/ Aragó 182, 08011, Barcelona | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: C/ Aragó 182, 08011, Barcelona | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -202,7 +202,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [9] NN VIA AUGUSTA, 281 - 285 - DR. ROUX (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -221,7 +221,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [10] PK.URGELL,234-CORCEGA,171 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: COMTE URGELL 234, 08036 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: COMTE URGELL 234, 08036 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -240,7 +240,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [11] PK. ROCAFORT, 64-SEPULVEDA, 61 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: ROCAFORT, 64 08015 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: ROCAFORT, 64 08015 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -259,7 +259,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [12] PK.SANTALO, 14-16 (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: SANTALO 14, 08021 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: SANTALO 14, 08021 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -278,7 +278,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [13] PK.VALENCIA,375-377 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -297,7 +297,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [14] PK.BRUC, 103-113 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: VALENCIA, 307 08009 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: VALENCIA, 307 08009 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -316,7 +316,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [15] PK.VALENCIA, 243-245 (VALENCIA - 2) (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -335,7 +335,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [16] PK.URGELL, 154-156 (URGELL - 2) (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -354,7 +354,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [17] PK.BORRELL, 26-28 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: ROCAFORT, 64 08015 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: ROCAFORT, 64 08015 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -373,7 +373,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [18] NN ZONA FRANCA, 137-139 (Sants-Montjuïc) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: ZONA FRANCA, 137-139 08004 BARCELONA | Cota: 24 msnm | Pendiente: 0.9%
+    Dirección: ZONA FRANCA, 137-139 08004 BARCELONA | Cota: 26.0 msnm | Pendiente: 1.1%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -392,7 +392,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [19] PK.MORAGAS, 15 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: VALENCIA,511  08013 BARCELONA | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -410,8 +410,8 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
     Yield Advice (SIN_DATOS): Sin telemetría de capacidad física (0 plazas en archivo cargado)
 ----------------------------------------------------------------------------------------
 
-[20] PK.M.SENTMENAT, 6 (Les Corts) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 54 msnm | Pendiente: 1.4%
+[20] PK.M.SENTMENAT, 6 (Sants-Montjuïc) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
+    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 26.0 msnm | Pendiente: 1.1%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -429,8 +429,8 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
     Yield Advice (SIN_DATOS): Sin telemetría de capacidad física (0 plazas en archivo cargado)
 ----------------------------------------------------------------------------------------
 
-[21] NN ESPRONCEDA, 254 - 274 (Sant Martí) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: ESPRONCEDA, 254 - 274 08018 BARCELONA | Cota: 14 msnm | Pendiente: 0.5%
+[21] NN ESPRONCEDA, 254 - 274 (Sant Martí / 22@) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
+    Dirección: ESPRONCEDA, 254 - 274 08018 BARCELONA | Cota: 10.0 msnm | Pendiente: 0.5%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -449,7 +449,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [22] NN CORSEGA, 344 -352 (H) (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: Calle Córcega, 344, 08037 Barcelona | Cota: 38 msnm | Pendiente: 1.2%
+    Dirección: Calle Córcega, 344, 08037 Barcelona | Cota: 34.0 msnm | Pendiente: 1.3%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -468,7 +468,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [23] NN VIA AUGUSTA,349-355 -AVION PLUS- MONSERDA (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -487,7 +487,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [24] NN SANT GERVASI, 51-53 - AV.TIBIDABO (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: CISTER, 2 08022 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: CISTER, 2 08022 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -506,7 +506,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [25] NN ESTEVE TERRADAS, 23-31 (UA4) (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: HERCEGOVINA, 19 - 23 08006 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -524,8 +524,8 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
     Yield Advice (SIN_DATOS): Sin telemetría de capacidad física (0 plazas en archivo cargado)
 ----------------------------------------------------------------------------------------
 
-[26] NN ROSSELLO, 1 - 13 (Eixample) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: C/ Rosselló 13, 08029, Barcelona | Cota: 38 msnm | Pendiente: 1.2%
+[26] NN ROSSELLO, 1 - 13 (Les Corts) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
+    Dirección: C/ Rosselló 13, 08029, Barcelona | Cota: 48.0 msnm | Pendiente: 1.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -544,7 +544,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [27] NN TRAV. DE GRACIA, 183 - 185 (Gràcia) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: Travessera de Gràcia 183, 08012, Barcelona | Cota: 68 msnm | Pendiente: 2.1%
+    Dirección: Travessera de Gràcia 183, 08012, Barcelona | Cota: 72.0 msnm | Pendiente: 4.2%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -562,8 +562,8 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
     Yield Advice (SIN_DATOS): Sin telemetría de capacidad física (0 plazas en archivo cargado)
 ----------------------------------------------------------------------------------------
 
-[28] PK. TARRAGONA, 141-157 (Les Corts) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 54 msnm | Pendiente: 1.4%
+[28] PK. TARRAGONA, 141-157 (Sants-Montjuïc) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
+    Dirección: DIAGONAL, 593 - 595  08014 BARCELONA | Cota: 26.0 msnm | Pendiente: 1.1%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h
@@ -582,7 +582,7 @@ DESGLOSE EN CASCADA (WATERFALL) Y RECOMENDACIONES ESTRATÉGICAS:
 ----------------------------------------------------------------------------------------
 
 [29] PK. LLUIS PERICOT, 12 JOSEL, S.L. (Sarrià-Sant Gervasi) — Origen: ESTIMADO DETERMINISTA (Sin telemetría previa)
-    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 95 msnm | Pendiente: 2.8%
+    Dirección: BONANOVA, 59  08017 BARCELONA | Cota: 92.0 msnm | Pendiente: 5.8%
     Tarifa rotación: 0.00 €/h | Capacidad: 0 plazas
     Cascada de Flujo:
       1. Aforo Viario Bruto (Q_total):    0 veh/h

@@ -99,15 +99,11 @@ class NNApp {
       console.warn("[Persistencia] Error al leer nn_parkings_state desde localStorage:", e);
     }
 
-    // Si no hay datos en localStorage, cargar PARKINGS_PORTFOLIO predeterminado
-    if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO) && PARKINGS_PORTFOLIO.length > 0) {
-      const cloned = JSON.parse(JSON.stringify(PARKINGS_PORTFOLIO));
-      this.parkings = cloned.map((p, idx) => (typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(p, idx) : p));
-      if (this.parkings.length > 0 && !this.selectedAssetId) {
-        this.selectedAssetId = this.parkings[0].id;
-      }
-      console.log(`[Cartera Base] Cargados ${this.parkings.length} aparcamientos auditados desde PARKINGS_PORTFOLIO.`);
-    }
+    // La aplicación inicia sin aparcamientos pregrabados (cartera vacía).
+    // Todos los activos se cargan dinámicamente mediante archivos Excel (.xlsx/.xls), CSV o TXT.
+    this.parkings = [];
+    this.selectedAssetId = null;
+    console.log("[Cartera Base] Iniciando sin aparcamientos pregrabados (esperando carga por XLSX/CSV).");
   }
 
   savePersistedState() {
@@ -134,14 +130,8 @@ class NNApp {
         tariff: 3.75
       };
 
-      if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) {
-        const cloned = JSON.parse(JSON.stringify(PARKINGS_PORTFOLIO));
-        this.parkings = cloned.map((p, idx) => (typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(p, idx) : p));
-        this.selectedAssetId = this.parkings[0]?.id || null;
-      } else {
-        this.parkings = [];
-        this.selectedAssetId = null;
-      }
+      this.parkings = [];
+      this.selectedAssetId = null;
 
       this.currentDistrict = "all";
       this.recalcAllParkings();
@@ -159,7 +149,7 @@ class NNApp {
         this.chartGlobalMonthlyDL.update();
       }
 
-      alert("Cartera original restaurada con éxito (29 aparcamientos auditados). Se han limpiado las personalizaciones y restablecido los simuladores.");
+      alert("Cartera restablecida a 0 aparcamientos. Sube tu archivo Excel (.xlsx / .xls) o CSV con el botón 'Cargar Excel/CSV'.");
     } catch (err) {
       alert(`Error al restaurar los datos: ${err.message || err}`);
     }
@@ -2952,7 +2942,7 @@ class NNApp {
           <p class="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
             Carga tu archivo Excel (.xlsx / .xls), CSV o TXT con las columnas de obras (Obra Anterior, Obra Actual, Nombre de la Obra, X, Y, Dirección...) para iniciar el análisis.
           </p>
-          <button onclick="app.openModal('uploadModal')" class="px-4 py-2 rounded-xl bg-[#164250] hover:bg-[#0F323D] text-white font-semibold text-xs shadow-xs transition-all inline-flex items-center gap-2">
+          <button onclick="document.getElementById('directExcelFileInput') ? document.getElementById('directExcelFileInput').click() : app.openModal('uploadModal')" class="px-4 py-2 rounded-xl bg-[#004B57] hover:bg-[#0D2730] text-white font-semibold text-xs shadow-xs transition-all inline-flex items-center gap-2 cursor-pointer">
             <span>Cargar Excel / CSV / TXT</span>
           </button>
         </div>
