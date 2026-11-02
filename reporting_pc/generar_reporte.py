@@ -149,23 +149,17 @@ def match_parking_to_audited(
         merged["is_audited"] = True
         return merged
     else:
-        # Estimación determinista basada en semilla (hashing de nombre y código)
-        seed_str = f"{in_obra}_{parking_input.get('name', '')}_{parking_input.get('address', '')}"
-        seed = sum((i + 1) * ord(c) for i, c in enumerate(seed_str))
-
+        # Regla real-data-only: Si el aparcamiento no tiene capacidad o tarifa informada en el archivo, su valor es 0
         merged = dict(parking_input)
-        if not merged.get("capacity"):
-            merged["capacity"] = 180 + (seed % 220)
-        if not merged.get("tariff"):
-            merged["tariff"] = round(3.40 + ((seed % 75) * 0.01), 2)
+        merged["capacity"] = int(merged["capacity"]) if (merged.get("capacity") and int(merged["capacity"]) > 0) else 0
+        merged["tariff"] = round(float(merged["tariff"]), 2) if (merged.get("tariff") and float(merged["tariff"]) > 0) else 0.0
         if not merged.get("elevation"):
-            merged["elevation"] = 25 + (seed % 40)
+            merged["elevation"] = 25
         if not merged.get("slope"):
-            merged["slope"] = round(0.8 + ((seed % 20) * 0.1), 1)
-        if not merged.get("pois") and not merged.get("pois_count"):
-            merged["pois_count"] = 90 + (seed % 90)
+            merged["slope"] = 1.2
+        merged["pois_count"] = int(merged["pois_count"]) if (merged.get("pois_count") and int(merged["pois_count"]) > 0) else 0
 
-        merged["data_source"] = "ESTIMATED_SEEDED"
+        merged["data_source"] = "SIN_DATOS_CAPACIDAD" if merged["capacity"] == 0 else "DATOS_INFORMADOS"
         merged["is_audited"] = False
         return merged
 
@@ -270,15 +264,27 @@ def generate_text_report(results: List[Dict[str, Any]], source_file: str) -> str
         lines.append(f"      => DEMANDA LATENTE NETA (D_L):      {r['latent_demand_dl']} veh/h")
 
         # Puntos de paso, entrada y salida
-        tp = r.get("traffic_points", [{}])[0]
-        yoy = r.get("traffic_yoy_growth_pct", 0)
-        lines.append(f"    Puntos de Paso Exterior: {tp.get('name', 'Tramo principal')} | {tp.get('annual_cars_current', 0):,} veh/año (Año Anterior: {tp.get('annual_cars_prev', 0):,} veh, {'▲ Creció' if yoy >= 0 else '▼ Decreció'} {yoy}%)".replace(",", "."))
+        tps = r.get("traffic_points") or []
+        if tps:
+            tp = tps[0]
+            yoy = r.get("traffic_yoy_growth_pct", 0)
+            lines.append(f"    Puntos de Paso Exterior: {tp.get('name', 'Tramo principal')} | {tp.get('annual_cars_current', 0):,} veh/año (Año Anterior: {tp.get('annual_cars_prev', 0):,} veh, {'▲ Creció' if yoy >= 0 else '▼ Decreció'} {yoy}%)".replace(",", "."))
+        else:
+            lines.append("    Puntos de Paso Exterior: Sin telemetría de aforo exterior (0 veh/año)")
 
-        ep_strs = [f"{ep['name']}: {ep.get('start_1_year_ago', 0):,} v/m (hace 1 año) ➔ {ep.get('current_volume', 0):,} v/m (+{ep.get('growth_pct', 0)}%)".replace(",", ".") for ep in r.get("entry_points", [])]
-        lines.append(f"    Puntos de Entrada: {' | '.join(ep_strs)}")
+        eps = r.get("entry_points") or []
+        if eps:
+            ep_strs = [f"{ep['name']}: {ep.get('start_1_year_ago', 0):,} v/m (hace 1 año) ➔ {ep.get('current_volume', 0):,} v/m (+{ep.get('growth_pct', 0)}%)".replace(",", ".") for ep in eps]
+            lines.append(f"    Puntos de Entrada: {' | '.join(ep_strs)}")
+        else:
+            lines.append("    Puntos de Entrada: Sin telemetría de barrera en archivo")
 
-        xp_strs = [f"{xp['name']}: {xp.get('current_volume', 0):,} v/m ({xp.get('share_pct', 0)}% cuota)".replace(",", ".") for xp in r.get("exit_points", [])]
-        lines.append(f"    Puntos de Salida:  {' | '.join(xp_strs)}")
+        xps = r.get("exit_points") or []
+        if xps:
+            xp_strs = [f"{xp['name']}: {xp.get('current_volume', 0):,} v/m ({xp.get('share_pct', 0)}% cuota)".replace(",", ".") for xp in xps]
+            lines.append(f"    Puntos de Salida:  {' | '.join(xp_strs)}")
+        else:
+            lines.append("    Puntos de Salida:  Sin telemetría de barrera en archivo")
 
         lines.append(f"    Impacto Económico: {r['uncaptured_daily_revenue_eur']:,} €/día ({r['uncaptured_weekly_revenue_eur']:,} €/semana)".replace(",", "."))
         lines.append(f"    Yield Advice ({r['yield_priority']}): {r['yield_action']}")
@@ -445,8 +451,8 @@ def generate_html_report(results: List[Dict[str, Any]], source_file: str) -> str
               <span class="font-bold text-[#10B981] block uppercase text-[10px]">Puntos de Entrada ({len(r.get('entry_points', []))} accesos)</span>
               <div class="font-mono font-bold text-slate-800 text-sm">{sum(ep.get('current_volume', 0) for ep in r.get('entry_points', [])):,} v/mes</div>
               <div class="text-[11px] text-slate-500">Inicio hace 1 año: {sum(ep.get('start_1_year_ago', 0) for ep in r.get('entry_points', [])):,} v/m</div>
-              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
-                ▲ +{r.get('entry_points', [{}])[0].get('growth_pct', 12)}% evolución entradas
+              <span class="inline-block mt-1 px-2 py-0.2 rounded-full font-bold text-[10px] {'bg-emerald-100 text-emerald-800' if r.get('entry_points') else 'bg-slate-100 text-slate-500'}">
+                {('▲ +' + str((r.get('entry_points') or [{}])[0].get('growth_pct', 0)) + '% evolución') if r.get('entry_points') else 'Sin telemetría de barrera'}
               </span>
             </div>
 

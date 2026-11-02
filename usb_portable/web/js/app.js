@@ -189,15 +189,16 @@ class NNApp {
       const merged = { ...(existing || {}), ...item };
       const seed = hashStr(`${item.obraActual || item.id || idx}_${item.name || ''}`);
 
-      if (merged.occ_base === undefined) merged.occ_base = 78 + (seed % 16);
-      if (merged.search_index === undefined) merged.search_index = +(1.05 + ((seed % 25) * 0.01)).toFixed(2);
-      if (merged.elasticity === undefined) merged.elasticity = +(-0.40 - ((seed % 15) * 0.01)).toFixed(2);
-      if (merged.competition === undefined) merged.competition = +(1.0 + ((seed % 30) * 0.01)).toFixed(2);
-      if (merged.saturation === undefined) merged.saturation = 86 + (seed % 10);
-      if (merged.rotacion === undefined) merged.rotacion = +(2.8 + ((seed % 18) * 0.1)).toFixed(1);
-      if (!merged.pois) merged.pois = 95 + (seed % 110);
-      if (!merged.tariff) merged.tariff = +(3.30 + ((seed % 80) * 0.01)).toFixed(2);
-      if (!merged.capacity) merged.capacity = 160 + (seed % 280);
+      // Regla real-data-only: No inventar plazas ni tarifas. Si no vienen en el archivo, su valor es 0.
+      merged.occ_base = 0;
+      merged.search_index = 0.0;
+      merged.elasticity = 0.0;
+      merged.competition = 0.0;
+      merged.saturation = 0.0;
+      merged.rotacion = 0.0;
+      merged.pois = (merged.pois && merged.pois > 0) ? merged.pois : 0;
+      merged.tariff = (merged.tariff && merged.tariff > 0) ? +(parseFloat(merged.tariff).toFixed(2)) : 0.0;
+      merged.capacity = (merged.capacity && merged.capacity > 0) ? parseInt(merged.capacity, 10) : 0;
 
       return typeof enrichParkingWithPoints === 'function' ? enrichParkingWithPoints(merged, idx) : merged;
     });
@@ -947,7 +948,7 @@ class NNApp {
             </div>
             <div class="flex items-center justify-between text-[11px] pt-1 border-t border-purple-100/60">
               <span class="text-slate-600 font-mono-num text-[10px]">
-                ~${(s.avgDailyCars || 12000).toLocaleString('es-ES')} veh/día • ${s.lanes} carril(es)
+                ~${(s.avgDailyCars || 0).toLocaleString('es-ES')} veh/día • ${s.lanes} carril(es)
               </span>
               <button type="button" onclick="window.app.focusSensorOnMap(${s.lat}, ${s.lon})" class="text-purple-700 hover:text-purple-900 font-bold text-[11px] flex items-center gap-0.5 cursor-pointer">
                 <i data-lucide="map-pin" class="w-3 h-3"></i> Ver en mapa
@@ -976,7 +977,7 @@ class NNApp {
         lon: s.lon,
         lanes: s.lanes || 2,
         direction: s.direction || "Calzada Principal",
-        avgDailyCars: s.avgDailyCars || 12000,
+        avgDailyCars: s.avgDailyCars || 0,
         source: s.source || "Red Aforos Ajuntament de Barcelona",
         type: "municipal"
       });
@@ -994,7 +995,7 @@ class NNApp {
           lon: tp.lon,
           lanes: tp.lanes || 2,
           direction: tp.direction || "Calzada",
-          avgDailyCars: Math.round(tp.annualCarsCurrentYear / 365) || 11500,
+          avgDailyCars: Math.round((tp.annualCarsCurrentYear || 0) / 365),
           source: `Sensor activo en entorno de ${otherP.name.split(',')[0]}`,
           type: "portfolio"
         });
@@ -1196,7 +1197,7 @@ class NNApp {
                 </div>
                 <div class="flex justify-between text-slate-600">
                   <span>Aforo Estimado:</span>
-                  <span class="font-mono font-bold text-purple-700">${(s.avgDailyCars || 12000).toLocaleString('es-ES')} veh/día</span>
+                  <span class="font-mono font-bold text-purple-700">${(s.avgDailyCars || 0).toLocaleString('es-ES')} veh/día</span>
                 </div>
                 <div class="flex justify-between text-slate-600">
                   <span>Tecnología:</span>
@@ -1608,14 +1609,15 @@ class NNApp {
     if (!this.radarChart || !p) return;
     const calc = p.calc || DemandEngine.calculate(p, this.sliders);
 
-    // Índices calibrados 0-100 para los 6 ejes multiaxiales
-    const grossFlow = calc.waterfall?.gross_flow || (p.capacity * 3.8) || 1000;
-    const aforoIdx = Math.max(15, Math.min(100, Math.round((grossFlow / 2200) * 100)));
-    const poisIdx = Math.max(20, Math.min(100, Math.round(((p.pois || 100) / 200) * 100)));
-    const deficitIdx = Math.max(15, Math.min(100, Math.round(((calc.waterfall?.surface_deficit_added || 35) / 120) * 100)));
-    const cruisingIdx = Math.max(20, Math.min(100, Math.round(((calc.cruising || 45) / 150) * 100)));
-    const topoEaseIdx = Math.max(20, Math.min(100, Math.round(100 - (p.slope || 1.4) * 20)));
-    const huffIdx = Math.max(20, Math.min(100, Math.round(((p.dl || 90) / 200) * 100)));
+    // Índices calibrados 0-100 para los 6 ejes multiaxiales (0 si no hay capacidad/plazas en archivo)
+    const hasCap = (p.capacity && p.capacity > 0);
+    const grossFlow = hasCap ? ((calc.waterfall?.grossFlow || 0) || Math.round(p.capacity * 3.8)) : 0;
+    const aforoIdx = hasCap ? Math.max(0, Math.min(100, Math.round((grossFlow / 2200) * 100))) : 0;
+    const poisIdx = (p.pois && p.pois > 0) ? Math.max(0, Math.min(100, Math.round((p.pois / 200) * 100))) : 0;
+    const deficitIdx = hasCap ? Math.max(0, Math.min(100, Math.round(((calc.deficit || 0) / 120) * 100))) : 0;
+    const cruisingIdx = hasCap ? Math.max(0, Math.min(100, Math.round(((calc.cruising || 0) / 150) * 100))) : 0;
+    const topoEaseIdx = Math.max(0, Math.min(100, Math.round(100 - (p.slope || 1.4) * 15)));
+    const huffIdx = hasCap ? Math.max(0, Math.min(100, Math.round(((calc.dl || 0) / 200) * 100))) : 0;
 
     this.radarChart.data.datasets[0].data = [
       aforoIdx,
@@ -1843,9 +1845,9 @@ class NNApp {
       const activeDays = allDays.filter(d => this.chart1SelectedDays.includes(d.id));
       const safeActiveDays = activeDays.length > 0 ? activeDays : allDays;
 
-      // Calcular IMD medio anual actual y previo
-      const avgDayCur = rawCur.length > 0 ? (rawCur.reduce((a, b) => a + b, 0) / rawCur.length) : 24000;
-      const avgDayPrev = rawPrev.length > 0 ? (rawPrev.reduce((a, b) => a + b, 0) / rawPrev.length) : 23550;
+      // Calcular IMD medio anual actual y previo (0 si no hay telemetría de aforo)
+      const avgDayCur = rawCur.length > 0 ? (rawCur.reduce((a, b) => a + b, 0) / rawCur.length) : 0;
+      const avgDayPrev = rawPrev.length > 0 ? (rawPrev.reduce((a, b) => a + b, 0) / rawPrev.length) : 0;
 
       const hourlyCur = [];
       const hourlyPrev = [];
@@ -2456,7 +2458,7 @@ class NNApp {
 
     // Datos base de tráfico pasante de la calle/zona inmediata
     const mainTraffic = p.trafficPoints?.[0] || {};
-    const annualCars = mainTraffic.annualCarsCurrentYear || p.totalAnnualTrafficCurrentYear || 320000;
+    const annualCars = mainTraffic.annualCarsCurrentYear || p.totalAnnualTrafficCurrentYear || 0;
     const baseDailyCars = Math.round(annualCars / 365);
     const yoyTrend = (mainTraffic.yoyGrowthPct || 1.8);
 
@@ -2672,7 +2674,7 @@ class NNApp {
     const count = this.parkings.length;
     const totalDL = this.parkings.reduce((sum, p) => sum + p.dl, 0);
     const totalCruising = this.parkings.reduce((sum, p) => sum + p.cruising, 0);
-    const totalRevenueDay = this.parkings.reduce((sum, p) => sum + (p.calc?.revDay || 900), 0);
+    const totalRevenueDay = this.parkings.reduce((sum, p) => sum + (p.calc?.revDay || 0), 0);
     const totalCapacity = this.parkings.reduce((sum, p) => sum + p.capacity, 0);
 
     const kpiLatentEl = document.getElementById("kpiTotalLatent");
@@ -2684,6 +2686,20 @@ class NNApp {
     if (kpiCruisingEl) kpiCruisingEl.innerText = totalCruising.toLocaleString("es-ES");
     if (kpiRevEl) kpiRevEl.innerText = totalRevenueDay.toLocaleString("es-ES");
     if (kpiCapEl) kpiCapEl.innerText = totalCapacity.toLocaleString("es-ES");
+
+    // Subtítulos transparentes según la regla de oro 'real-data-only'
+    const kpiCapSubEl = document.getElementById("kpiCapSubtitle");
+    if (kpiCapSubEl) {
+      kpiCapSubEl.innerText = totalCapacity === 0 ? "No informada en el archivo cargado" : "Capacidad nominal auditada";
+    }
+    const kpiLatentSubEl = document.getElementById("kpiLatentSubtitle");
+    if (kpiLatentSubEl) {
+      kpiLatentSubEl.innerText = totalDL === 0 ? "Pendiente de plazas en archivo" : "Volumen insatisfecho en calzada";
+    }
+    const kpiCruisingSubEl = document.getElementById("kpiCruisingSubtitle");
+    if (kpiCruisingSubEl) {
+      kpiCruisingSubEl.innerText = totalCruising === 0 ? "Sin telemetría de aforo en archivo" : "Buscando plaza en superficie";
+    }
 
     // Actualizar contadores dinámicos de cartera en la vista global
     const elSubtitleCount = document.getElementById("portfolioCountSubtitle");

@@ -25,10 +25,40 @@ const DemandEngine = {
     const tariff = options.tariff !== undefined ? options.tariff : (parking.tariff || 3.60);
     const hour = options.hour !== undefined ? options.hour : 18;
 
-    const cap = parking.capacity || 260;
+    const cap = (parking.capacity && parking.capacity > 0) ? parking.capacity : 0;
     const slope = parking.slope || 1.5;
-    const pois = parking.pois || 120;
+    const pois = (parking.pois && parking.pois > 0) ? parking.pois : 0;
     const kappaBase = parking.passThroughBase || 0.60;
+
+    // Regla real-data-only: Si no se dispone de capacidad física de plazas en el archivo cargado,
+    // todas las métricas de demanda, agitación (cruising) y aforo exterior son estrictamente 0.
+    if (cap <= 0) {
+      return {
+        dl: 0,
+        cruising: 0,
+        qAgitacion: 0,
+        deficit: 0,
+        pois: 0,
+        revDay: 0,
+        revWeek: 0,
+        ratio: 0,
+        hasRealCapacity: false,
+        yieldAction: "Sin telemetría de capacidad física (0 plazas en archivo cargado)",
+        yieldPrio: "SIN DATOS",
+        waterfall: {
+          grossFlow: 0,
+          passThrough: 0,
+          passThroughPct: 0,
+          localFlow: 0,
+          cruising: 0,
+          deficit: 0,
+          pois: 0,
+          toblerLoss: 0,
+          toblerPct: 0,
+          netDL: 0
+        }
+      };
+    }
 
     // 1. Aforo viario bruto (Q_total)
     const hourFlow = [0.12, 0.08, 0.05, 0.04, 0.06, 0.15, 0.42, 0.85, 1.05, 0.98, 0.92, 1.02, 1.15, 1.20, 1.05, 0.95, 1.10, 1.28, 1.35, 1.25, 1.05, 0.80, 0.50, 0.28];

@@ -44,11 +44,60 @@ def calculate_latent_demand(
     Calcula la demanda latente neta y el desglose de flujo (Waterfall)
     siguiendo la formulación matemática del Manual Técnico de Ingeniería.
     """
-    cap = parking.get("capacity", 250)
-    tariff = custom_tariff if custom_tariff is not None else parking.get("tariff", 3.60)
+    cap = parking.get("capacity", 0) or 0
+    tariff = custom_tariff if custom_tariff is not None else (parking.get("tariff", 0.0) or 0.0)
     slope = parking.get("slope", 1.5)
-    pois = parking.get("pois_count", 120)
+    pois = parking.get("pois_count", 0) or 0
     kappa_base = parking.get("pass_through_base", 0.60)
+
+    # Regla real-data-only: Si no se dispone de capacidad física de plazas en el archivo cargado,
+    # todas las métricas de aforo, cruising y demanda latente son estrictamente 0.
+    if cap <= 0:
+        return {
+            "parking_id": parking.get("id"),
+            "obra_actual": parking.get("obra_actual") or parking.get("obraActual"),
+            "name": parking.get("name"),
+            "district": parking.get("district", "Barcelona"),
+            "address": parking.get("address", ""),
+            "capacity": 0,
+            "tariff": 0.0,
+            "elevation": parking.get("elevation", 30.0),
+            "slope": slope,
+            "lat": parking.get("lat", 41.388),
+            "lon": parking.get("lon", 2.160),
+            "data_source": "SIN_DATOS_CAPACIDAD",
+            "is_audited": False,
+            "latent_demand_dl": 0,
+            "cruising_vehicles": 0,
+            "surface_deficit": 0,
+            "poi_induced_demand": 0,
+            "gross_traffic_flow": 0,
+            "pass_through_flow": 0,
+            "pass_through_pct": 0.0,
+            "tobler_friction_loss": 0,
+            "tobler_friction_pct": 0.0,
+            "uncaptured_daily_revenue_eur": 0,
+            "uncaptured_weekly_revenue_eur": 0,
+            "yield_action": "Sin telemetría de capacidad física (0 plazas en archivo cargado)",
+            "yield_priority": "SIN_DATOS",
+            "traffic_points": [],
+            "entry_points": [],
+            "exit_points": [],
+            "total_annual_traffic": 0,
+            "total_annual_traffic_prev": 0,
+            "traffic_yoy_growth_pct": 0.0,
+            "has_capacity_data": False,
+            "waterfall": {
+                "gross_flow": 0,
+                "pass_through_deducted": 0,
+                "local_destination_flow": 0,
+                "cruising_added": 0,
+                "surface_deficit_added": 0,
+                "poi_demand_added": 0,
+                "tobler_penalty_deducted": 0,
+                "net_latent_demand": 0
+            }
+        }
 
     # 1. Aforo Viario Bruto (Q_total) simulado para el tramo viario (según capacidad y hora)
     # Patrón horario de tráfico en Barcelona
@@ -613,13 +662,9 @@ def _parse_structured_row(
 
     elevation, slope = infer_topography(inferred_district, lat)
 
-    # Estimar capacidad y tarifa de forma determinista cuando el Excel solo trae coordenadas y obra
-    seed_str = f"{obra_actual or idx}_{raw_name}"
-    h_val = sum((i + 1) * ord(ch) for i, ch in enumerate(seed_str))
-    if capacity is None or capacity <= 0:
-        capacity = 190 + (h_val % 240)
-    if tariff is None or tariff <= 0:
-        tariff = round(3.45 + ((h_val % 65) / 100.0), 2)
+    # Regla real-data-only: No inventar plazas ni tarifas. Si no vienen en el archivo, su valor es 0
+    capacity = int(capacity) if (capacity is not None and int(capacity) > 0) else 0
+    tariff = round(float(tariff), 2) if (tariff is not None and float(tariff) > 0) else 0.0
 
     display_name = raw_name if re.match(r"^(nn\b|pk\.?\b|parking\b)", raw_name, re.I) else f"NN {raw_name}"
     code = str(obra_actual or obra_anterior or idx).strip()
@@ -642,8 +687,8 @@ def _parse_structured_row(
         "road_type": "distribuidora",
         "pass_through_base": 0.58,
         "dominant_profile": f"Cartera Activa ({inferred_district})",
-        "pois_count": 115 + (h_val % 95),
-        "ev_chargers": max(4, round(capacity * 0.025))
+        "pois_count": 0,
+        "ev_chargers": 0
     }
 
 
