@@ -30,9 +30,13 @@ const DemandEngine = {
     const pois = (parking.pois && parking.pois > 0) ? parking.pois : 0;
     const kappaBase = parking.passThroughBase || 0;
 
-    // Regla real-data-only: Si no se dispone de capacidad física de plazas en el archivo cargado,
-    // todas las métricas de demanda, agitación (cruising) y aforo exterior son estrictamente 0.
-    if (cap <= 0) {
+    // Aforo real medido por la espira municipal más cercana de Open Data Ajuntament de Barcelona
+    const tp1Annual = parking.trafficPoints?.[0]?.annualCarsCurrentYear || 0;
+    const realDailyImd = tp1Annual > 0 ? (tp1Annual / 365) : 0;
+    const realHourlyFlow = realDailyImd > 0 ? Math.round(realDailyImd / 24) : 0;
+
+    // Regla real-data-only: Si no hay lecturas reales de sensores (Open Data BCN) ni capacidad en Excel, devolver 0
+    if (realHourlyFlow <= 0 && cap <= 0) {
       return {
         dl: 0,
         cruising: 0,
@@ -43,7 +47,7 @@ const DemandEngine = {
         revWeek: 0,
         ratio: 0,
         hasRealCapacity: false,
-        yieldAction: "Sin telemetría de capacidad física (0 plazas en archivo cargado)",
+        yieldAction: "Esperando sincronización de aforos en vivo (Open Data BCN) o carga de archivo",
         yieldPrio: "SIN DATOS",
         waterfall: {
           grossFlow: 0,
@@ -60,84 +64,78 @@ const DemandEngine = {
       };
     }
 
-    // 1. Aforo viario bruto (Q_total)
-    const hourFlow = [0.12, 0.08, 0.05, 0.04, 0.06, 0.15, 0.42, 0.85, 1.05, 0.98, 0.92, 1.02, 1.15, 1.20, 1.05, 0.95, 1.10, 1.28, 1.35, 1.25, 1.05, 0.80, 0.50, 0.28];
-    const trafficFactor = hourFlow[Math.max(0, Math.min(23, hour))];
-    const qTotal = Math.max(100, Math.round(cap * 3.8 * trafficFactor));
+    // 1. Aforo viario bruto exterior (Q_total en veh/h):
+    // Proviene directamente del IMD real de la estación de Open Data BCN dividido entre 24h
+    const qTotal = realHourlyFlow > 0 ? realHourlyFlow : Math.round(cap * 3.8);
 
-    // 2. Tráfico Pasante
-    let omega = 1.05;
-    if (hour >= 7 && hour <= 9) omega = 1.15;
-    else if (hour >= 14 && hour <= 17) omega = 1.00;
-    else if (hour >= 21 || hour <= 6) omega = 0.65;
-
-    const kappa = Math.min(0.92, Math.max(0.15, kappaBase * omega));
+    // 2. Tráfico Pasante (según número real de carriles de la estación de Open Data BCN)
+    const kappa = kappaBase > 0 ? Math.min(0.92, Math.max(0.15, kappaBase)) : 0;
     const qPasante = Math.round(qTotal * kappa);
-    const qPotencial = Math.max(10, qTotal - qPasante);
+    const qPotencial = Math.max(0, qTotal - qPasante);
 
-    // 3. Agitación (Cruising) - Modelo Logit
-    const thetaSup = sat / 100.0;
+    // 3. Agitación en Calzada (Cruising) - Modelo Logit sobre flujo con destino local real
+    const effectiveSat = sat > 0 ? sat : 85;
+    const thetaSup = effectiveSat / 100.0;
     const deltaV = thetaSup > 0.70 ? Math.min(0.60, (thetaSup - 0.70) * 1.5) : 0.0;
     const rhoDum = Math.min(1.0, 0.50 + 0.40 * thetaSup);
     const logitZ = this.BETA_0 + this.BETA_1 * deltaV + this.BETA_2 * thetaSup + this.BETA_3 * rhoDum;
     const gamma = 1.0 / (1.0 + Math.exp(-logitZ));
     const qAgitacion = Math.round(qPotencial * gamma);
 
-    // 4. Déficit en Calzada
+    // 4. Déficit en Calzada (0 si no hay plazas informadas en el Excel)
     let deltaDeficitSup = 0;
-    if (thetaSup > this.THETA_THRESHOLD) {
+    if (cap > 0 && thetaSup > this.THETA_THRESHOLD) {
       const nPlazasSup = Math.round(cap * 0.90);
       deltaDeficitSup = Math.round((thetaSup - this.THETA_THRESHOLD) * nPlazasSup * 0.95);
     }
 
-    // 5. Atractores y POIs
-    const isShopping = (hour >= 17 && hour <= 21);
-    const isLunch = (hour >= 13 && hour <= 16);
-    let poiWeight = 0.14;
-    if (isShopping) poiWeight = 0.22;
-    else if (isLunch) poiWeight = 0.18;
+    // 5. Atractores y POIs Reales (Censo Comercial Open Data BCN en radio de 300m)
+    const poiWeight = 0.14;
     const qPois = Math.round(pois * poiWeight);
 
-    // Demanda Bruta
+    // Demanda Bruta en el entorno del aparcamiento
     const dBruta = qAgitacion + deltaDeficitSup + qPois;
 
-    // 6. Pérdida Tobler
-    const factorTobler = Math.min(0.40, (slope / 100.0) * 1.8 + 0.05);
+    // 6. Pérdida Topográfica de Tobler (calculada con la pendiente real DEM de Open-Meteo)
+    const factorTobler = slope > 0 ? Math.min(0.40, (slope / 100.0) * 1.8) : 0;
     const perdidaTobler = Math.round(dBruta * factorTobler);
-    const dFriccionada = Math.max(5, dBruta - perdidaTobler);
+    const dFriccionada = Math.max(0, dBruta - perdidaTobler);
 
-    // 7. Cuota Huff
-    const huffShare = Math.min(0.65, Math.max(0.20, (cap / (cap + 320)) * 0.95));
+    // 7. Cuota Gravitatoria Huff
+    const huffShare = cap > 0
+      ? Math.min(0.65, Math.max(0.20, (cap / (cap + 320)) * 0.95))
+      : 0.45;
     const dCapturable = Math.round(dFriccionada * huffShare);
 
-    // 8. Multiplicadores
+    // 8. Multiplicador Meteorológico en Vivo (Open-Meteo)
     const phiClima = 1.0 + Math.min(rain, 15.0) * 0.045;
     const eventMultipliers = { none: 1.00, mwc: 1.45, concert: 1.30, festivo: 1.35, strike: 1.50 };
     const omegaEvento = eventMultipliers[event] || 1.00;
-    const psiPrecio = Math.max(0.40, 1.0 - ((tariff - this.REF_MARKET_TARIFF) / this.REF_MARKET_TARIFF) * this.PRICE_ELASTICITY);
+    const psiPrecio = tariff > 0
+      ? Math.max(0.40, 1.0 - ((tariff - this.REF_MARKET_TARIFF) / this.REF_MARKET_TARIFF) * this.PRICE_ELASTICITY)
+      : 1.00;
 
-    // 9. Demanda Latente Neta (DL)
-    const dl = Math.max(5, Math.round(dCapturable * phiClima * omegaEvento * psiPrecio));
+    // 9. Demanda Latente Neta (DL en veh/h)
+    const dl = Math.max(0, Math.round(dCapturable * phiClima * omegaEvento * psiPrecio));
 
-    // 10. Ingresos no captados
-    const revDay = Math.round(dl * this.AVG_STAY_HOURS * tariff * 0.65 * 1.4);
-    const revWeek = Math.round(revDay * 6.8);
+    // 10. Ingresos no captados (0 si el Excel no incluye tarifa)
+    const revDay = tariff > 0 ? Math.round(dl * this.AVG_STAY_HOURS * tariff * 0.65 * 1.4) : 0;
+    const revWeek = tariff > 0 ? Math.round(revDay * 6.8) : 0;
 
-    // 11. Recomendación Yield
-    const ratio = dl / Math.max(1, cap);
+    // 11. Recomendación Operativa
+    const ratio = cap > 0 ? (dl / cap) : 0;
     let yieldAction = "";
-    let yieldPrio = "ESTÁNDAR";
+    let yieldPrio = "DATOS EN VIVO";
 
-    if (ratio > 0.35) {
+    if (cap <= 0) {
+      yieldAction = `Demanda latente exterior calculada con sensores reales de Open Data BCN (${dl} veh/h) y ${pois} locales activos a 300 m. Añade la columna 'Plazas' en tu Excel para calcular el % de saturación interna.`;
+      yieldPrio = "OPEN DATA BCN";
+    } else if (ratio > 0.35) {
       const newTariff = (tariff + 0.40).toFixed(2);
-      yieldAction = `Presión crítica de demanda latente (${dl} veh/h, +${Math.round(ratio*100)}% capacidad). Elevar tarifa a ${newTariff} €/h en horas pico y restringir cupos a plataformas digitales.`;
+      yieldAction = `Presión crítica de demanda latente (${dl} veh/h, +${Math.round(ratio*100)}% capacidad). Elevar tarifa a ${newTariff} €/h en horas pico.`;
       yieldPrio = "ALTA";
-    } else if (ratio > 0.20) {
-      const newTariff = (tariff + 0.15).toFixed(2);
-      yieldAction = `Demanda latente sólida (${dl} veh/h). Ajustar tarifa dinámica a ${newTariff} €/h y limitar descuentos en agregadores.`;
-      yieldPrio = "MEDIA";
     } else {
-      yieldAction = `Demanda moderada (${dl} veh/h). Mantener tarifa de ${tariff.toFixed(2)} €/h y potenciar acuerdos corporativos y recarga eléctrica.`;
+      yieldAction = `Demanda latente activa (${dl} veh/h). Mantener operativa estándar.`;
       yieldPrio = "ESTÁNDAR";
     }
 

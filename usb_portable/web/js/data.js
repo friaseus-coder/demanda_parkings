@@ -15,32 +15,10 @@ const PORTFOLIO_REFERENCE_CATALOG = [];
 // La aplicación inicia sin aparcamientos precargados (cartera vacía al inicio)
 const PARKINGS_PORTFOLIO = [];
 
-function buildRolling12Months() {
-  const shortNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  const now = new Date();
-  const labels = [];
-  const prevLabels = [];
-  const monthNumbers = []; // 0 = Ene ... 11 = Dic
-
-  // Último mes natural completamente cerrado
-  const lastClosedMonthOffset = 1;
-
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), (now.getMonth() - lastClosedMonthOffset) - i, 1);
-    const m = d.getMonth();
-    const yr = String(d.getFullYear()).slice(-2);
-    const prevYr = String(d.getFullYear() - 1).slice(-2);
-    labels.push(`${shortNames[m]} ${yr}`);
-    prevLabels.push(`${shortNames[m]} ${prevYr}`);
-    monthNumbers.push(m);
-  }
-  return { labels, prevLabels, monthNumbers };
-}
-
-const _ROLLING_12M = buildRolling12Months();
-const MONTHS_LABELS = _ROLLING_12M.labels;
-const MONTHS_PREV_LABELS = _ROLLING_12M.prevLabels;
-const MONTHS_INDEXES = _ROLLING_12M.monthNumbers;
+// Meses oficiales de los datasets de Aforamientos de Open Data Ajuntament de Barcelona (2025 vs. 2024)
+const MONTHS_LABELS = ['Ene 25', 'Feb 25', 'Mar 25', 'Abr 25', 'May 25', 'Jun 25', 'Jul 25', 'Ago 25', 'Sep 25', 'Oct 25', 'Nov 25', 'Dic 25'];
+const MONTHS_PREV_LABELS = ['Ene 24', 'Feb 24', 'Mar 24', 'Abr 24', 'May 24', 'Jun 24', 'Jul 24', 'Ago 24', 'Sep 24', 'Oct 24', 'Nov 24', 'Dic 24'];
+const MONTHS_INDEXES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
 // Factores estacionales puestos a 0 cuando no existen lecturas reales de sensores
 const BCN_TRAFFIC_SEASONALITY_MAIN = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -160,16 +138,40 @@ function enrichParkingWithPoints(p, index) {
     ? p.district
     : inferBarcelonaDistrict(name, address, lat, lon);
 
-  // Solo conservar valores si provienen explícitamente de columnas reales del archivo Excel/CSV (fromExcel === true)
+  // Conservar valores si provienen explícitamente del archivo Excel/CSV (fromExcel === true) o de APIs oficiales en vivo (fromApi === true)
   const isFromExcel = p.fromExcel === true;
+  const isFromApi = p.fromApi === true;
+  const isRealSource = isFromExcel || isFromApi;
 
-  const roadType = (isFromExcel && p.roadType) ? p.roadType : "Sin datos en archivo";
-  const passThroughBase = (isFromExcel && p.passThroughBase > 0) ? parseFloat(p.passThroughBase) : 0;
-  const elevation = (isFromExcel && p.elevation > 0) ? parseFloat(p.elevation) : 0;
-  const slope = (isFromExcel && p.slope > 0) ? parseFloat(p.slope) : 0;
+  const roadType = (isRealSource && p.roadType && p.roadType !== "Sin datos en archivo") ? p.roadType : "Sin datos en archivo";
+  const passThroughBase = (isRealSource && p.passThroughBase > 0) ? parseFloat(p.passThroughBase) : 0;
+  const elevation = (isRealSource && p.elevation > 0) ? parseFloat(p.elevation) : 0;
+  const slope = (isRealSource && p.slope > 0) ? parseFloat(p.slope) : 0;
   const cap = (isFromExcel && p.capacity > 0) ? parseInt(p.capacity, 10) : 0;
   const tariff = (isFromExcel && p.tariff > 0) ? +(parseFloat(p.tariff).toFixed(2)) : 0;
-  const pois = (isFromExcel && p.pois > 0) ? parseInt(p.pois, 10) : 0;
+  const pois = (isRealSource && p.pois > 0) ? parseInt(p.pois, 10) : 0;
+  const surfaceSpots = (isRealSource && p.surfaceSpots > 0) ? parseInt(p.surfaceSpots, 10) : 0;
+
+  if (isFromApi && Array.isArray(p.trafficPoints) && p.trafficPoints.length > 0 && (p.trafficPoints[0].annualCarsCurrentYear || 0) > 0) {
+    return {
+      ...p,
+      lat,
+      lon,
+      name,
+      address,
+      district,
+      capacity: cap,
+      tariff: tariff,
+      hasCapacityData: cap > 0,
+      hasTariffData: tariff > 0,
+      elevation,
+      slope,
+      pois,
+      surfaceSpots,
+      roadType,
+      passThroughBase
+    };
+  }
 
   // Series mensuales de sensores viarios: estrictamente 0 salvo que el archivo Excel traiga lecturas reales
   const empty12Months = new Array(12).fill(0);
@@ -398,5 +400,5 @@ function evaluateEventImpact(distKm, expectedAttendance) {
   };
 }
 
-// Sin sensores municipales con aforos diarios pregrabados o inferidos (Regla Real-Data-Only)
-const BCN_MUNICIPAL_TRAFFIC_SENSORS = [];
+// Red de sensores municipales poblada en vivo desde la API SQL de Open Data Ajuntament de Barcelona
+let BCN_MUNICIPAL_TRAFFIC_SENSORS = [];

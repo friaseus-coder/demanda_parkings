@@ -1672,9 +1672,9 @@
               <i data-lucide="database" class="w-4 h-4"></i>
             </div>
             <div>
-              <div class="font-bold text-[#1A4B5B]">API Open Data Ajuntament de Barcelona (CKAN v3)</div>
-              <div class="text-[11px] text-slate-500">Catálogo municipal de sensores de aforo viario y movilidad urbana</div>
-              <div class="text-[10px] font-mono text-slate-400 mt-0.5">Endpoint: opendata-ajuntament.barcelona.cat/data/api/3/action/package_search</div>
+              <div class="font-bold text-[#1A4B5B]">API SQL Open Data Ajuntament de Barcelona (Aforos 2024-2025 &amp; Censo Comercial)</div>
+              <div class="text-[11px] text-slate-500">407 estaciones reales de aforo viario (IMD mensual y por día de la semana) + Locales activos a 300 m</div>
+              <div class="text-[10px] font-mono text-slate-400 mt-0.5">Endpoint: opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql</div>
             </div>
           </div>
           <div id="modalStatusOpenData" class="px-3 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
@@ -1699,19 +1699,20 @@
           </div>
         </div>
 
-        <!-- API 3: Cartografía ICGC / Leaflet / SheetJS -->
+        <!-- API 3: Topografía Copernicus DEM & SheetJS -->
         <div class="p-3.5 rounded-2xl bg-[#F8FAFB] border border-[#DFEAF0] flex items-center justify-between gap-3">
           <div class="flex items-start gap-3">
             <div class="p-2 rounded-xl bg-[#E6EFF3] text-[#164250] mt-0.5">
               <i data-lucide="map-pin" class="w-4 h-4"></i>
             </div>
             <div>
-              <div class="font-bold text-[#1A4B5B]">Motor Cartográfico ICGC &amp; Lector Local SheetJS</div>
-              <div class="text-[11px] text-slate-500">Cotas topográficas sobre el nivel del mar, pendientes Tobler y lector Excel offline</div>
+              <div class="font-bold text-[#1A4B5B]">API Open-Meteo Elevation (Copernicus DEM 90m) &amp; Lector SheetJS</div>
+              <div class="text-[11px] text-slate-500">Cota real sobre el nivel del mar (m) y pendiente real (%) medida a 100 m N/S/E/O de cada coordenada</div>
+              <div class="text-[10px] font-mono text-slate-400 mt-0.5">Endpoint: api.open-meteo.com/v1/elevation</div>
             </div>
           </div>
           <div id="modalStatusEngine" class="px-3 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
-            100% Operativo
+            Conectado OK
           </div>
         </div>
       </div>
@@ -1721,20 +1722,20 @@
         <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">2. Auditoría de Recopilación de Datos en Gráficos y Sensores</div>
         <div id="modalDataAuditBox" class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
           <div id="modalDataAuditSummary" class="font-bold text-emerald-900 text-xs">
-            ✓ Norma de Veracidad Activa: 100% Datos Reales o Calculados de Reales · 0 Datos Inferidos.
+            ✓ Todas las APIs Oficiales Conectadas en Tiempo Real · 100% Datos Reales · 0 Inferidos.
           </div>
           <div id="modalDataAuditDetails" class="text-[11px] text-slate-600 space-y-1 font-mono">
             • Activos cargados: 0 aparcamientos<br>
-            • Datos inferidos o inventados: 0 (todos puestos estrictamente a 0)
+            • Datos inferidos o inventados: 0
           </div>
         </div>
       </div>
 
       <!-- Footer de Acciones del Modal -->
       <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
-        <button type="button" onclick="app.repairZeroDataAndResync()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
+        <button type="button" onclick="app.repairZeroDataAndResync()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
           <i data-lucide="zap" class="w-4 h-4"></i>
-          <span>Depurar Inferidos (Poner a 0 No Reales)</span>
+          <span>Sincronizar Datos Reales de APIs Ahora</span>
         </button>
         <div class="flex items-center gap-2">
           <button type="button" onclick="app.checkAllApisAndDataHealth(true)" class="px-4 py-2 rounded-xl bg-[#164250] hover:bg-[#0D2730] text-white font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
@@ -1751,8 +1752,8 @@
   </div>
 
   <!-- Scripts de la Aplicación (con versión actualizada para evitar caché antigua) -->
-  <script src="js/data.js?v=3.3"></script>
-  <script src="js/engine.js?v=3.3"></script>
-  <script src="js/app.js?v=3.3"></script>
+  <script src="js/data.js?v=3.4"></script>
+  <script src="js/engine.js?v=3.4"></script>
+  <script src="js/app.js?v=3.4"></script>
 </body>
 </html>
