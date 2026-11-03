@@ -19,14 +19,10 @@ desktop.ini
 
 # Carpetas internas de IA / Asistente
 .gemini/
+scratch/
 
-# Archivos de datos, ofimática y reportes generados
+# Archivos de datos, ofimática y temporales
 *.xlsx
 *.docx
 *.zip
 *.png
-reporting_pc/reporte_*.*
-usb_portable/reportes/*
-!usb_portable/reportes/.gitkeep
-
-
