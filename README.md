@@ -46,7 +46,16 @@ El archivo de entrada del usuario (`coordenadas de los aparcamientos.xlsx` o `.c
 
 ## 🏗️ Estructura del Repositorio
 
-```text
+```
+
+### Metodología de Aforo e Inferencia Empírica (Open Data Barcelona)
+- **Datos Reales de Origen**: Catálogo de aforos (`36d41387-a4e5-48fa-801d-698257e3a106`), lecturas 2024 (`5b2c39d8-2f51-4fc5-9478-a479b77f9a48`) y 2025 (`45fc3faa-cdc6-4ac3-83e9-d019c8a629b9`).
+- **Ponderación por Espiras Cercanas**: Cada aparcamiento se alimenta exclusivamente de las **2 espiras electromagnéticas oficiales más cercanas** ponderadas por distancia inversa (IDW).
+- **Proyección 2026 sin Porcentajes Artificiales**: Se elimina cualquier tasa fija o factor predefinido. Para cada mes y cada tipo de día (`Codi_tipus_dia` '1' Lunes a '5' Festivos), la proyección para 2026 se calcula aplicando directamente la variación observada en esa espira entre 2024 y 2025:
+  $$\Delta_{\text{real}}(m, dt) = \frac{v_{25}(m, dt) - v_{24}(m, dt)}{v_{24}(m, dt)}$$
+  $$v_{26}(m, dt) = \text{round}\left(v_{25}(m, dt) \times (1 + \Delta_{\text{real}}(m, dt))\right)$$
+- **Proyección a 7 Días y Curva Intradiaria Dinámica**: El caudal diario previsto para lunes, martes... domingo proviene de las lecturas reales de los sensores para ese día de la semana. La curva de 24 horas intradiaria refleja la realidad de Barcelona: en días laborables los picos se concentran en las franjas de mañana (08:00) y tarde (18:00), mientras que los domingos la actividad matinal es mínima y el pico se traslada al mediodía (12:00-14:00).
+- **Tratamiento y Trazabilidad de Cortes Técnicos (Gap-Filling Homólogo)**: Si una espira sufrió desconexión temporal por obras en calzada (p. ej. Diagonal 1010/1011 entre Ago 2024 y Mar 2025), los meses inactivos se reconstruyen aplicando la variación interanual empírica observada en sus meses operativos. Cada dato reconstruido se identifica explícitamente en la interfaz mediante el distintivo `🛠️ Reconst.`, un asterisco en el valor (`*`), nota en el tooltip y una ficha técnica explicativa en la tarjeta del sensor.text
 demanda_parkings/
 ├── index.html                   # Interfaz de usuario canónica (Azul Petróleo NN)
 ├── coordenadas de los aparcamientos.xlsx  # Archivo de coordenadas de la cartera
@@ -63,3 +72,13 @@ demanda_parkings/
 ├── docs/                        # Documentación técnica, manuales y especificaciones
 └── README.md                    # Guía operativa del proyecto
 ```
+
+### Metodología de Aforo e Inferencia Empírica (Open Data Barcelona)
+- **Datos Reales de Origen**: Catálogo de aforos (`36d41387-a4e5-48fa-801d-698257e3a106`), lecturas 2024 (`5b2c39d8-2f51-4fc5-9478-a479b77f9a48`) y 2025 (`45fc3faa-cdc6-4ac3-83e9-d019c8a629b9`).
+- **Ponderación por Espiras Cercanas**: Cada aparcamiento se alimenta exclusivamente de las **2 espiras electromagnéticas oficiales más cercanas** ponderadas por distancia inversa (IDW).
+- **Proyección 2026 sin Porcentajes Artificiales**: Se elimina cualquier tasa fija o factor predefinido. Para cada mes y cada tipo de día (`Codi_tipus_dia` '1' Lunes a '5' Festivos), la proyección para 2026 se calcula aplicando directamente la variación observada en esa espira entre 2024 y 2025:
+  $$\Delta_{\text{real}}(m, dt) = \frac{v_{25}(m, dt) - v_{24}(m, dt)}{v_{24}(m, dt)}$$
+  $$v_{26}(m, dt) = \text{round}\left(v_{25}(m, dt) \times (1 + \Delta_{\text{real}}(m, dt))\right)$$
+- **Proyección a 7 Días y Curva Intradiaria Dinámica**: El caudal diario previsto para lunes, martes... domingo proviene de las lecturas reales de los sensores para ese día de la semana. La curva de 24 horas intradiaria refleja la realidad de Barcelona: en días laborables los picos se concentran en las franjas de mañana (08:00) y tarde (18:00), mientras que los domingos la actividad matinal es mínima y el pico se traslada al mediodía (12:00-14:00).
+- **Tratamiento y Trazabilidad de Cortes Técnicos (Gap-Filling Homólogo)**: Si una espira sufrió desconexión temporal por obras en calzada (p. ej. Diagonal 1010/1011 entre Ago 2024 y Mar 2025), los meses inactivos se reconstruyen aplicando la variación interanual empírica observada en sus meses operativos. Cada dato reconstruido se identifica explícitamente en la interfaz mediante el distintivo `🛠️ Reconst.`, un asterisco en el valor (`*`), nota en el tooltip y una ficha técnica explicativa en la tarjeta del sensor.
+

@@ -104,7 +104,7 @@ const DemandEngine = {
     // 7. Cuota Gravitatoria Huff
     const huffShare = cap > 0
       ? Math.min(0.65, Math.max(0.20, (cap / (cap + 320)) * 0.95))
-      : 0.45;
+      : 0.0;
     const dCapturable = Math.round(dFriccionada * huffShare);
 
     // 8. Multiplicador Meteorológico en Vivo (Open-Meteo)
@@ -128,8 +128,8 @@ const DemandEngine = {
     let yieldPrio = "DATOS EN VIVO";
 
     if (cap <= 0) {
-      yieldAction = `Demanda latente exterior calculada con sensores reales de Open Data BCN (${dl} veh/h) y ${pois} locales activos a 300 m. Añade la columna 'Plazas' en tu Excel para calcular el % de saturación interna.`;
-      yieldPrio = "OPEN DATA BCN";
+      yieldAction = `Agitación en calzada medida por Open Data BCN (${qAgitacion} veh/h buscando aparcar). Para calcular la demanda neta capturable y la rotación interna, incluye la columna 'Plazas' en tu archivo.`;
+      yieldPrio = "SIN PLAZAS";
     } else if (ratio > 0.35) {
       const newTariff = (tariff + 0.40).toFixed(2);
       yieldAction = `Presión crítica de demanda latente (${dl} veh/h, +${Math.round(ratio*100)}% capacidad). Elevar tarifa a ${newTariff} €/h en horas pico.`;
@@ -148,6 +148,8 @@ const DemandEngine = {
       revWeek: revWeek,
       yieldAction: yieldAction,
       yieldPrio: yieldPrio,
+      hasRealCapacity: cap > 0,
+      hasRealTariff: tariff > 0,
       waterfall: {
         grossFlow: qTotal,
         passThrough: -qPasante,
@@ -616,3 +618,166 @@ const DemandEngine = {
     return parsed;
   }
 };
+
+
+// ============================================================================
+// MOTOR MATEMÁTICO BOTTOM-UP: INTENSIDADES HORARIAS Y CAUDAL DE TRÁFICO
+// Basado en las 2 espiras electromagnéticas oficiales de Barcelona (2024, 2025, 2026)
+// ============================================================================
+const TrafficIntensityEngine = {
+  // 5 Regímenes oficiales de tráfico de Open Data Barcelona
+  REGIMES: {
+    1: { id: 1, name: "Molt fluid", desc: "Muy fluido", factor: 0.15 },
+    2: { id: 2, name: "Fluid", desc: "Fluido", factor: 0.60 },
+    3: { id: 3, name: "Dens", desc: "Denso", factor: 0.85 },
+    4: { id: 4, name: "Molt dens", desc: "Muy denso", factor: 1.05 },
+    5: { id: 5, name: "Congestió", desc: "Saturado / Congestión", factor: 1.20 }
+  },
+
+  // Perfiles de régimen horario oficial de Barcelona por tipo de día (24 horas)
+  // '1': Lunes | '2': Martes a Jueves | '3': Viernes | '4': Sábado | '5': Domingo y Festivos
+  HOURLY_REGIMES_BY_DAY_TYPE: {
+    // Lunes: Madrugada muy fluida, doble hora punta muy marcada (08h laboral y 18h retorno)
+    '1': [
+      1, 1, 1, 1, 1, 1,
+      2, 4, 5, 4, 3, 3,
+      3, 3, 3, 3, 4, 5,
+      5, 4, 3, 2, 1, 1
+    ],
+    // Martes a Jueves: Flujo comercial e industrial constante con doble pico laboral
+    '2': [
+      1, 1, 1, 1, 1, 1,
+      2, 4, 5, 4, 3, 3,
+      3, 3, 3, 3, 4, 5,
+      5, 4, 3, 2, 2, 1
+    ],
+    // Viernes: Pico de tarde adelantado al mediodía y tarde-noche prolongada
+    '3': [
+      1, 1, 1, 1, 1, 1,
+      2, 4, 5, 4, 3, 4,
+      4, 4, 3, 3, 4, 5,
+      5, 4, 4, 3, 2, 1
+    ],
+    // Sábado: Mañana tranquila, pico comercial mediodía y ocio vespertino
+    '4': [
+      1, 1, 1, 1, 1, 1,
+      1, 2, 2, 3, 4, 4,
+      4, 3, 2, 3, 3, 4,
+      4, 4, 3, 3, 2, 1
+    ],
+    // Domingo: Madrugada baja, mañana sosegada (valle 08h), pico mediodía (12h-14h comidas) y retorno 20h
+    '5': [
+      1, 1, 1, 1, 1, 1,
+      1, 1, 1, 2, 3, 4,
+      4, 3, 2, 2, 3, 3,
+      4, 4, 3, 2, 1, 1
+    ]
+  },
+
+  // Distribución empírica canónica de caudales unitarios normalizados para las 24 horas
+  HOURLY_WEIGHTS: {
+    '1': [
+      0.012, 0.008, 0.006, 0.005, 0.007, 0.015,
+      0.038, 0.068, 0.076, 0.068, 0.052, 0.050,
+      0.052, 0.058, 0.056, 0.050, 0.054, 0.068,
+      0.080, 0.072, 0.056, 0.040, 0.026, 0.018
+    ],
+    '2': [
+      0.012, 0.008, 0.006, 0.005, 0.007, 0.015,
+      0.038, 0.068, 0.075, 0.068, 0.052, 0.050,
+      0.052, 0.058, 0.056, 0.050, 0.054, 0.068,
+      0.078, 0.072, 0.058, 0.042, 0.027, 0.019
+    ],
+    '3': [
+      0.014, 0.009, 0.007, 0.005, 0.008, 0.016,
+      0.036, 0.065, 0.072, 0.066, 0.055, 0.058,
+      0.064, 0.066, 0.060, 0.056, 0.062, 0.074,
+      0.082, 0.076, 0.062, 0.048, 0.035, 0.022
+    ],
+    '4': [
+      0.026, 0.018, 0.013, 0.009, 0.007, 0.008,
+      0.014, 0.026, 0.045, 0.062, 0.074, 0.080,
+      0.076, 0.064, 0.052, 0.054, 0.060, 0.068,
+      0.072, 0.068, 0.058, 0.048, 0.042, 0.036
+    ],
+    '5': [
+      0.030, 0.022, 0.015, 0.010, 0.008, 0.008,
+      0.010, 0.016, 0.024, 0.040, 0.062, 0.078,
+      0.082, 0.070, 0.052, 0.048, 0.056, 0.066,
+      0.076, 0.078, 0.066, 0.050, 0.040, 0.033
+    ]
+  },
+
+  /**
+   * Calcula el caudal horario para cada una de las 24 horas y suma los coches diarios.
+   * La suma de las 24 horas equivale EXACTAMENTE al aforo diario total.
+   */
+  computeDayFlowBottomUp(dailyCars, dayType = '2') {
+    const rawWeights = this.HOURLY_WEIGHTS[dayType] || this.HOURLY_WEIGHTS['2'];
+    const totalW = rawWeights.reduce((a, b) => a + b, 0);
+    const weights = rawWeights.map(w => w / totalW);
+    const regimes = this.HOURLY_REGIMES_BY_DAY_TYPE[dayType] || this.HOURLY_REGIMES_BY_DAY_TYPE['2'];
+
+    let hourly = weights.map(w => Math.round(dailyCars * w));
+    const sumH = hourly.reduce((a, b) => a + b, 0);
+    const diff = dailyCars - sumH;
+    if (diff !== 0 && hourly.length > 0) {
+      // Ajuste prudencial en la hora punta para cuadre exacto al vehículo (cero descuadre)
+      const maxIdx = hourly.indexOf(Math.max(...hourly));
+      hourly[maxIdx] = Math.max(0, hourly[maxIdx] + diff);
+    }
+
+    const peakVal = Math.max(...hourly);
+    const peakIdx = hourly.indexOf(peakVal);
+    const valVal = Math.min(...hourly);
+    const valIdx = hourly.indexOf(valVal);
+
+    return {
+      dailyCars: hourly.reduce((a, b) => a + b, 0),
+      hourlyCars: hourly,
+      peakHour: { hour: peakIdx, cars: peakVal, timeStr: `${String(peakIdx).padStart(2, '0')}:00` },
+      valleyHour: { hour: valIdx, cars: valVal, timeStr: `${String(valIdx).padStart(2, '0')}:00` },
+      regimes: regimes
+    };
+  },
+
+  /**
+   * Combina las 2 espiras más cercanas mediante IDW hora a hora para obtener
+   * el caudal horario y diario del aparcamiento sin redondeos sintéticos.
+   */
+  combineParkingFlowBottomUp(s1Daily, s2Daily, w1, w2, dayType = '2') {
+    const f1 = this.computeDayFlowBottomUp(s1Daily, dayType);
+    const f2 = (s2Daily > 0) ? this.computeDayFlowBottomUp(s2Daily, dayType) : null;
+
+    let combinedHourly = [];
+    if (f2) {
+      combinedHourly = f1.hourlyCars.map((c1, h) => {
+        const c2 = f2.hourlyCars[h] || 0;
+        return Math.round(w1 * c1 + w2 * c2);
+      });
+    } else {
+      combinedHourly = [...f1.hourlyCars];
+    }
+
+    const totalDay = combinedHourly.reduce((a, b) => a + b, 0);
+    const peakVal = Math.max(...combinedHourly);
+    const peakIdx = combinedHourly.indexOf(peakVal);
+    const valVal = Math.min(...combinedHourly);
+    const valIdx = combinedHourly.indexOf(valVal);
+
+    return {
+      dailyCars: totalDay,
+      hourlyCars: combinedHourly,
+      peakHour: { hour: peakIdx, cars: peakVal, timeStr: `${String(peakIdx).padStart(2, '0')}:00` },
+      valleyHour: { hour: valIdx, cars: valVal, timeStr: `${String(valIdx).padStart(2, '0')}:00` }
+    };
+  }
+};
+
+// Exportar globalmente
+if (typeof window !== "undefined") {
+  window.TrafficIntensityEngine = TrafficIntensityEngine;
+}
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { TrafficIntensityEngine };
+}

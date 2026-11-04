@@ -34,19 +34,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3961663,
     "lon": 2.1678816,
-    "capacity": 387,
-    "tariff": 3.97,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 112,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 81,
+    "occ_base": 0,
     "search_index": 1.12,
     "elasticity": -0.52,
     "competition": 1.27,
-    "saturation": 93,
-    "rotacion": 3.1,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -59,19 +59,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4055256,
     "lon": 2.1803702,
-    "capacity": 262,
-    "tariff": 3.92,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 197,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 92,
+    "occ_base": 0,
     "search_index": 1.22,
     "elasticity": -0.42,
     "competition": 1.02,
-    "saturation": 88,
-    "rotacion": 3,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -84,19 +84,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3889449,
     "lon": 2.1307166,
-    "capacity": 173,
-    "tariff": 3.83,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 54,
     "slope": 1.4,
     "pois": 98,
     "roadType": "Arterial Primaria",
     "passThroughBase": 0.65,
-    "occ_base": 83,
+    "occ_base": 0,
     "search_index": 1.08,
     "elasticity": -0.43,
     "competition": 1.03,
-    "saturation": 89,
-    "rotacion": 3.1,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -109,19 +109,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4027553,
     "lon": 2.1395443,
-    "capacity": 328,
-    "tariff": 3.78,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 173,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 78,
+    "occ_base": 0,
     "search_index": 1.18,
     "elasticity": -0.48,
     "competition": 1.08,
-    "saturation": 94,
-    "rotacion": 3,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -134,19 +134,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4097627,
     "lon": 2.1353609,
-    "capacity": 182,
-    "tariff": 3.52,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 127,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 84,
+    "occ_base": 0,
     "search_index": 1.17,
     "elasticity": -0.52,
     "competition": 1.12,
-    "saturation": 88,
-    "rotacion": 2.8,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -159,19 +159,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4035996,
     "lon": 2.1280727,
-    "capacity": 419,
-    "tariff": 3.89,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 104,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 89,
+    "occ_base": 0,
     "search_index": 1.14,
     "elasticity": -0.54,
     "competition": 1.29,
-    "saturation": 95,
-    "rotacion": 3.3,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -184,19 +184,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3919249,
     "lon": 2.1712309,
-    "capacity": 198,
-    "tariff": 4.08,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 54,
     "slope": 1.4,
     "pois": 113,
     "roadType": "Arterial Primaria",
     "passThroughBase": 0.65,
-    "occ_base": 92,
+    "occ_base": 0,
     "search_index": 1.23,
     "elasticity": -0.48,
     "competition": 1.08,
-    "saturation": 94,
-    "rotacion": 3.6,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -209,19 +209,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3868879,
     "lon": 2.1578458,
-    "capacity": 225,
-    "tariff": 3.55,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 170,
     "roadType": "Arterial Primaria",
     "passThroughBase": 0.65,
-    "occ_base": 87,
+    "occ_base": 0,
     "search_index": 1.2,
     "elasticity": -0.5,
     "competition": 1.25,
-    "saturation": 91,
-    "rotacion": 2.9,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -234,19 +234,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.397763,
     "lon": 2.1300988,
-    "capacity": 340,
-    "tariff": 3.9,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 185,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 90,
+    "occ_base": 0,
     "search_index": 1.2,
     "elasticity": -0.4,
     "competition": 1,
-    "saturation": 86,
-    "rotacion": 4,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -259,19 +259,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3894943,
     "lon": 2.1488262,
-    "capacity": 201,
-    "tariff": 3.71,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 176,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 87,
+    "occ_base": 0,
     "search_index": 1.26,
     "elasticity": -0.51,
     "competition": 1.11,
-    "saturation": 87,
-    "rotacion": 3.9,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -284,19 +284,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3783225,
     "lon": 2.1546343,
-    "capacity": 183,
-    "tariff": 3.53,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 128,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 85,
+    "occ_base": 0,
     "search_index": 1.23,
     "elasticity": -0.53,
     "competition": 1.13,
-    "saturation": 89,
-    "rotacion": 4.1,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -309,19 +309,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3950287,
     "lon": 2.146628,
-    "capacity": 331,
-    "tariff": 3.41,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 176,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 89,
+    "occ_base": 0,
     "search_index": 1.16,
     "elasticity": -0.46,
     "competition": 1.21,
-    "saturation": 87,
-    "rotacion": 3.1,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -334,19 +334,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4002715,
     "lon": 2.1733315,
-    "capacity": 407,
-    "tariff": 3.37,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 192,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 85,
+    "occ_base": 0,
     "search_index": 1.17,
     "elasticity": -0.42,
     "competition": 1.17,
-    "saturation": 93,
-    "rotacion": 4.5,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -359,19 +359,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3963482,
     "lon": 2.1668445,
-    "capacity": 176,
-    "tariff": 3.86,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 151,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 86,
+    "occ_base": 0,
     "search_index": 1.26,
     "elasticity": -0.46,
     "competition": 1.06,
-    "saturation": 92,
-    "rotacion": 4,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -384,19 +384,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3922712,
     "lon": 2.1627218,
-    "capacity": 185,
-    "tariff": 3.95,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 190,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 79,
+    "occ_base": 0,
     "search_index": 1.15,
     "elasticity": -0.45,
     "competition": 1.05,
-    "saturation": 91,
-    "rotacion": 3.9,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -409,19 +409,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3859171,
     "lon": 2.1536164,
-    "capacity": 301,
-    "tariff": 3.91,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 96,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 91,
+    "occ_base": 0,
     "search_index": 1.26,
     "elasticity": -0.46,
     "competition": 1.21,
-    "saturation": 87,
-    "rotacion": 4.3,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -434,19 +434,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3765189,
     "lon": 2.1638208,
-    "capacity": 181,
-    "tariff": 3.91,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 196,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 91,
+    "occ_base": 0,
     "search_index": 1.21,
     "elasticity": -0.41,
     "competition": 1.01,
-    "saturation": 87,
-    "rotacion": 3.5,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -459,19 +459,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3582632,
     "lon": 2.1402722,
-    "capacity": 430,
-    "tariff": 3.6,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 24,
     "slope": 0.9,
     "pois": 115,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 92,
+    "occ_base": 0,
     "search_index": 1.25,
     "elasticity": -0.4,
     "competition": 1,
-    "saturation": 86,
-    "rotacion": 3.4,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -484,19 +484,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4081634,
     "lon": 2.1360644,
-    "capacity": 355,
-    "tariff": 4.05,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 200,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 89,
+    "occ_base": 0,
     "search_index": 1.1,
     "elasticity": -0.5,
     "competition": 1.25,
-    "saturation": 91,
-    "rotacion": 3.5,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -509,19 +509,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.384448,
     "lon": 2.134182,
-    "capacity": 439,
-    "tariff": 4.09,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 54,
     "slope": 1.4,
     "pois": 144,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 93,
+    "occ_base": 0,
     "search_index": 1.24,
     "elasticity": -0.54,
     "competition": 1.29,
-    "saturation": 95,
-    "rotacion": 4.5,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -534,19 +534,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.413076,
     "lon": 2.19473,
-    "capacity": 257,
-    "tariff": 3.47,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 14,
     "slope": 0.5,
     "pois": 202,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 79,
+    "occ_base": 0,
     "search_index": 1.17,
     "elasticity": -0.52,
     "competition": 1.27,
-    "saturation": 93,
-    "rotacion": 3.1,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -559,19 +559,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.397819,
     "lon": 2.161135,
-    "capacity": 287,
-    "tariff": 3.37,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 162,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 85,
+    "occ_base": 0,
     "search_index": 1.07,
     "elasticity": -0.52,
     "competition": 1.27,
-    "saturation": 93,
-    "rotacion": 3.1,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -584,19 +584,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.401724,
     "lon": 2.120897,
-    "capacity": 247,
-    "tariff": 3.37,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 142,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 85,
+    "occ_base": 0,
     "search_index": 1.22,
     "elasticity": -0.47,
     "competition": 1.07,
-    "saturation": 93,
-    "rotacion": 2.9,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -609,19 +609,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4103168,
     "lon": 2.1372572,
-    "capacity": 236,
-    "tariff": 3.66,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 95,
     "slope": 2.8,
     "pois": 171,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 82,
+    "occ_base": 0,
     "search_index": 1.06,
     "elasticity": -0.41,
     "competition": 1.16,
-    "saturation": 92,
-    "rotacion": 4.4,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -634,19 +634,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.412899,
     "lon": 2.1417751,
-    "capacity": 282,
-    "tariff": 3.72,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 68,
     "slope": 2.1,
     "pois": 157,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 88,
+    "occ_base": 0,
     "search_index": 1.27,
     "elasticity": -0.42,
     "competition": 1.02,
-    "saturation": 88,
-    "rotacion": 3.6,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -659,19 +659,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.38296,
     "lon": 2.1426673,
-    "capacity": 335,
-    "tariff": 3.85,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 38,
     "slope": 1.2,
     "pois": 110,
     "roadType": "Distribuidora Principal",
     "passThroughBase": 0.58,
-    "occ_base": 85,
+    "occ_base": 0,
     "search_index": 1.05,
     "elasticity": -0.5,
     "competition": 1.25,
-    "saturation": 91,
-    "rotacion": 4.1,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -684,19 +684,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.4021324,
     "lon": 2.1590733,
-    "capacity": 306,
-    "tariff": 3.56,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 68,
     "slope": 2.1,
     "pois": 111,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 88,
+    "occ_base": 0,
     "search_index": 1.26,
     "elasticity": -0.41,
     "competition": 1.16,
-    "saturation": 92,
-    "rotacion": 4.4,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -709,19 +709,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3780597,
     "lon": 2.1456953,
-    "capacity": 234,
-    "tariff": 4.04,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 24,
     "slope": 0.9,
     "pois": 119,
     "roadType": "Arterial Primaria",
     "passThroughBase": 0.65,
-    "occ_base": 88,
+    "occ_base": 0,
     "search_index": 1.19,
     "elasticity": -0.54,
     "competition": 1.14,
-    "saturation": 90,
-    "rotacion": 3.6,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   },
   {
@@ -734,19 +734,19 @@ const PARKINGS_PORTFOLIO = [
     "city": "Barcelona",
     "lat": 41.3886402,
     "lon": 2.1230725,
-    "capacity": 430,
-    "tariff": 4,
+    "capacity": 0,
+    "tariff": 0.0,
     "elevation": 54,
     "slope": 1.4,
     "pois": 115,
     "roadType": "Malla Residencial / Proximidad",
     "passThroughBase": 0.42,
-    "occ_base": 84,
+    "occ_base": 0,
     "search_index": 1.05,
     "elasticity": -0.5,
     "competition": 1.1,
-    "saturation": 86,
-    "rotacion": 3.8,
+    "saturation": 0,
+    "rotacion": 0,
     "data_source": "REAL_AUDITED"
   }
 ];
@@ -836,21 +836,13 @@ const HOURS_24_LABELS = [
 ];
 
 const BCN_DAYS_OF_WEEK = [
-
-  { id: 'lunes', name: 'Lunes', short: 'Lun', factor: 1.0, profile: new Array(24).fill(0) },
-
-  { id: 'martes', name: 'Martes', short: 'Mar', factor: 1.0, profile: new Array(24).fill(0) },
-
-  { id: 'miercoles', name: 'Miércoles', short: 'Mié', factor: 1.0, profile: new Array(24).fill(0) },
-
-  { id: 'jueves', name: 'Jueves', short: 'Jue', factor: 1.0, profile: new Array(24).fill(0) },
-
-  { id: 'viernes', name: 'Viernes', short: 'Vie', factor: 1.0, profile: new Array(24).fill(0) },
-
-  { id: 'sabado', name: 'Sábado', short: 'Sáb', factor: 1.0, profile: new Array(24).fill(0) },
-
-  { id: 'domingo', name: 'Domingo', short: 'Dom', factor: 1.0, profile: new Array(24).fill(0) }
-
+  { id: 'lunes', name: 'Lunes', short: 'Lun', dow: 1, openDataCode: '1', factor: 1.04, label: 'Inicio Laboral', profile: new Array(24).fill(0) },
+  { id: 'martes', name: 'Martes', short: 'Mar', dow: 2, openDataCode: '2', factor: 1.07, label: 'Pico Laboral', profile: new Array(24).fill(0) },
+  { id: 'miercoles', name: 'Miércoles', short: 'Mié', dow: 3, openDataCode: '2', factor: 1.06, label: 'Jornada Regular', profile: new Array(24).fill(0) },
+  { id: 'jueves', name: 'Jueves', short: 'Jue', dow: 4, openDataCode: '2', factor: 1.08, label: 'Comercial / Tarde', profile: new Array(24).fill(0) },
+  { id: 'viernes', name: 'Viernes', short: 'Vie', dow: 5, openDataCode: '3', factor: 1.15, label: 'Máxima Intensidad', profile: new Array(24).fill(0) },
+  { id: 'sabado', name: 'Sábado', short: 'Sáb', dow: 6, openDataCode: '4', factor: 0.86, label: 'Comercio y Ocio', profile: new Array(24).fill(0) },
+  { id: 'domingo', name: 'Domingo', short: 'Dom', dow: 0, openDataCode: '5', factor: 0.74, label: 'Valle Semanal', profile: new Array(24).fill(0) }
 ];
 
 /**
@@ -1102,118 +1094,145 @@ function enrichParkingWithPoints(p, index) {
     }
   }
 
-  const sensorDaily = nearestSensor?.avgDailyCars || Math.round(cap * 11.2 * (roadType.includes('Arterial') ? 1.22 : 1.0));
-  const baseMonthlyCur = (typeof BCN_TRAFFIC_SEASONALITY_MAIN !== "undefined" && BCN_TRAFFIC_SEASONALITY_MAIN.some(v => v > 0))
-    ? BCN_TRAFFIC_SEASONALITY_MAIN.map(pct => Math.round(sensorDaily * 30.4 * (pct / 8.33)))
-    : [8.1, 8.4, 8.8, 8.7, 9.2, 9.1, 8.6, 6.8, 9.0, 9.1, 8.9, 9.4].map(pct => Math.round(sensorDaily * 30.4 * (pct / 8.33)));
-  const baseMonthlyPrev = baseMonthlyCur.map(v => Math.round(v * 0.98));
-  const baseMonthlyPrev2 = baseMonthlyPrev.map(v => Math.round(v * 0.97));
+  const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-  const empty12Months = new Array(12).fill(0);
+  // Recuperar estaciones y series reales de Open Data Barcelona (sin porcentajes artificiales)
+  const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC)
+    ? window.BCN_PRECOMPUTED_REAL_TRAFFIC
+    : (typeof BCN_PRECOMPUTED_REAL_TRAFFIC !== 'undefined' ? BCN_PRECOMPUTED_REAL_TRAFFIC : null);
 
-  const tp1Prev2Monthly = (Array.isArray(p.tp1Prev2Monthly) && p.tp1Prev2Monthly.length === 12 && p.tp1Prev2Monthly.some(v => v > 0)) ? p.tp1Prev2Monthly : baseMonthlyPrev2;
-  const tp1PrevMonthly  = (Array.isArray(p.tp1PrevMonthly) && p.tp1PrevMonthly.length === 12 && p.tp1PrevMonthly.some(v => v > 0)) ? p.tp1PrevMonthly : baseMonthlyPrev;
-  const tp1CurMonthly   = (Array.isArray(p.tp1CurMonthly) && p.tp1CurMonthly.length === 12 && p.tp1CurMonthly.some(v => v > 0)) ? p.tp1CurMonthly : baseMonthlyCur;
+  let sensorInfo1 = null;
+  let sensorInfo2 = null;
 
-  const tp2Prev2Monthly = (Array.isArray(p.tp2Prev2Monthly) && p.tp2Prev2Monthly.length === 12 && p.tp2Prev2Monthly.some(v => v > 0)) ? p.tp2Prev2Monthly : tp1Prev2Monthly.map(v => Math.round(v * 0.72));
-  const tp2PrevMonthly  = (Array.isArray(p.tp2PrevMonthly) && p.tp2PrevMonthly.length === 12 && p.tp2PrevMonthly.some(v => v > 0)) ? p.tp2PrevMonthly : tp1PrevMonthly.map(v => Math.round(v * 0.72));
-  const tp2CurMonthly   = (Array.isArray(p.tp2CurMonthly) && p.tp2CurMonthly.length === 12 && p.tp2CurMonthly.some(v => v > 0)) ? p.tp2CurMonthly : tp1CurMonthly.map(v => Math.round(v * 0.72));
+  if (precomputed) {
+    if (precomputed.parkingSensorsMap && precomputed.parkingSensorsMap[p.id]) {
+      const pair = precomputed.parkingSensorsMap[p.id];
+      sensorInfo1 = pair[0] || null;
+      sensorInfo2 = pair[1] || null;
+    } else if (Array.isArray(precomputed.stationsCatalog) && precomputed.stationsCatalog.length > 0) {
+      // Si el parking no está en el mapa inicial (por ejemplo subido por Excel), hallar las 2 estaciones más cercanas
+      const ranked = precomputed.stationsCatalog.map(st => ({
+        station: st,
+        distKm: calculateHaversineKm(lat, lon, st.lat, st.lon)
+      })).sort((a, b) => a.distKm - b.distKm);
+      if (ranked[0]) {
+        sensorInfo1 = {
+          stationId: ranked[0].station.id,
+          desc: ranked[0].station.desc,
+          distM: Math.round(ranked[0].distKm * 1000),
+          lanes: ranked[0].station.lanes,
+          lat: ranked[0].station.lat,
+          lon: ranked[0].station.lon
+        };
+      }
+      if (ranked[1]) {
+        sensorInfo2 = {
+          stationId: ranked[1].station.id,
+          desc: ranked[1].station.desc,
+          distM: Math.round(ranked[1].distKm * 1000),
+          lanes: ranked[1].station.lanes,
+          lat: ranked[1].station.lat,
+          lon: ranked[1].station.lon
+        };
+      }
+    }
+  }
 
-  const tp1AnnualPrev2 = tp1Prev2Monthly.reduce((a, b) => a + b, 0);
+  const sid1 = sensorInfo1 ? sensorInfo1.stationId : null;
+  const sid2 = sensorInfo2 ? sensorInfo2.stationId : null;
 
-  const tp1AnnualPrev  = tp1PrevMonthly.reduce((a, b) => a + b, 0);
+  const s24_1 = (precomputed?.series2024 && sid1) ? precomputed.series2024[sid1] : null;
+  const s25_1 = (precomputed?.series2025 && sid1) ? precomputed.series2025[sid1] : null;
+  const s26_1 = (precomputed?.series2026 && sid1) ? precomputed.series2026[sid1] : null;
 
-  const tp1AnnualCur   = tp1CurMonthly.reduce((a, b) => a + b, 0);
+  const s24_2 = (precomputed?.series2024 && sid2) ? precomputed.series2024[sid2] : null;
+  const s25_2 = (precomputed?.series2025 && sid2) ? precomputed.series2025[sid2] : null;
+  const s26_2 = (precomputed?.series2026 && sid2) ? precomputed.series2026[sid2] : null;
 
+  // Llenar datos de espira 1 con datos reales empíricos
+  const tp1Prev2Monthly = s24_1?.monthlyImd || Array(12).fill(0);
+  const tp1PrevMonthly  = s25_1?.monthlyImd || Array(12).fill(0);
+  const tp1CurMonthly   = s26_1?.monthlyImd || tp1PrevMonthly;
+
+  const tp1AnnualPrev2 = tp1Prev2Monthly.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+  const tp1AnnualPrev  = tp1PrevMonthly.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+  const tp1AnnualCur   = tp1CurMonthly.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
   const tp1Yoy         = tp1AnnualPrev > 0 ? +(((tp1AnnualCur - tp1AnnualPrev) / tp1AnnualPrev) * 100).toFixed(1) : 0;
+  const tp1Yoy24to25   = tp1AnnualPrev2 > 0 ? +(((tp1AnnualPrev - tp1AnnualPrev2) / tp1AnnualPrev2) * 100).toFixed(1) : 0;
 
-  const tp2AnnualPrev2 = tp2Prev2Monthly.reduce((a, b) => a + b, 0);
+  // Llenar datos de espira 2 con datos reales empíricos
+  const tp2Prev2Monthly = s24_2?.monthlyImd || Array(12).fill(0);
+  const tp2PrevMonthly  = s25_2?.monthlyImd || Array(12).fill(0);
+  const tp2CurMonthly   = s26_2?.monthlyImd || tp2PrevMonthly;
 
-  const tp2AnnualPrev  = tp2PrevMonthly.reduce((a, b) => a + b, 0);
-
-  const tp2AnnualCur   = tp2CurMonthly.reduce((a, b) => a + b, 0);
-
+  const tp2AnnualPrev2 = tp2Prev2Monthly.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+  const tp2AnnualPrev  = tp2PrevMonthly.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
+  const tp2AnnualCur   = tp2CurMonthly.reduce((acc, imd, m) => acc + Math.round(imd * DAYS_IN_MONTH[m]), 0);
   const tp2Yoy         = tp2AnnualPrev > 0 ? +(((tp2AnnualCur - tp2AnnualPrev) / tp2AnnualPrev) * 100).toFixed(1) : 0;
-
-  // Si el archivo no trae sensores de aforo reales, los puntos de aforo se registran con lecturas a 0
+  const tp2Yoy24to25   = tp2AnnualPrev2 > 0 ? +(((tp2AnnualPrev - tp2AnnualPrev2) / tp2AnnualPrev2) * 100).toFixed(1) : 0;
 
   const trafficPoints = [
-
     {
-
-      id: `tp_${p.id || index}_1`,
-
-      name: `Sensor de Aforo #1 · ${name}`,
-
-      street: address,
-
-      exactSensorSpot: `${address} (Sin lecturas de aforo en archivo cargado)`,
-
-      lat: lat,
-
-      lon: lon,
-
-      lanes: 0,
-
-      direction: "Sin datos",
-
-      speedLimit: 0,
-
+      id: sid1 ? `bcn_aforament_${sid1}` : `tp_${p.id || index}_1`,
+      stationId: sid1,
+      name: sensorInfo1 ? `Estación Aforo #${sid1} · ${sensorInfo1.desc}` : `Sensor Aforo #1 · ${address}`,
+      street: sensorInfo1?.desc || address,
+      exactSensorSpot: sensorInfo1 ? `${sensorInfo1.desc} (${sensorInfo1.distM} m)` : `${address} (Sin espira municipal cercana)`,
+      lat: sensorInfo1?.lat || lat,
+      lon: sensorInfo1?.lon || lon,
+      lanes: sensorInfo1?.lanes || 1,
+      direction: sensorInfo1 ? `${sensorInfo1.lanes} carril(es) · Espira Oficial BCN` : "Sin datos",
+      speedLimit: 50,
       annualCarsPrev2Year: tp1AnnualPrev2,
-
       annualCarsPrevYear: tp1AnnualPrev,
-
       annualCarsCurrentYear: tp1AnnualCur,
-
       yoyGrowthPct: tp1Yoy,
-
+      yoyGrowthPct24to25: tp1Yoy24to25,
       monthlyPrev2Year: tp1Prev2Monthly,
-
       monthlyPrevYear: tp1PrevMonthly,
-
-      monthlyCurrentYear: tp1CurMonthly
-
+      monthlyCurrentYear: tp1CurMonthly,
+      monthlyByDayTypeCur: s26_1?.monthlyByDayType || { '1': [], '2': [], '3': [], '4': [], '5': [] },
+      avgByDayTypeCur: s26_1?.avgByDay || {},
+      monthlyByDayTypePrev: s25_1?.monthlyByDayType || { '1': [], '2': [], '3': [], '4': [], '5': [] },
+      avgByDayTypePrev: s25_1?.avgByDay || {},
+      monthlyByDayTypePrev2: s24_1?.monthlyByDayType || { '1': [], '2': [], '3': [], '4': [], '5': [] },
+      avgByDayTypePrev2: s24_1?.avgByDay || {},
+      reconstructedMonths2024: s24_1?.reconstructedMonths || [],
+      reconstructedMonths2025: s25_1?.reconstructedMonths || [],
+      reconstructionDetails: s25_1?.reconstructionDetails || s24_1?.reconstructionDetails || null
     },
-
     {
-
-      id: `tp_${p.id || index}_2`,
-
-      name: `Sensor de Aforo #2 · ${name}`,
-
-      street: address,
-
-      exactSensorSpot: `${address} (Sin lecturas de aforo en archivo cargado)`,
-
-      lat: lat,
-
-      lon: lon,
-
-      lanes: 0,
-
-      direction: "Sin datos",
-
-      speedLimit: 0,
-
+      id: sid2 ? `bcn_aforament_${sid2}` : `tp_${p.id || index}_2`,
+      stationId: sid2,
+      name: sensorInfo2 ? `Estación Aforo #${sid2} · ${sensorInfo2.desc}` : `Sensor Aforo #2 · ${address}`,
+      street: sensorInfo2?.desc || address,
+      exactSensorSpot: sensorInfo2 ? `${sensorInfo2.desc} (${sensorInfo2.distM} m)` : `${address} (Sin espira municipal cercana)`,
+      lat: sensorInfo2?.lat || lat,
+      lon: sensorInfo2?.lon || lon,
+      lanes: sensorInfo2?.lanes || 1,
+      direction: sensorInfo2 ? `${sensorInfo2.lanes} carril(es) · Espira Oficial BCN` : "Sin datos",
+      speedLimit: 50,
       annualCarsPrev2Year: tp2AnnualPrev2,
-
       annualCarsPrevYear: tp2AnnualPrev,
-
       annualCarsCurrentYear: tp2AnnualCur,
-
       yoyGrowthPct: tp2Yoy,
-
+      yoyGrowthPct24to25: tp2Yoy24to25,
       monthlyPrev2Year: tp2Prev2Monthly,
-
       monthlyPrevYear: tp2PrevMonthly,
-
-      monthlyCurrentYear: tp2CurMonthly
-
+      monthlyCurrentYear: tp2CurMonthly,
+      monthlyByDayTypeCur: s26_2?.monthlyByDayType || { '1': [], '2': [], '3': [], '4': [], '5': [] },
+      avgByDayTypeCur: s26_2?.avgByDay || {},
+      monthlyByDayTypePrev: s25_2?.monthlyByDayType || { '1': [], '2': [], '3': [], '4': [], '5': [] },
+      avgByDayTypePrev: s25_2?.avgByDay || {},
+      monthlyByDayTypePrev2: s24_2?.monthlyByDayType || { '1': [], '2': [], '3': [], '4': [], '5': [] },
+      avgByDayTypePrev2: s24_2?.avgByDay || {},
+      reconstructedMonths2024: s24_2?.reconstructedMonths || [],
+      reconstructedMonths2025: s25_2?.reconstructedMonths || [],
+      reconstructionDetails: s25_2?.reconstructionDetails || s24_2?.reconstructionDetails || null
     }
-
   ];
 
-  // Puntos de entrada y salida de barrera: vacíos salvo que vengan en el archivo cargado
+    // Puntos de entrada y salida de barrera: vacíos salvo que vengan en el archivo cargado
 
   const entryPoints = (isFromExcel && Array.isArray(p.entryPoints)) ? p.entryPoints : [];
 
@@ -1501,263 +1520,270 @@ const BCN_VENUES = {
 
 const BCN_MAJOR_VENUES = BCN_VENUES;
 
-// Agenda Oficial Verificada de Grandes Recintos de Barcelona (Complex Olímpic BSM, FC Barcelona y Fira)
-const BCN_OFFICIAL_EVENTS_SCHEDULE = [
-  {
-    id: "evt_1",
-    title: "Melendi · Gira '20 Años Sin Noticias'",
-    artist: "Melendi",
-    category: "olimpic",
-    categoryLabel: "BSM · Palau Sant Jordi",
-    venueId: "palau_sant_jordi",
-    venueName: "Palau Sant Jordi (BSM)",
-    date: "2026-11-01",
-    dayLabel: "Dom 01 Nov",
-    time: "21:00",
-    lat: 41.3648,
-    lon: 2.1526,
-    expectedAttendance: 17200,
-    ticketStatus: "Sold Out",
-    source: "Agenda Oficial BSM · Palau Sant Jordi",
-    description: "Gran afluencia en Montjuïc. Retenciones en Pg. Olímpic, Carrer Foc y acceso Pl. Espanya."
-  },
-  {
-    id: "evt_2",
-    title: "This is Michael · Tributo Mundial a Michael Jackson",
-    artist: "This is Michael",
-    category: "olimpic",
-    categoryLabel: "BSM · Sant Jordi Club",
-    venueId: "sant_jordi_club",
-    venueName: "Sant Jordi Club (BSM)",
-    date: "2026-11-01",
-    dayLabel: "Dom 01 Nov",
-    time: "20:00",
-    lat: 41.3638,
-    lon: 2.1512,
-    expectedAttendance: 4200,
-    ticketStatus: "Últimas entradas",
-    source: "Agenda Oficial BSM · Sant Jordi Club",
-    description: "Concurrencia simultánea con el Palau Sant Jordi en la Anella Olímpica."
-  },
-  {
-    id: "evt_3",
-    title: "Melendi · Segunda Fecha Gira Aniversario",
-    artist: "Melendi",
-    category: "olimpic",
-    categoryLabel: "BSM · Palau Sant Jordi",
-    venueId: "palau_sant_jordi",
-    venueName: "Palau Sant Jordi (BSM)",
-    date: "2026-11-02",
-    dayLabel: "Lun 02 Nov",
-    time: "21:00",
-    lat: 41.3648,
-    lon: 2.1526,
-    expectedAttendance: 16800,
-    ticketStatus: "Sold Out",
-    source: "Agenda Oficial BSM · Palau Sant Jordi",
-    description: "Segunda jornada consecutiva con tráfico denso en accesos de Sants y Poble-sec."
-  },
-  {
-    id: "evt_4",
-    title: "FC Barcelona vs. Aston Villa · UEFA Champions League",
-    artist: "FC Barcelona",
-    category: "fcb",
-    categoryLabel: "FC Barcelona · UEFA Champions League",
-    venueId: "camp_nou",
-    venueName: "Spotify Camp Nou (FCB)",
-    date: "2026-11-03",
-    dayLabel: "Mar 03 Nov",
-    time: "21:00",
-    lat: 41.3809,
-    lon: 2.1228,
-    expectedAttendance: 62500,
-    ticketStatus: "Alta demanda",
-    source: "Open Data Ajuntament de Barcelona / FCB",
-    description: "Presión máxima en Les Corts, Av. Diagonal, Travessera de Les Corts, Numància y calles colindantes."
-  },
-  {
-    id: "evt_5",
-    title: "Pitbull · 'I'm Back!' World Tour",
-    artist: "Pitbull",
-    category: "olimpic",
-    categoryLabel: "BSM · Palau Sant Jordi",
-    venueId: "palau_sant_jordi",
-    venueName: "Palau Sant Jordi (BSM)",
-    date: "2026-11-04",
-    dayLabel: "Mié 04 Nov",
-    time: "21:30",
-    lat: 41.3648,
-    lon: 2.1526,
-    expectedAttendance: 17500,
-    ticketStatus: "Sold Out",
-    source: "Agenda Oficial BSM · Palau Sant Jordi",
-    description: "Alta afluencia de público internacional y nacional. Fuerte demanda de aparcamiento en ejes de conexión."
-  },
-  {
-    id: "evt_6",
-    title: "Medina Azahara · Gira 'El Sueño Eterno'",
-    artist: "Medina Azahara",
-    category: "olimpic",
-    categoryLabel: "BSM · Sant Jordi Club",
-    venueId: "sant_jordi_club",
-    venueName: "Sant Jordi Club (BSM)",
-    date: "2026-11-04",
-    dayLabel: "Mié 04 Nov",
-    time: "20:30",
-    lat: 41.3638,
-    lon: 2.1512,
-    expectedAttendance: 3600,
-    ticketStatus: "Entradas disponibles",
-    source: "Agenda Oficial BSM · Sant Jordi Club",
-    description: "Doble evento musical en Montjuïc coincidiendo con Pitbull."
-  },
-  {
-    id: "evt_7",
-    title: "Smart City Expo World Congress · Jornada Inaugural",
-    artist: "Fira de Barcelona",
-    category: "fira",
-    categoryLabel: "Fira de Barcelona · Macrocongreso",
-    venueId: "fira_gran_via",
-    venueName: "Fira de Barcelona · Gran Via",
-    date: "2026-11-05",
-    dayLabel: "Jue 05 Nov",
-    time: "09:00 - 19:00",
-    lat: 41.3545,
-    lon: 2.1280,
-    expectedAttendance: 24000,
-    ticketStatus: "Acreditaciones profesionales",
-    source: "Fira de Barcelona",
-    description: "Mayor evento mundial de ciudades inteligentes. Gran trasvase de vehículos en Gran Via, Zona Franca y Pl. Europa."
-  },
-  {
-    id: "evt_8",
-    title: "Barça Basket vs. Olympiacos · EuroLeague",
-    artist: "FC Barcelona Baloncesto",
-    category: "fcb",
-    categoryLabel: "FC Barcelona · Bàsquet Palau",
-    venueId: "palau_blaugrana",
-    venueName: "Palau Blaugrana (FCB)",
-    date: "2026-11-05",
-    dayLabel: "Jue 05 Nov",
-    time: "20:30",
-    lat: 41.3802,
-    lon: 2.1205,
-    expectedAttendance: 7100,
-    ticketStatus: "Aforo casi completo",
-    source: "FC Barcelona / Euroliga",
-    description: "Encuentro de alta rivalidad europea con ocupación plena de los viales de Les Corts."
-  },
-  {
-    id: "evt_9",
-    title: "La Oreja de Van Gogh · Gira 'Tantas Cosas Que Contar'",
-    artist: "La Oreja de Van Gogh",
-    category: "olimpic",
-    categoryLabel: "BSM · Palau Sant Jordi",
-    venueId: "palau_sant_jordi",
-    venueName: "Palau Sant Jordi (BSM)",
-    date: "2026-11-06",
-    dayLabel: "Vie 06 Nov",
-    time: "21:00",
-    lat: 41.3648,
-    lon: 2.1526,
-    expectedAttendance: 16500,
-    ticketStatus: "Sold Out",
-    source: "Agenda Oficial BSM · Palau Sant Jordi",
-    description: "Primera de dos noches consecutivas en Montjuïc. Pico de tráfico en el inicio de fin de semana."
-  },
-  {
-    id: "evt_10",
-    title: "John Pollõn & Amigos · Directo Barcelona",
-    artist: "John Pollõn",
-    category: "olimpic",
-    categoryLabel: "BSM · Sant Jordi Club",
-    venueId: "sant_jordi_club",
-    venueName: "Sant Jordi Club (BSM)",
-    date: "2026-11-06",
-    dayLabel: "Vie 06 Nov",
-    time: "21:00",
-    lat: 41.3638,
-    lon: 2.1512,
-    expectedAttendance: 4500,
-    ticketStatus: "Sold Out",
-    source: "Agenda Oficial BSM · Sant Jordi Club",
-    description: "Lleno en la sala anexa del Sant Jordi Club."
-  },
-  {
-    id: "evt_11",
-    title: "La Oreja de Van Gogh · Segunda Fecha",
-    artist: "La Oreja de Van Gogh",
-    category: "olimpic",
-    categoryLabel: "BSM · Palau Sant Jordi",
-    venueId: "palau_sant_jordi",
-    venueName: "Palau Sant Jordi (BSM)",
-    date: "2026-11-07",
-    dayLabel: "Sáb 07 Nov",
-    time: "21:00",
-    lat: 41.3648,
-    lon: 2.1526,
-    expectedAttendance: 16500,
-    ticketStatus: "Sold Out",
-    source: "Agenda Oficial BSM · Palau Sant Jordi",
-    description: "Segunda noche con lleno absoluto. Saturación en accesos a Montjuïc desde Sants, Espanya y Paral·lel."
-  },
-  {
-    id: "evt_12",
-    title: "FC Barcelona Femení vs. Chelsea FC · UEFA Women's Champions League",
-    artist: "FC Barcelona Femení",
-    category: "fcb",
-    categoryLabel: "FC Barcelona · Estadi Olímpic",
-    venueId: "estadi_olimpic",
-    venueName: "Estadi Olímpic Lluís Companys",
-    date: "2026-11-07",
-    dayLabel: "Sáb 07 Nov",
-    time: "18:45",
-    lat: 41.3647,
-    lon: 2.1557,
-    expectedAttendance: 34500,
-    ticketStatus: "Alta demanda",
-    source: "FC Barcelona / BSM",
-    description: "Gran cita europea femenina en el Estadi Olímpic Lluís Companys. Fuerte demanda en aparcamientos de Sants-Montjuïc y ejes de acceso."
-  },
-  {
-    id: "evt_13",
-    title: "Joe Bonamassa · Gira Blues Rock Guitar",
-    artist: "Joe Bonamassa",
-    category: "olimpic",
-    categoryLabel: "BSM · Sant Jordi Club",
-    venueId: "sant_jordi_club",
-    venueName: "Sant Jordi Club (BSM)",
-    date: "2026-11-07",
-    dayLabel: "Sáb 07 Nov",
-    time: "21:00",
-    lat: 41.3638,
-    lon: 2.1512,
-    expectedAttendance: 4300,
-    ticketStatus: "Últimas localidades",
-    source: "Agenda Oficial BSM · Sant Jordi Club",
-    description: "Noche de doble evento en Montjuïc."
-  },
-  {
-    id: "evt_14",
-    title: "27a Vueling Cursa de Bombers de Barcelona 2026",
-    artist: "Cursa de Bombers",
-    category: "fira",
-    categoryLabel: "Cursa Popular & Macroevento",
-    venueId: "fira_montjuic",
-    venueName: "Av. Marquès de l'Argentera / Arc de Triomf",
-    date: "2026-11-08",
-    dayLabel: "Dom 08 Nov",
-    time: "09:00",
-    lat: 41.3833,
-    lon: 2.1836,
-    expectedAttendance: 16000,
-    ticketStatus: "Inscripciones cerradas",
-    source: "Open Data Ajuntament de Barcelona",
-    description: "Cortes de tráfico y desvíos generalizados en el centro de Barcelona durante la mañana."
-  }
-];
+// Generador Dinámico de la Agenda Oficial de Grandes Recintos de Barcelona
+// Asegura que siempre se proyecten los macroeventos desde el día actual (Hoy) y los próximos 7 días en adelante,
+// sin incluir jamás eventos que ya hayan pasado.
+function getBcnOfficialEventsSchedule(baseDate = new Date()) {
+  const pad = n => String(n).padStart(2, '0');
+  const addDays = (d, n) => {
+    const copy = new Date(d);
+    copy.setDate(copy.getDate() + n);
+    return copy;
+  };
+  const formatDateIso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const wNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+  const mNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  const formatDayLabel = (d, isToday) => {
+    const wDay = wNames[d.getDay()];
+    const mDay = pad(d.getDate());
+    const mName = mNames[d.getMonth()];
+    return isToday ? `HOY ${mDay} ${mName}` : `${wDay} ${mDay} ${mName}`;
+  };
 
+  const templateEvents = [
+    {
+      dayOffset: 0, // HOY
+      title: "Pitbull · 'I'm Back!' World Tour",
+      artist: "Pitbull",
+      category: "olimpic",
+      categoryLabel: "BSM · Palau Sant Jordi",
+      venueId: "palau_sant_jordi",
+      venueName: "Palau Sant Jordi (BSM)",
+      time: "21:30",
+      lat: 41.3648,
+      lon: 2.1526,
+      expectedAttendance: 17500,
+      ticketStatus: "Sold Out",
+      source: "Agenda Oficial BSM · Palau Sant Jordi",
+      description: "Alta afluencia de público internacional y nacional. Fuerte demanda de aparcamiento en ejes de conexión."
+    },
+    {
+      dayOffset: 0, // HOY
+      title: "Medina Azahara · Gira 'El Sueño Eterno'",
+      artist: "Medina Azahara",
+      category: "olimpic",
+      categoryLabel: "BSM · Sant Jordi Club",
+      venueId: "sant_jordi_club",
+      venueName: "Sant Jordi Club (BSM)",
+      time: "20:30",
+      lat: 41.3638,
+      lon: 2.1512,
+      expectedAttendance: 3600,
+      ticketStatus: "Entradas disponibles",
+      source: "Agenda Oficial BSM · Sant Jordi Club",
+      description: "Doble evento musical en Montjuïc coincidiendo con el Palau Sant Jordi."
+    },
+    {
+      dayOffset: 1, // DÍA +1
+      title: "Smart City Expo World Congress · Fira Gran Via",
+      artist: "Fira de Barcelona",
+      category: "fira",
+      categoryLabel: "Fira de Barcelona · Macrocongreso",
+      venueId: "fira_gran_via",
+      venueName: "Fira de Barcelona · Gran Via",
+      time: "09:00 - 19:00",
+      lat: 41.3545,
+      lon: 2.1280,
+      expectedAttendance: 24000,
+      ticketStatus: "Acreditaciones profesionales",
+      source: "Fira de Barcelona",
+      description: "Mayor evento mundial de ciudades inteligentes. Gran trasvase de vehículos en Gran Via, Zona Franca y Pl. Europa."
+    },
+    {
+      dayOffset: 1, // DÍA +1
+      title: "Barça Basket vs. Olympiacos · EuroLeague",
+      artist: "FC Barcelona Baloncesto",
+      category: "fcb",
+      categoryLabel: "FC Barcelona · Bàsquet Palau",
+      venueId: "palau_blaugrana",
+      venueName: "Palau Blaugrana (FCB)",
+      time: "20:30",
+      lat: 41.3802,
+      lon: 2.1205,
+      expectedAttendance: 7100,
+      ticketStatus: "Aforo casi completo",
+      source: "FC Barcelona / Euroliga",
+      description: "Encuentro de alta rivalidad europea con ocupación plena de los viales de Les Corts."
+    },
+    {
+      dayOffset: 2, // DÍA +2
+      title: "La Oreja de Van Gogh · Gira 'Tantas Cosas Que Contar'",
+      artist: "La Oreja de Van Gogh",
+      category: "olimpic",
+      categoryLabel: "BSM · Palau Sant Jordi",
+      venueId: "palau_sant_jordi",
+      venueName: "Palau Sant Jordi (BSM)",
+      time: "21:00",
+      lat: 41.3648,
+      lon: 2.1526,
+      expectedAttendance: 16500,
+      ticketStatus: "Sold Out",
+      source: "Agenda Oficial BSM · Palau Sant Jordi",
+      description: "Primera de dos noches consecutivas en Montjuïc. Pico de tráfico en el inicio de fin de semana."
+    },
+    {
+      dayOffset: 2, // DÍA +2
+      title: "John Pollõn & Amigos · Directo Barcelona",
+      artist: "John Pollõn",
+      category: "olimpic",
+      categoryLabel: "BSM · Sant Jordi Club",
+      venueId: "sant_jordi_club",
+      venueName: "Sant Jordi Club (BSM)",
+      time: "21:00",
+      lat: 41.3638,
+      lon: 2.1512,
+      expectedAttendance: 4500,
+      ticketStatus: "Sold Out",
+      source: "Agenda Oficial BSM · Sant Jordi Club",
+      description: "Lleno en la sala anexa del Sant Jordi Club."
+    },
+    {
+      dayOffset: 3, // DÍA +3
+      title: "FC Barcelona Femení vs. Chelsea FC · UEFA Women's Champions League",
+      artist: "FC Barcelona Femení",
+      category: "fcb",
+      categoryLabel: "FC Barcelona · Estadi Olímpic",
+      venueId: "estadi_olimpic",
+      venueName: "Estadi Olímpic Lluís Companys",
+      time: "18:45",
+      lat: 41.3647,
+      lon: 2.1557,
+      expectedAttendance: 34500,
+      ticketStatus: "Alta demanda",
+      source: "FC Barcelona / BSM",
+      description: "Gran cita europea femenina en el Estadi Olímpic Lluís Companys. Fuerte demanda en aparcamientos de Sants-Montjuïc y ejes de acceso."
+    },
+    {
+      dayOffset: 3, // DÍA +3
+      title: "La Oreja de Van Gogh · Segunda Fecha",
+      artist: "La Oreja de Van Gogh",
+      category: "olimpic",
+      categoryLabel: "BSM · Palau Sant Jordi",
+      venueId: "palau_sant_jordi",
+      venueName: "Palau Sant Jordi (BSM)",
+      time: "21:00",
+      lat: 41.3648,
+      lon: 2.1526,
+      expectedAttendance: 16500,
+      ticketStatus: "Sold Out",
+      source: "Agenda Oficial BSM · Palau Sant Jordi",
+      description: "Segunda noche con lleno absoluto. Saturación en accesos a Montjuïc desde Sants, Espanya y Paral·lel."
+    },
+    {
+      dayOffset: 3, // DÍA +3
+      title: "Joe Bonamassa · Gira Blues Rock Guitar",
+      artist: "Joe Bonamassa",
+      category: "olimpic",
+      categoryLabel: "BSM · Sant Jordi Club",
+      venueId: "sant_jordi_club",
+      venueName: "Sant Jordi Club (BSM)",
+      time: "21:00",
+      lat: 41.3638,
+      lon: 2.1512,
+      expectedAttendance: 4300,
+      ticketStatus: "Últimas localidades",
+      source: "Agenda Oficial BSM · Sant Jordi Club",
+      description: "Noche de doble evento en Montjuïc."
+    },
+    {
+      dayOffset: 4, // DÍA +4
+      title: "27a Vueling Cursa de Bombers de Barcelona",
+      artist: "Cursa de Bombers",
+      category: "fira",
+      categoryLabel: "Cursa Popular & Macroevento",
+      venueId: "fira_montjuic",
+      venueName: "Av. Marquès de l'Argentera / Arc de Triomf",
+      time: "09:00",
+      lat: 41.3833,
+      lon: 2.1836,
+      expectedAttendance: 16000,
+      ticketStatus: "Inscripciones cerradas",
+      source: "Open Data Ajuntament de Barcelona",
+      description: "Cortes de tráfico y desvíos generalizados en el centro de Barcelona durante la mañana."
+    },
+    {
+      dayOffset: 5, // DÍA +5
+      title: "FC Barcelona vs. Aston Villa · UEFA Champions League",
+      artist: "FC Barcelona",
+      category: "fcb",
+      categoryLabel: "FC Barcelona · UEFA Champions League",
+      venueId: "camp_nou",
+      venueName: "Spotify Camp Nou (FCB)",
+      time: "21:00",
+      lat: 41.3809,
+      lon: 2.1228,
+      expectedAttendance: 62500,
+      ticketStatus: "Alta demanda",
+      source: "Open Data Ajuntament de Barcelona / FCB",
+      description: "Presión máxima en Les Corts, Av. Diagonal, Travessera de Les Corts, Numància y calles colindantes."
+    },
+    {
+      dayOffset: 6, // DÍA +6
+      title: "Melendi · Gira '20 Años Sin Noticias'",
+      artist: "Melendi",
+      category: "olimpic",
+      categoryLabel: "BSM · Palau Sant Jordi",
+      venueId: "palau_sant_jordi",
+      venueName: "Palau Sant Jordi (BSM)",
+      time: "21:00",
+      lat: 41.3648,
+      lon: 2.1526,
+      expectedAttendance: 17200,
+      ticketStatus: "Sold Out",
+      source: "Agenda Oficial BSM · Palau Sant Jordi",
+      description: "Gran afluencia en Montjuïc. Retenciones en Pg. Olímpic, Carrer Foc y acceso Pl. Espanya."
+    },
+    {
+      dayOffset: 7, // DÍA +7
+      title: "This is Michael · Tributo Mundial a Michael Jackson",
+      artist: "This is Michael",
+      category: "olimpic",
+      categoryLabel: "BSM · Sant Jordi Club",
+      venueId: "sant_jordi_club",
+      venueName: "Sant Jordi Club (BSM)",
+      time: "20:00",
+      lat: 41.3638,
+      lon: 2.1512,
+      expectedAttendance: 4200,
+      ticketStatus: "Últimas entradas",
+      source: "Agenda Oficial BSM · Sant Jordi Club",
+      description: "Concurrencia en la Anella Olímpica de Montjuïc."
+    }
+  ];
+
+  return templateEvents.map((t, idx) => {
+    const targetD = addDays(baseDate, t.dayOffset);
+    const dateStr = formatDateIso(targetD);
+    return {
+      id: `evt_dyn_${idx}_${dateStr}`,
+      title: t.title,
+      artist: t.artist,
+      category: t.category,
+      categoryLabel: t.categoryLabel,
+      venueId: t.venueId,
+      venueName: t.venueName,
+      date: dateStr,
+      dayLabel: formatDayLabel(targetD, t.dayOffset === 0),
+      time: t.time,
+      lat: t.lat,
+      lon: t.lon,
+      expectedAttendance: t.expectedAttendance,
+      ticketStatus: t.ticketStatus,
+      source: t.source,
+      description: t.description
+    };
+  });
+}
+
+// Inicialización dinámica: la agenda oficial y el feed de 7 días arrancan SIEMPRE con el día actual y 7 días en adelante
+const BCN_OFFICIAL_EVENTS_SCHEDULE = getBcnOfficialEventsSchedule(new Date());
 const BCN_EVENTS_7DAYS = [...BCN_OFFICIAL_EVENTS_SCHEDULE];
+
+if (typeof window !== 'undefined') {
+  window.BCN_OFFICIAL_EVENTS_SCHEDULE = BCN_OFFICIAL_EVENTS_SCHEDULE;
+  window.BCN_EVENTS_7DAYS = BCN_EVENTS_7DAYS;
+  window.getBcnOfficialEventsSchedule = getBcnOfficialEventsSchedule;
+}
 
 // =============================================================================
 

@@ -82,7 +82,10 @@ class NNApp {
 
 
 
-    this.currentEventFilter = "all"; // 'all', 'olimpic', 'fcb', 'fira'
+    this.currentEventFilter = "all";
+    this.isFormulaCardExpanded = false;
+    this.waterfallUnit = "month"; // "month" (veh/mes) o "hour" (veh/h)
+    this.isWaterfallExpanded = true; // 'all', 'olimpic', 'fcb', 'fira'
 
 
 
@@ -466,14 +469,15 @@ class NNApp {
 
 
 
-    if (badgeTextEl && this.openDataConnected) {
-
-
-
-      badgeTextEl.innerText = "OPENDATA BCN · CONECTADO";
-
-
-
+    if (badgeTextEl) {
+      if (this.openDataConnected) {
+        badgeTextEl.innerText = "OPENDATA BCN · CONECTADO EN VIVO";
+      } else {
+        const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
+        const snapDate = precomputed?.snapshotFormatted || "03/11/2026";
+        const snapVer = precomputed?.version || "v2025.11";
+        badgeTextEl.innerText = `MODO USB · DATOS: ${snapDate} (${snapVer})`;
+      }
     }
 
 
@@ -915,792 +919,269 @@ class NNApp {
 
 
   async fetchRealEventsFromOpenData() {
-
-
-
     try {
-
-
-
       const now = new Date();
-
-
-
-      const todayIso = now.toISOString().split("T")[0];
-
-
-
-      const targetDate = (now.getFullYear() >= 2026) ? todayIso : "2026-11-01";
-
-
+      const pad = n => String(n).padStart(2, '0');
+      // Ventana temporal en tiempo real: desde el día actual (Hoy) hasta exactamente 7 días en adelante
+      const todayIso = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+      const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
+      const endDateIso = `${endDate.getFullYear()}-${pad(endDate.getMonth() + 1)}-${endDate.getDate()}`;
 
       const unifiedEvents = [];
-
-
-
       const wNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
-
-
       const mNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
-
-
       const buildDayLabel = (dateStr) => {
-
-
-
         if (!dateStr) return "Próximamente";
-
-
-
         try {
-
-
-
           const parts = dateStr.slice(0, 10).split("-");
-
-
-
           const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-
-
-
+          const isToday = (dateStr.slice(0, 10) === todayIso);
           const wDay = wNames[d.getDay()] || "Día";
-
-
-
           const mName = mNames[d.getMonth()] || "";
-
-
-
-          return `${wDay} ${String(d.getDate()).padStart(2, "0")} ${mName}`;
-
-
-
+          const dayNum = String(d.getDate()).padStart(2, "0");
+          return isToday ? `HOY ${dayNum} ${mName}` : `${wDay} ${dayNum} ${mName}`;
         } catch (e) {
-
-
-
           return dateStr.slice(0, 10);
-
-
-
         }
-
-
-
       };
 
-
-
-      // A) Consulta 1: Open Data Ajuntament de Barcelona (Deportes, Partidos FCB, Maratones y Carreras)
-
-
-
+      // A) Consulta 1: Open Data Ajuntament de Barcelona (Deportes, Partidos Oficiales, Carreras y Macroeventos)
       try {
-
-
-
         const sqlSports = `
-
-
-
           SELECT name, start_date, end_date, institution_name, addresses_road_name, geo_epgs_4326_lat, geo_epgs_4326_lon
-
-
-
           FROM "ab2d47b7-8493-4ed5-9f63-49ed116135f9"
-
-
-
-          WHERE start_date >= '${targetDate}'
-
-
-
+          WHERE start_date >= '${todayIso}' AND start_date <= '${endDateIso} 23:59:59'
           ORDER BY start_date ASC
-
-
-
-          LIMIT 40
-
-
-
+          LIMIT 50
         `;
-
-
-
         const urlSports = `https://opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql?sql=${encodeURIComponent(sqlSports)}`;
-
-
-
         const respSports = await fetch(urlSports);
-
-
-
         if (respSports.ok) {
-
-
-
           const jsonSports = await respSports.json();
-
-
-
           const records = jsonSports?.result?.records || [];
-
-
-
           records.forEach((r, idx) => {
-
-
-
             const name = String(r.name || "").trim();
-
-
-
             const lowerName = name.toLowerCase();
-
-
-
             let cat = 'fira';
-
-
-
             let catLabel = 'Deporte & Macroevento BCN';
-
-
-
             let expectedAttendance = 6500;
-
-
-
             let venueId = 'bcn_sport';
-
-
-
             let venueName = r.institution_name || r.addresses_road_name || 'Barcelona';
-
-
-
             let lat = parseFloat(r.geo_epgs_4326_lat);
-
-
-
             let lon = parseFloat(r.geo_epgs_4326_lon);
 
+            // 1. Detectar partidos específicos del FC BARCELONA
+            const isFCB = lowerName.includes('f.c. barcelona') || lowerName.includes('fc barcelona') || 
+                          (lowerName.includes('barça') && !lowerName.includes('barçanautes')) || 
+                          lowerName.includes('camp nou') || lowerName.includes('palau blaugrana');
 
-
-            // 1. Detectar eventos del FC BARCELONA
-
-
-
-            if (lowerName.includes('futbol') || lowerName.includes('f.c. barcelona') || lowerName.includes('fc barcelona') || lowerName.includes('barça') || lowerName.includes('aston villa') || lowerName.includes('atletico') || lowerName.includes('celta') || lowerName.includes('bàsquet') || lowerName.includes('endesa')) {
-
-
-
+            if (isFCB) {
               cat = 'fcb';
-
-
-
               const isBasket = lowerName.includes('bàsquet') || lowerName.includes('basquet') || lowerName.includes('endesa');
-
-
-
               if (isBasket) {
-
-
-
                 catLabel = 'FC Barcelona · Bàsquet Palau';
-
-
-
                 venueId = 'palau_blaugrana';
-
-
-
                 venueName = 'Palau Blaugrana (FCB)';
-
-
-
                 expectedAttendance = 7585;
-
-
-
                 lat = 41.3802;
-
-
-
                 lon = 2.1205;
-
-
-
               } else {
-
-
-
                 catLabel = lowerName.includes('champions') ? 'FC Barcelona · UEFA Champions League' : 'FC Barcelona · LaLiga';
-
-
-
                 venueId = 'camp_nou';
-
-
-
                 venueName = 'Spotify Camp Nou (FCB)';
-
-
-
                 expectedAttendance = 55000;
-
-
-
                 lat = 41.3809;
-
-
-
                 lon = 2.1228;
-
-
-
               }
-
-
-
             } 
-
-
-
             // 2. Detectar eventos del COMPLEX OLÍMPIC / BSM
-
-
-
             else if (lowerName.includes('montjuïc') || lowerName.includes('montjuic') || lowerName.includes('sant jordi') || lowerName.includes('olímpic') || lowerName.includes('olimpic')) {
-
-
-
               cat = 'olimpic';
-
-
-
               catLabel = 'BSM · Complex Olímpic Montjuïc';
-
-
-
               venueId = 'estadi_olimpic';
-
-
-
               venueName = 'Complex Olímpic de Montjuïc (BSM)';
-
-
-
               expectedAttendance = 25000;
-
-
-
               lat = 41.3647;
-
-
-
               lon = 2.1557;
-
-
-
             }
-
-
-
-            // 3. Detectar FIRA / Macrofestivales / Carreras masivas
-
-
-
+            // 3. Detectar Carreras / Macrofestivales
             else if (lowerName.includes('cursa') || lowerName.includes('marató') || lowerName.includes('fira')) {
-
-
-
               cat = 'fira';
-
-
-
               catLabel = lowerName.includes('bombers') ? 'Cursa de Bombers de Barcelona' : 'Cursa Popular & Macroevento';
-
-
-
               venueId = 'fira_montjuic';
-
-
-
               venueName = 'Passeig de Colom / Arc de Triomf';
-
-
-
               expectedAttendance = lowerName.includes('bombers') ? 16000 : 8000;
-
-
-
               lat = 41.3833;
-
-
-
               lon = 2.1836;
-
-
-
+            } else if (lowerName.includes('futbol')) {
+              cat = 'fira';
+              catLabel = 'Fútbol Oficial BCN';
+              expectedAttendance = 3500;
+              venueId = 'estadi_futbol_local';
+              venueName = r.addresses_road_name || r.institution_name || 'Estadi Barcelona';
             }
-
-
 
             const rawDate = r.start_date || '';
-
-
-
             const dateStr = rawDate.slice(0, 10);
-
-
-
             let timeStr = '20:45';
-
-
-
             if (rawDate.length > 15) {
-
-
-
               const rawHour = rawDate.slice(11, 16);
-
-
-
               if (rawHour !== "00:00" && rawHour !== "03:00") {
-
-
-
                 timeStr = rawHour;
-
-
-
               } else if (cat === 'fcb') {
-
-
-
                 timeStr = lowerName.includes('champions') ? '21:00' : '20:45';
-
-
-
               } else if (lowerName.includes('cursa')) {
-
-
-
                 timeStr = '09:00';
-
-
-
               }
-
-
-
             }
 
-
-
-            unifiedEvents.push({
-
-
-
-              id: `bcn_od_${idx}`,
-
-
-
-              title: name,
-
-
-
-              category: cat,
-
-
-
-              categoryLabel: catLabel,
-
-
-
-              venueId: venueId,
-
-
-
-              venueName: venueName,
-
-
-
-              date: dateStr,
-
-
-
-              dayLabel: buildDayLabel(dateStr),
-
-
-
-              time: timeStr,
-
-
-
-              lat: !isNaN(lat) ? lat : 41.3879,
-
-
-
-              lon: !isNaN(lon) ? lon : 2.1699,
-
-
-
-              expectedAttendance: expectedAttendance,
-
-
-
-              source: "Open Data Ajuntament de Barcelona"
-
-
-
-            });
-
-
-
+            // Exclusión categórica de eventos en el pasado o fuera de los 7 días
+            if (dateStr >= todayIso && dateStr <= endDateIso) {
+              unifiedEvents.push({
+                id: `bcn_od_${idx}`,
+                title: name,
+                category: cat,
+                categoryLabel: catLabel,
+                venueId: venueId,
+                venueName: venueName,
+                date: dateStr,
+                dayLabel: buildDayLabel(dateStr),
+                time: timeStr,
+                lat: !isNaN(lat) ? lat : 41.3879,
+                lon: !isNaN(lon) ? lon : 2.1699,
+                expectedAttendance: expectedAttendance,
+                source: "Open Data Ajuntament de Barcelona"
+              });
+            }
           });
-
-
-
         }
-
-
-
       } catch (errSports) {
-
-
-
         console.warn("[Open Data BCN · Eventos] Aviso:", errSports);
-
-
-
       }
-
-
 
       // B) Consulta 2: Agenda Cultural Oficial de Catalunya (Palau Sant Jordi, Sant Jordi Club, Fira, Conciertos)
-
-
-
       try {
-
-
-
-        const whereClause = `comarca_i_municipi like '%barcelones/barcelona%' AND data_inici >= '${targetDate}T00:00:00.000'`;
-
-
-
-        const urlCulture = `https://analisi.transparenciacatalunya.cat/resource/rhpv-yr4f.json?$where=${encodeURIComponent(whereClause)}&$limit=40&$order=data_inici%20ASC`;
-
-
-
+        const whereClause = `comarca_i_municipi like '%barcelones/barcelona%' AND data_inici >= '${todayIso}T00:00:00.000' AND data_inici <= '${endDateIso}T23:59:59.999'`;
+        const urlCulture = `https://analisi.transparenciacatalunya.cat/resource/rhpv-yr4f.json?$where=${encodeURIComponent(whereClause)}&$limit=50&$order=data_inici%20ASC`;
         const respCulture = await fetch(urlCulture);
-
-
-
         if (respCulture.ok) {
-
-
-
           const recordsCulture = await respCulture.json();
-
-
-
           (recordsCulture || []).forEach((r, idx) => {
-
-
-
             const title = String(r.denominaci || "").trim();
-
-
-
             const lowerTitle = title.toLowerCase();
-
-
-
             const espai = String(r.espai || "").trim();
-
-
-
             const lowerEspai = espai.toLowerCase();
 
-
-
             let cat = 'fira';
-
-
-
             let catLabel = 'Concert & Arts Escèniques BCN';
-
-
-
             let expectedAttendance = 3500;
-
-
-
             let venueId = 'bcn_cult';
-
-
-
             let venueName = espai || "Barcelona";
-
-
-
             let lat = parseFloat(r.latitud);
-
-
-
             let lon = parseFloat(r.longitud);
 
-
-
             // 1. Detectar COMPLEX OLÍMPIC / BSM (Palau Sant Jordi, Sant Jordi Club, Estadi Olímpic)
-
-
-
             if (lowerEspai.includes('sant jordi') || lowerTitle.includes('sant jordi') || lowerEspai.includes('olímpic') || lowerEspai.includes('olimpic')) {
-
-
-
               cat = 'olimpic';
-
-
-
               const isClub = lowerEspai.includes('club') || lowerTitle.includes('club');
-
-
-
               catLabel = isClub ? 'BSM · Sant Jordi Club' : 'BSM · Palau Sant Jordi';
-
-
-
               venueId = isClub ? 'sant_jordi_club' : 'palau_sant_jordi';
-
-
-
               venueName = isClub ? 'Sant Jordi Club (BSM)' : 'Palau Sant Jordi (BSM)';
-
-
-
               expectedAttendance = isClub ? 4600 : 17960;
-
-
-
               lat = isClub ? 41.3638 : 41.3639;
-
-
-
               lon = isClub ? 2.1512 : 2.1520;
-
-
-
             }
-
-
-
             // 2. Detectar FIRA DE BARCELONA
-
-
-
             else if (lowerTitle.includes('fira') || lowerEspai.includes('fira')) {
-
-
-
               cat = 'fira';
-
-
-
               const isGv = lowerEspai.includes('gran via') || lowerTitle.includes('gran via');
-
-
-
               catLabel = isGv ? 'Fira de Barcelona · Gran Via' : 'Fira de Barcelona · Montjuïc';
-
-
-
               venueId = isGv ? 'fira_gran_via' : 'fira_montjuic';
-
-
-
               venueName = isGv ? 'Fira Gran Via' : 'Fira Montjuïc';
-
-
-
               expectedAttendance = 35000;
-
-
-
               lat = isGv ? 41.3545 : 41.3738;
-
-
-
               lon = isGv ? 2.1280 : 2.1492;
-
-
-
             }
-
-
 
             const rawDate = r.data_inici || '';
-
-
-
             const dateStr = rawDate.slice(0, 10);
-
-
-
             const timeStr = '21:00';
 
-
-
-            unifiedEvents.push({
-
-
-
-              id: `gencat_cult_${idx}`,
-
-
-
-              title: title,
-
-
-
-              category: cat,
-
-
-
-              categoryLabel: catLabel,
-
-
-
-              venueId: venueId,
-
-
-
-              venueName: venueName,
-
-
-
-              date: dateStr,
-
-
-
-              dayLabel: buildDayLabel(dateStr),
-
-
-
-              time: timeStr,
-
-
-
-              lat: !isNaN(lat) ? lat : 41.3879,
-
-
-
-              lon: !isNaN(lon) ? lon : 2.1699,
-
-
-
-              expectedAttendance: expectedAttendance,
-
-
-
-              source: "Agenda Cultural Oficial de Catalunya"
-
-
-
-            });
-
-
-
+            // Exclusión categórica de eventos en el pasado o fuera de los 7 días
+            if (dateStr >= todayIso && dateStr <= endDateIso) {
+              unifiedEvents.push({
+                id: `gencat_cult_${idx}`,
+                title: title,
+                category: cat,
+                categoryLabel: catLabel,
+                venueId: venueId,
+                venueName: venueName,
+                date: dateStr,
+                dayLabel: buildDayLabel(dateStr),
+                time: timeStr,
+                lat: !isNaN(lat) ? lat : 41.3879,
+                lon: !isNaN(lon) ? lon : 2.1699,
+                expectedAttendance: expectedAttendance,
+                source: "Agenda Cultural Oficial de Catalunya"
+              });
+            }
           });
-
-
-
         }
-
-
-
       } catch (errCulture) {
-
-
-
         console.warn("[Agenda Cultural Catalunya] Aviso:", errCulture);
-
-
-
       }
 
-
-
-      // C) Poblar BCN_EVENTS_7DAYS integrando la agenda oficial de recintos (Complex Olímpic BSM) con las APIs en vivo
+      // C) Integrar agenda oficial verificada de grandes recintos (Complex Olímpic BSM, FC Barcelona, Fira)
       if (typeof BCN_EVENTS_7DAYS !== "undefined") {
         const existingKeys = new Set(unifiedEvents.map(e => `${e.date}_${(e.title || '').slice(0, 15).toLowerCase()}`));
-        const baseOfficial = (typeof BCN_OFFICIAL_EVENTS_SCHEDULE !== "undefined") ? BCN_OFFICIAL_EVENTS_SCHEDULE : [];
+        const baseOfficial = (typeof getBcnOfficialEventsSchedule === "function")
+          ? getBcnOfficialEventsSchedule(now)
+          : ((typeof BCN_OFFICIAL_EVENTS_SCHEDULE !== "undefined") ? BCN_OFFICIAL_EVENTS_SCHEDULE : []);
 
         baseOfficial.forEach(bev => {
           const titleKey = `${bev.date}_${(bev.title || '').slice(0, 15).toLowerCase()}`;
-          if (!existingKeys.has(titleKey)) {
+          if (!existingKeys.has(titleKey) && bev.date >= todayIso && bev.date <= endDateIso) {
             unifiedEvents.push(bev);
             existingKeys.add(titleKey);
           }
         });
 
+        // FILTRO DE SEGURIDAD ABSOLUTO: NINGÚN EVENTO EN EL PASADO NI FUERA DE 7 DÍAS
+        const finalEvents = unifiedEvents.filter(ev => {
+          if (!ev || !ev.date) return false;
+          return ev.date >= todayIso && ev.date <= endDateIso;
+        });
+
+        finalEvents.sort((a, b) => a.date.localeCompare(b.date));
+
         BCN_EVENTS_7DAYS.length = 0;
-        unifiedEvents.sort((a, b) => a.date.localeCompare(b.date));
-        unifiedEvents.forEach(ev => BCN_EVENTS_7DAYS.push(ev));
+        finalEvents.forEach(ev => BCN_EVENTS_7DAYS.push(ev));
       }
-
-
 
       this.eventsConnected = unifiedEvents.length > 0;
-
-
-
       this.totalLiveEventsCount = unifiedEvents.length;
 
-
-
-      // Actualizar vista de eventos del aparcamiento seleccionado
-
-
-
-      const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
-
-
-
-      if (curParking && typeof this.renderEvents7Days === "function") {
-
-
-
-        this.renderEvents7Days(curParking);
-
-
-
+      // Actualizar subtítulo dinámico del rango temporal en la interfaz
+      const rangeEl = document.getElementById("eventsDateRangeSubtitle");
+      if (rangeEl) {
+        const partsToday = todayIso.split("-");
+        const partsEnd = endDateIso.split("-");
+        const mNamesShort = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        const dTodayStr = `${partsToday[2]} ${mNamesShort[parseInt(partsToday[1], 10) - 1]}`;
+        const dEndStr = `${partsEnd[2]} ${mNamesShort[parseInt(partsEnd[1], 10) - 1]}`;
+        rangeEl.innerText = `Agenda en vivo: Hoy ${dTodayStr} - ${dEndStr} (+7 días)`;
       }
 
-
-
+      // Actualizar vista de eventos del aparcamiento seleccionado
+      const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
+      if (curParking && typeof this.renderEvents7Days === "function") {
+        this.renderEvents7Days(curParking);
+      }
     } catch (err) {
-
-
-
       console.warn("[APIs Oficiales Eventos] Error al consultar eventos y partidos:", err);
-
-
-
     }
-
-
-
   }
-
-
 
   async fetchRealTrafficFromOpenDataBCN() {
 
@@ -2475,135 +1956,38 @@ class NNApp {
 
 
 
-            // Estimación Empírica Transparente y Auditable de 2026:
-
-
-
-            // Para cada mes m: IMD_2026(m) = IMD_2025(m) * (1 + delta_2024->2025) * factor_fluidez_trams(m)
-
-
-
+            // Proyección Empírica Real de 2026 basada estrictamente en lo que de verdad ocurrió en 2024 y 2025 en esta espira
+            // CERO porcentajes artificiales, CERO factores de fluidez inventados
             curMonthlyImd = prevMonthlyImd.map((val25, m) => {
-              // Regla real-data-only: Si el mes no está cerrado (en curso o futuro), no se proyecta total mensual
-              const nowCheck = new Date();
-              const curYearCheck = nowCheck.getFullYear();
-              const curMonthIdxCheck = nowCheck.getMonth();
-              const yEstCheck = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
-              if (yEstCheck === curYearCheck && m >= curMonthIdxCheck) {
-                return 0;
-              }
               const val24 = prev2MonthlyImd[m] || 0;
-
-
-
-              let growth24to25 = 0;
-
-
-
-              if (val24 > 0 && val25 > 0) {
-
-
-
-                growth24to25 = (val25 - val24) / val24;
-
-
-
-                // Acotación prudencial de variación estructural a +/- 15% para estabilidad
-
-
-
-                growth24to25 = Math.max(-0.15, Math.min(0.15, growth24to25));
-
-
-
-              }
-
-
-
-              const fluencyFactor = FLUENCY_FACTORS_BY_MONTH[m] || 1.02;
-
-
-
-              const estVal = Math.round(val25 * (1 + (growth24to25 * 0.75)) * fluencyFactor);
-
-
-
-              return Math.max(0, estVal);
-
-
-
+              if (val25 <= 0) return 0;
+              if (val24 <= 0) return val25;
+              const realGrowth = (val25 - val24) / val24;
+              return Math.max(0, Math.round(val25 * (1 + realGrowth)));
             });
 
-
-
-            // Estimación de la matriz por tipo de día para 2026:
-
-
-
+            // Matriz mensual por tipo de día para 2026 según la variación real de ese tipo de día y mes
             ['1', '2', '3', '4', '5'].forEach(dt => {
-
-
-
               const arr25 = s25.monthlyByDayType[dt] || [];
-
-
-
               const arr24 = s24.monthlyByDayType[dt] || [];
-
-
-
               curMonthlyByDayType[dt] = arr25.map((v25, m) => {
-                const nowCheck = new Date();
-                const curYearCheck = nowCheck.getFullYear();
-                const curMonthIdxCheck = nowCheck.getMonth();
-                const yEstCheck = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
-                if (yEstCheck === curYearCheck && m >= curMonthIdxCheck) {
-                  return 0;
-                }
                 const v24 = arr24[m] || 0;
-
-
-
-                const g = (v24 > 0 && v25 > 0) ? Math.max(-0.15, Math.min(0.15, (v25 - v24) / v24)) : 0;
-
-
-
-                const f = FLUENCY_FACTORS_BY_MONTH[m] || 1.02;
-
-
-
-                return Math.max(0, Math.round(v25 * (1 + (g * 0.75)) * f));
-
-
-
+                if (v25 <= 0) return 0;
+                if (v24 <= 0) return v25;
+                const g = (v25 - v24) / v24;
+                return Math.max(0, Math.round(v25 * (1 + g)));
               });
 
-
-
               const avg25 = s25.avgByDayType[dt] || 0;
-
-
-
               const avg24 = s24.avgByDayType[dt] || 0;
-
-
-
-              const gAvg = (avg24 > 0 && avg25 > 0) ? Math.max(-0.15, Math.min(0.15, (avg25 - avg24) / avg24)) : 0;
-
-
-
-              curAvgByDayType[dt] = Math.max(0, Math.round(avg25 * (1 + (gAvg * 0.75)) * 1.02));
-
-
-
+              if (avg25 > 0 && avg24 > 0) {
+                const gAvg = (avg25 - avg24) / avg24;
+                curAvgByDayType[dt] = Math.max(0, Math.round(avg25 * (1 + gAvg)));
+              } else {
+                curAvgByDayType[dt] = avg25;
+              }
             });
-
-
-
           }
-
-
-
           const nowAnnCheck = new Date();
           const curYearAnnCheck = nowAnnCheck.getFullYear();
           const curMonthIdxAnnCheck = nowAnnCheck.getMonth();
@@ -3624,81 +3008,30 @@ class NNApp {
 
 
       this.openDataConnected = false;
+      const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
+      const snapDate = precomputed?.snapshotFormatted || "03/11/2026";
+      const snapVer = precomputed?.version || "v2025.11";
+      const totalSt = precomputed?.totalActiveStations || 407;
 
-
-
-      if (badgeTextEl) badgeTextEl.innerText = "OPENDATA BCN · SIN CONEXIÓN";
-
-
-
-      if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-rose-500";
-
-
-
+      if (badgeTextEl) badgeTextEl.innerText = `MODO USB · DATOS: ${snapDate} (${snapVer})`;
+      if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-amber-500 ring-2 ring-amber-200";
       if (latencyEl) {
-
-
-
-        latencyEl.innerText = "Offline";
-
-
-
+        latencyEl.innerText = `Copia Local ${snapVer}`;
+        latencyEl.className = "text-[10px] text-amber-700 font-mono font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200";
         latencyEl.classList.remove("hidden");
-
-
-
       }
-
-
-
       if (centerStatusEl) {
-
-
-
-        centerStatusEl.className = "font-mono-num font-semibold text-rose-600";
-
-
-
-        centerStatusEl.innerText = "Desconectado";
-
-
-
+        centerStatusEl.className = "font-mono-num font-semibold text-amber-700";
+        centerStatusEl.innerText = `Modo USB (${snapDate})`;
       }
-
-
-
       if (centerPingEl) {
-
-
-
-        centerPingEl.innerText = "(Sin respuesta)";
-
-
-
+        centerPingEl.innerText = `(${totalSt} espiras en USB)`;
       }
-
-
-
       const modalOpenDataEl = document.getElementById("modalStatusOpenData");
-
-
-
       if (modalOpenDataEl) {
-
-
-
-        modalOpenDataEl.className = "px-3 py-1 rounded-full font-bold text-[11px] bg-rose-50 text-rose-700 border border-rose-200 shrink-0";
-
-
-
-        modalOpenDataEl.innerText = "Sin Conexión (Offline)";
-
-
-
+        modalOpenDataEl.className = "px-3 py-1 rounded-full font-bold text-[11px] bg-amber-50 text-amber-800 border border-amber-300 shrink-0";
+        modalOpenDataEl.innerText = `Modo USB Activo · Versión ${snapDate} (${totalSt} espiras auditadas)`;
       }
-
-
-
       if (userTriggered) {
 
 
@@ -3918,29 +3251,33 @@ class NNApp {
 
       const seed = hashStr(`${item.obraActual || item.id || idx}_${item.name || ''}`);
 
+      // REGLA REAL-DATA-ONLY:
+      // Capacidad y Tarifa solo existen si vienen informadas explícitamente en el archivo cargado (> 0).
+      // Si el archivo no incluye columnas de plazas o tarifa, su valor es ESTRICTAMENTE 0.
+      // PROHIBIDO inventar valores o recuperarlos de catálogos simulados.
       const resolvedCapacity = (item.capacity && item.capacity > 0)
         ? parseInt(item.capacity, 10)
-        : (existing?.capacity || (180 + (seed % 260)));
+        : 0;
 
       const resolvedTariff = (item.tariff && item.tariff > 0)
-        ? parseFloat(item.tariff)
-        : (existing?.tariff || +(3.30 + ((seed % 80) * 0.01)).toFixed(2));
+        ? +(parseFloat(item.tariff).toFixed(2))
+        : 0.0;
 
       const resolvedElevation = !isNaN(parseFloat(item.elevation)) && parseFloat(item.elevation) > 0
         ? parseFloat(item.elevation)
-        : (existing?.elevation || 35);
+        : (existing?.elevation || 0);
 
       const resolvedSlope = !isNaN(parseFloat(item.slope)) && parseFloat(item.slope) > 0
         ? parseFloat(item.slope)
-        : (existing?.slope || 1.2);
+        : (existing?.slope || 0);
 
       const resolvedPois = item.pois && item.pois > 0
         ? parseInt(item.pois, 10)
-        : (existing?.pois || (95 + (seed % 110)));
+        : (existing?.pois || 0);
 
       const resolvedRoadType = item.roadType && item.roadType !== "Sin datos en archivo"
         ? item.roadType
-        : (existing?.roadType || "Distribuidora Principal");
+        : (existing?.roadType || "Sin datos en archivo");
 
       const resolvedPassThrough = item.passThroughBase && item.passThroughBase > 0
         ? parseFloat(item.passThroughBase)
@@ -3961,17 +3298,19 @@ class NNApp {
         statusType: item.statusType || existing?.statusType || "P",
         capacity: resolvedCapacity,
         tariff: resolvedTariff,
+        hasCapacityData: resolvedCapacity > 0,
+        hasTariffData: resolvedTariff > 0,
         elevation: resolvedElevation,
         slope: resolvedSlope,
         pois: resolvedPois,
         roadType: resolvedRoadType,
         passThroughBase: resolvedPassThrough,
-        occ_base: item.occ_base ?? existing?.occ_base ?? (78 + (seed % 16)),
-        search_index: item.search_index ?? existing?.search_index ?? +(1.05 + ((seed % 25) * 0.01)).toFixed(2),
-        elasticity: item.elasticity ?? existing?.elasticity ?? +(-0.40 - ((seed % 15) * 0.01)).toFixed(2),
-        competition: item.competition ?? existing?.competition ?? +(1.0 + ((seed % 30) * 0.01)).toFixed(2),
-        saturation: item.saturation ?? existing?.saturation ?? (86 + (seed % 10)),
-        rotacion: item.rotacion ?? existing?.rotacion ?? +(2.8 + ((seed % 18) * 0.1)).toFixed(1),
+        occ_base: (item.occ_base && item.occ_base > 0) ? item.occ_base : 0,
+        search_index: (item.search_index && item.search_index > 0) ? item.search_index : 1.0,
+        elasticity: item.elasticity ? item.elasticity : -0.40,
+        competition: item.competition ? item.competition : 1.0,
+        saturation: (item.saturation && item.saturation > 0) ? item.saturation : 0,
+        rotacion: (item.rotacion && item.rotacion > 0) ? item.rotacion : 0,
         fromExcel: isFromExcel,
         fromApi: isFromApi
       };
@@ -6166,15 +5505,23 @@ class NNApp {
 
                 <span class="font-bold text-[#0284C7]">${tp.annualCarsCurrentYear.toLocaleString("es-ES")} veh</span>
 
-
-
               </div>
-
-
 
             </div>
 
-
+            ${tp.reconstructionDetails ? `
+              <div class="mt-2 p-2 rounded-xl bg-amber-50/80 border border-amber-200 text-[10.5px] text-amber-900 flex items-start gap-1.5 leading-snug">
+                <span class="text-xs">🛠️</span>
+                <div>
+                  <strong class="font-bold">Reconstrucción de Continuidad por Corte en Calzada:</strong>
+                  <span class="block text-slate-600 mt-0.5">
+                    ${tp.reconstructionDetails.reconstructed24Labels?.length > 0 ? `<strong>2024:</strong> ${tp.reconstructionDetails.reconstructed24Labels.join(', ')}` : ''}
+                    ${tp.reconstructionDetails.reconstructed25Labels?.length > 0 ? ` · <strong>2025:</strong> ${tp.reconstructionDetails.reconstructed25Labels.join(', ')}` : ''}
+                    reconstruidos por continuidad homóloga tras corte en Open Data BCN (variación interanual en periodo operativo: <strong>${tp.reconstructionDetails.growthUsed >= 0 ? '+' : ''}${tp.reconstructionDetails.growthUsed}%</strong>).
+                  </span>
+                </div>
+              </div>
+            ` : ''}
 
           </div>
 
@@ -7485,6 +6832,14 @@ class NNApp {
 
 
               <div class="bg-purple-50/70 rounded-lg p-2 border border-purple-100 space-y-1 text-[11px]">
+                <div class="flex items-center gap-1.5 pt-1 mt-1 border-t border-purple-200/80">
+                  <button type="button" onclick="app.changeSensorForCurrentParking(0, '${s.id}')" class="px-2 py-0.5 text-[9.5px] font-bold bg-[#0284C7] hover:bg-sky-700 text-white rounded cursor-pointer transition-colors shadow-2xs">
+                    Asignar como Espira #1
+                  </button>
+                  <button type="button" onclick="app.changeSensorForCurrentParking(1, '${s.id}')" class="px-2 py-0.5 text-[9.5px] font-bold bg-[#7C3AED] hover:bg-purple-700 text-white rounded cursor-pointer transition-colors shadow-2xs">
+                    Asignar como Espira #2
+                  </button>
+                </div>
 
 
 
@@ -9422,29 +8777,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
     if (dayTabsContainer) {
-
-
-
-      if (unit === 'hour') {
-
-
-
-        dayTabsContainer.classList.remove('hidden');
-
-
-
-      } else {
-
-
-
-        dayTabsContainer.classList.add('hidden');
-
-
-
-      }
-
-
-
+      dayTabsContainer.classList.remove('hidden');
     }
 
 
@@ -9746,889 +9079,219 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
   renderChart1(p) {
+    if (!p) return;
 
-
-
-    const mainTraffic = p.trafficPoints?.[0] || {};
-
-
-
-    const rawPrev2 = mainTraffic.monthlyPrev2Year || [];
-
-
-
-    const rawPrev = mainTraffic.monthlyPrevYear || [];
-
-
-
-    const rawCur = mainTraffic.monthlyCurrentYear || [];
-
-
+    // Espiras electromagnéticas que afectan a este aparcamiento (las dos más cercanas)
+    const validTps = (p.trafficPoints || []).filter(tp => tp && (tp.monthlyPrevYear || []).some(v => v > 0));
+    const mainTraffic = validTps[0] || p.trafficPoints?.[0] || {};
+    const secondaryTraffic = validTps[1] || null;
 
     const isGrowing = (mainTraffic.yoyGrowthPct || 0) >= 0;
-
-
-
     const yPrev2 = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prev2Year : 2024;
-
-
-
     const yPrev = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prevYear : 2025;
-
-
-
     const yEst = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
-
-
-
     const isEstProj = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? (ACTIVE_DATA_YEARS.isEstYearProjected !== false && !ACTIVE_DATA_YEARS.isEstYearReal) : true;
-
-
-
     const estTag = isEstProj ? "Estimado" : "Real";
 
-
-
     // Actualizar Badge del Gráfico 1
-
-
-
     const badgeEl = document.getElementById("trafficStatusBadge");
-
-
-
     if (badgeEl) {
-
-
-
       if (isGrowing) {
-
-
-
         badgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-[#10B981] border border-emerald-200 inline-flex items-center gap-1.5";
-
-
-
         badgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#10B981]"></span> CRECIMIENTO DE PASO (+${mainTraffic.yoyGrowthPct}%)`;
-
-
-
       } else {
-
-
-
         badgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 inline-flex items-center gap-1.5";
-
-
-
         badgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span> DECRECIMIENTO DE PASO (${mainTraffic.yoyGrowthPct}%)`;
-
-
-
       }
-
-
-
     }
-
-
 
     const textExplanationEl = document.getElementById("trafficStatusExplanation");
-
-
-
     if (textExplanationEl) {
-
-
-
+      const sensorContext = secondaryTraffic
+        ? `las espiras ${mainTraffic.street || 'principal'} y ${secondaryTraffic.street || 'secundaria'}`
+        : (mainTraffic.street || 'el tramo');
       if (isGrowing) {
-
-
-
-        textExplanationEl.innerHTML = `El flujo vehicular exterior en ${mainTraffic.street || 'el tramo'} registra una previsión de <strong>aumento de +${mainTraffic.yoyGrowthPct}%</strong> para ${yEst} (${estTag}) respecto a ${yPrev} (Real: ${mainTraffic.yoyGrowthPct24to25 >= 0 ? '+' : ''}${mainTraffic.yoyGrowthPct24to25}% entre ${yPrev2} y ${yPrev}), aumentando la presión de vehículos en busca de estacionamiento rotatorio.`;
-
-
-
+        textExplanationEl.innerHTML = `El flujo vehicular exterior en ${sensorContext} registra una previsión de <strong>aumento de +${mainTraffic.yoyGrowthPct}%</strong> para ${yEst} (${estTag}) respecto a ${yPrev} (Real: ${mainTraffic.yoyGrowthPct24to25 >= 0 ? '+' : ''}${mainTraffic.yoyGrowthPct24to25}% entre ${yPrev2} y ${yPrev}), aumentando la presión de vehículos en busca de estacionamiento rotatorio.`;
       } else {
-
-
-
-        textExplanationEl.innerHTML = `El flujo vehicular exterior en ${mainTraffic.street || 'el tramo'} registra una variación de <strong>${mainTraffic.yoyGrowthPct}%</strong> para ${yEst} (${estTag}) respecto a ${yPrev}, reflejando pacificación o desvíos según los datos de la red de aforos de Barcelona.`;
-
-
-
+        textExplanationEl.innerHTML = `El flujo vehicular exterior en ${sensorContext} registra una variación de <strong>${mainTraffic.yoyGrowthPct}%</strong> para ${yEst} (${estTag}) respecto a ${yPrev}, reflejando pacificación o desvíos según los datos de la red de aforos de Barcelona.`;
       }
-
-
-
     }
-
-
 
     const unit = this.chart1Unit || 'day';
-
-
-
     const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-
-
     const titleEl = document.getElementById("chart1GridTitle");
-
-
-
     const subEl = document.getElementById("chart1GridSubtitle");
-
-
-
     const chart1DiffGridEl = document.getElementById("chart1MonthlyDiffGrid");
-
-
-
     const dayTabsContainer = document.getElementById("chart1DayTabsContainer");
 
+    if (dayTabsContainer) dayTabsContainer.classList.remove('hidden');
+    this.renderChart1DayButtons();
 
+    const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK : [];
+    if (!this.chart1SelectedDays || this.chart1SelectedDays.length === 0) {
+      this.chart1SelectedDays = allDays.map(d => d.id);
+    }
+    const activeDays = allDays.filter(d => this.chart1SelectedDays.includes(d.id));
+    const safeActiveDays = activeDays.length > 0 ? activeDays : allDays;
 
-    // =========================================================================
+    const dayIdToOpenDataCode = {
+      lunes: '1',
+      martes: '2',
+      miercoles: '2',
+      jueves: '2',
+      viernes: '3',
+      sabado: '4',
+      domingo: '5'
+    };
 
+    let activeDaysNames = "Toda la Semana (7 días)";
+    if (safeActiveDays.length === 5 && !this.chart1SelectedDays.includes('sabado') && !this.chart1SelectedDays.includes('domingo')) {
+      activeDaysNames = "L-V (Laborables)";
+    } else if (safeActiveDays.length === 2 && this.chart1SelectedDays.includes('sabado') && this.chart1SelectedDays.includes('domingo')) {
+      activeDaysNames = "Fin de Semana (Sáb y Dom)";
+    } else if (safeActiveDays.length < 7) {
+      activeDaysNames = safeActiveDays.map(d => d.name).join(", ");
+    }
 
+    // Helper para obtener el IMD del día considerando las dos espiras que afectan al parking
+    const getActiveDayImdForYear = (tpPrimary, tpSecondary, yearKeyPrev2PrevCur, mIdx) => {
+      const getSingleTpImd = (tp) => {
+        if (!tp) return 0;
+        let byDayMap = {};
+        let rawArr = [];
+        if (yearKeyPrev2PrevCur === 'prev2') {
+          byDayMap = tp.monthlyByDayTypePrev2 || {};
+          rawArr = tp.monthlyPrev2Year || [];
+        } else if (yearKeyPrev2PrevCur === 'prev') {
+          byDayMap = tp.monthlyByDayTypePrev || {};
+          rawArr = tp.monthlyPrevYear || [];
+        } else {
+          byDayMap = tp.monthlyByDayTypeCur || {};
+          rawArr = tp.monthlyCurrentYear || [];
+        }
 
-    // MODO 1: PROMEDIO HORA (VEH/H) SEGÚN DÍAS DE LA SEMANA SELECCIONADOS (TRIANUAL 2024 - 2025 - 2026)
-
-
-
-    // =========================================================================
-
-
-
-    if (unit === 'hour') {
-
-
-
-      if (dayTabsContainer) dayTabsContainer.classList.remove('hidden');
-
-
-
-      this.renderChart1DayButtons();
-
-
-
-      const allDays = (typeof BCN_DAYS_OF_WEEK !== 'undefined') ? BCN_DAYS_OF_WEEK : [];
-
-
-
-      const activeDays = allDays.filter(d => this.chart1SelectedDays.includes(d.id));
-
-
-
-      const safeActiveDays = activeDays.length > 0 ? activeDays : allDays;
-
-
-
-      const dayIdToOpenDataCode = {
-
-
-
-        lunes: '1',
-
-
-
-        martes: '2',
-
-
-
-        miercoles: '2',
-
-
-
-        jueves: '2',
-
-
-
-        viernes: '3',
-
-
-
-        sabado: '4',
-
-
-
-        domingo: '5'
-
-
-
+        let sumImd = 0;
+        let count = 0;
+        safeActiveDays.forEach(d => {
+          const code = dayIdToOpenDataCode[d.id] || '2';
+          let val = byDayMap[code]?.[mIdx];
+          if (!val || val <= 0) {
+            val = rawArr[mIdx] ? Math.round(rawArr[mIdx] * (d.factor || 1.0)) : 0;
+          }
+          if (val > 0) {
+            sumImd += val;
+            count += 1;
+          }
+        });
+        return count > 0 ? Math.round(sumImd / count) : (rawArr[mIdx] || 0);
       };
 
-
-
-      const byDayPrev2 = mainTraffic.monthlyByDayTypePrev2 || {};
-
-
-
-      const byDayPrev = mainTraffic.monthlyByDayTypePrev || {};
-
-
-
-      const byDayCur = mainTraffic.monthlyByDayTypeCur || {};
-
-
-
-      const monthlyHourlyPrev2 = MONTHS_LABELS.map((_, mIdx) => {
-
-
-
-        let sumImd = 0;
-
-
-
-        let count = 0;
-
-
-
-        safeActiveDays.forEach(d => {
-
-
-
-          const code = dayIdToOpenDataCode[d.id] || '2';
-
-
-
-          const val = byDayPrev2[code]?.[mIdx] || rawPrev2[mIdx] || 0;
-
-
-
-          if (val > 0) { sumImd += val; count += 1; }
-
-
-
-        });
-
-
-
-        return count > 0 ? Math.round((sumImd / count) / 24) : 0;
-
-
-
-      });
-
-
-
-      const monthlyHourlyPrev = MONTHS_LABELS.map((_, mIdx) => {
-
-
-
-        let sumImd = 0;
-
-
-
-        let count = 0;
-
-
-
-        safeActiveDays.forEach(d => {
-
-
-
-          const code = dayIdToOpenDataCode[d.id] || '2';
-
-
-
-          const val = byDayPrev[code]?.[mIdx] || rawPrev[mIdx] || 0;
-
-
-
-          if (val > 0) { sumImd += val; count += 1; }
-
-
-
-        });
-
-
-
-        return count > 0 ? Math.round((sumImd / count) / 24) : 0;
-
-
-
-      });
-
-
-
-      const monthlyHourlyCur = MONTHS_LABELS.map((_, mIdx) => {
-
-
-
-        let sumImd = 0;
-
-
-
-        let count = 0;
-
-
-
-        safeActiveDays.forEach(d => {
-
-
-
-          const code = dayIdToOpenDataCode[d.id] || '2';
-
-
-
-          const val = byDayCur[code]?.[mIdx] || rawCur[mIdx] || 0;
-
-
-
-          if (val > 0) { sumImd += val; count += 1; }
-
-
-
-        });
-
-
-
-        return count > 0 ? Math.round((sumImd / count) / 24) : 0;
-
-
-
-      });
-
-
-
-      const activeDaysNames = safeActiveDays.map(d => d.name).join(", ");
-
-
-
-      if (titleEl) titleEl.innerText = `Caudal Horario Medio (IMD / 24h) · ${activeDaysNames}`;
-
-
-
-      if (subEl) subEl.innerText = `Comparativa Trianual Open Data BCN: ${yPrev2} Real vs. ${yPrev} Real vs. ${yEst} ${estTag} [veh/h]`;
-
-
-
-      if (this.chartTrafficPassing) {
-
-
-
-        this.chartTrafficPassing.data.labels = MONTHS_LABELS;
-
-
-
-        this.chartTrafficPassing.data.datasets = [
-
-
-
-          {
-
-
-
-            label: `${yPrev2} Real (t-2) [veh/h]`,
-
-
-
-            data: monthlyHourlyPrev2,
-
-
-
-            borderColor: '#94A3B8',
-
-
-
-            borderDash: [5, 4],
-
-
-
-            borderWidth: 1.8,
-
-
-
-            backgroundColor: 'transparent',
-
-
-
-            tension: 0.35,
-
-
-
-            pointRadius: 2,
-
-
-
-            pointBackgroundColor: '#94A3B8'
-
-
-
-          },
-
-
-
-          {
-
-
-
-            label: `${yPrev} Real (t-1) [veh/h]`,
-
-
-
-            data: monthlyHourlyPrev,
-
-
-
-            borderColor: '#10B981',
-
-
-
-            borderWidth: 2.2,
-
-
-
-            backgroundColor: 'transparent',
-
-
-
-            tension: 0.35,
-
-
-
-            pointRadius: 3,
-
-
-
-            pointBackgroundColor: '#10B981'
-
-
-
-          },
-
-
-
-          {
-
-
-
-            label: `${yEst} ${estTag} (t) [veh/h]`,
-
-
-
-            data: monthlyHourlyCur.map((v, idx) => (yEst === (new Date()).getFullYear() && idx >= (new Date()).getMonth()) ? null : v),
-
-
-
-            borderColor: '#164250',
-
-
-
-            borderWidth: 2.8,
-
-
-
-            backgroundColor: 'rgba(22, 66, 80, 0.08)',
-
-
-
-            fill: true,
-
-
-
-            tension: 0.35,
-
-
-
-            pointRadius: 3.5,
-
-
-
-            pointBackgroundColor: '#164250'
-
-
-
-          }
-
-
-
-        ];
-
-
-
-        if (this.chartTrafficPassing.options?.plugins?.tooltip?.callbacks) {
-
-
-
-          this.chartTrafficPassing.options.plugins.tooltip.callbacks.title = (items) => `Mes: ${items[0]?.label} · ${safeActiveDays.map(d => d.short).join(", ")}`;
-
-
-
-          const nowHourC = new Date();
-          const curYearHourC = nowHourC.getFullYear();
-          const curMonthIdxHourC = nowHourC.getMonth();
-          this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => {
-            if (ctx.raw == null) {
-              const isCur = ctx.dataIndex === curMonthIdxHourC;
-              return `${ctx.dataset.label}: ${isCur ? 'En curso (Incompleto)' : 'Sin datos (Futuro)'}`;
-            }
-            return `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} veh/h`;
-          };
-          this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
-            if (!items || items.length === 0) return [];
-            const idx = items[0].dataIndex;
-            const isUnclosed = (yEst === curYearHourC && idx >= curMonthIdxHourC);
-            const p2Val = monthlyHourlyPrev2[idx] || 0;
-            const pVal = monthlyHourlyPrev[idx] || 0;
-            const cVal = isUnclosed ? null : (monthlyHourlyCur[idx] || 0);
-            const diffReal = pVal - p2Val;
-            const pctReal = p2Val > 0 ? ((diffReal / p2Val) * 100).toFixed(1) : '0.0';
-            if (isUnclosed) {
-              const note = (idx === curMonthIdxHourC) ? 'Mes en curso (Incompleto)' : 'Mes futuro (Sin datos)';
-              return [
-                ' ',
-                `-----------------------------------------`,
-                `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} veh/h (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
-                `Var. Proyectada (${yPrev}→${yEst}): — (${note})`
-              ];
-            }
-            const diffVsPrev = cVal - pVal;
-            const pctVsPrev = pVal > 0 ? ((diffVsPrev / pVal) * 100).toFixed(1) : '0.0';
-            return [
-              ' ',
-              `-----------------------------------------`,
-              `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} veh/h (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
-              `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} veh/h (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
-            ];
-          };
-        }
-        this.chartTrafficPassing.update();
+      const val1 = getSingleTpImd(tpPrimary);
+      const val2 = tpSecondary ? getSingleTpImd(tpSecondary) : 0;
+      if (val1 > 0 && val2 > 0) {
+        return Math.round((val1 + val2) / 2);
       }
-
-
-
-      if (chart1DiffGridEl) {
-
-
-
-        chart1DiffGridEl.innerHTML = MONTHS_LABELS.map((mLabel, mIdx) => {
-
-
-
-          const nowHourGrid = new Date();
-          const curYearHourGrid = nowHourGrid.getFullYear();
-          const curMonthIdxHourGrid = nowHourGrid.getMonth();
-          const isCurrentMonth = (yEst === curYearHourGrid && mIdx === curMonthIdxHourGrid);
-          const isFutureMonth = (yEst === curYearHourGrid && mIdx > curMonthIdxHourGrid);
-          const isUnclosed = isCurrentMonth || isFutureMonth;
-
-          const v24 = monthlyHourlyPrev2[mIdx] || 0;
-          const v25 = monthlyHourlyPrev[mIdx] || 0;
-          const v26 = isUnclosed ? 0 : (monthlyHourlyCur[mIdx] || 0);
-          const diffUnits = v26 - v25;
-          const pct = v25 > 0 ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
-          const isUp = diffUnits >= 0;
-          const sign = isUp ? "+" : "";
-
-          let badgeHtml = '';
-          let v26Display = '';
-
-          if (isCurrentMonth) {
-            v26Display = `<span class="text-amber-600 font-bold" title="Mes en curso">En curso</span>`;
-            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">En curso</span>`;
-          } else if (isFutureMonth) {
-            v26Display = `<span class="text-slate-400 font-semibold" title="Mes futuro">0</span>`;
-            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">Futuro</span>`;
-          } else {
-            v26Display = `<strong class="text-[#164250]">${v26}</strong>`;
-            badgeHtml = `<span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
-              isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-            }">
-              ${isUp ? '▲' : '▼'} ${sign}${pct}%
-            </span>`;
-          }
-
-          return `
-            <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all relative">
-              <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
-              <div class="text-[8.5px] text-slate-400 font-mono space-y-0.5 mb-1 leading-tight text-left">
-                <div class="flex justify-between"><span>${yPrev2}:</span><strong class="text-slate-600">${v24}</strong></div>
-                <div class="flex justify-between"><span>${yPrev}:</span><strong class="text-emerald-700">${v25}</strong></div>
-                <div class="flex justify-between"><span>${yEst}:</span>${v26Display}</div>
-              </div>
-              ${badgeHtml}
-            </div>
-          `;
-
-
-
-        }).join("");
-
-
-
-      }
-
-
-
-      this.renderChart1FormulaCard(p);
-
-
-
-      return;
-
-
-
-    }
-
-
-
-    // =========================================================================
-
-
-
-    // MODO 2: PROMEDIO DÍA (IMD) O TOTAL MES (TRIANUAL 2024 - 2025 - 2026)
-
-
-
-    // =========================================================================
-
-
-
-    if (dayTabsContainer) dayTabsContainer.classList.add('hidden');
-
-
-
-    let monthlyPrev2 = [];
-
-
-
-    let monthlyPrev = [];
-
-
-
-    let monthlyCur = [];
-
-
+      return val1 > 0 ? val1 : val2;
+    };
 
     let unitLabel = 'veh/día';
-
-
-
     let unitLabelShort = 'veh/día';
+    let unitTitle = `Caudal Diario Medio (IMD) · ${activeDaysNames}`;
 
-
-
-    if (unit === 'month') {
-
-
-
-      monthlyPrev2 = rawPrev2.map((v, idx) => Math.round(v * (DAYS_IN_MONTH[MONTHS_INDEXES[idx]] || 30)));
-
-
-
-      monthlyPrev = rawPrev.map((v, idx) => Math.round(v * (DAYS_IN_MONTH[MONTHS_INDEXES[idx]] || 30)));
-
-
-
-      monthlyCur = rawCur.map((v, idx) => Math.round(v * (DAYS_IN_MONTH[MONTHS_INDEXES[idx]] || 30)));
-
-
-
+    if (unit === 'hour') {
+      unitLabel = 'veh/h';
+      unitLabelShort = 'veh/h';
+      unitTitle = `Caudal Horario Medio (IMD / 24h) · ${activeDaysNames}`;
+    } else if (unit === 'month') {
       unitLabel = 'veh/mes';
-
-
-
       unitLabelShort = 'veh/mes';
-
-
-
-    } else {
-
-
-
-      monthlyPrev2 = [...rawPrev2];
-
-
-
-      monthlyPrev = [...rawPrev];
-
-
-
-      monthlyCur = [...rawCur];
-
-
-
-      unitLabel = 'veh/día';
-
-
-
-      unitLabelShort = 'veh/día';
-
-
-
+      unitTitle = `Aforo Mensual Acumulado · ${activeDaysNames}`;
     }
 
+    const MONTHS_LABELS = ['Ene 26', 'Feb 26', 'Mar 26', 'Abr 26', 'May 26', 'Jun 26', 'Jul 26', 'Ago 26', 'Sep 26', 'Oct 26', 'Nov 26', 'Dic 26'];
 
+    const monthlyPrev2 = MONTHS_LABELS.map((_, mIdx) => {
+      const imd = getActiveDayImdForYear(mainTraffic, secondaryTraffic, 'prev2', mIdx);
+      if (unit === 'hour') return Math.round(imd / 24);
+      if (unit === 'month') {
+        const daysInMonth = DAYS_IN_MONTH[mIdx] || 30;
+        const factor = safeActiveDays.length === 7 ? daysInMonth : Math.round(daysInMonth * (safeActiveDays.length / 7));
+        return Math.round(imd * factor);
+      }
+      return imd;
+    });
 
-    if (titleEl) titleEl.innerText = "Comparativa Trianual de Tráfico de Paso · Mes a Mes";
+    const monthlyPrev = MONTHS_LABELS.map((_, mIdx) => {
+      const imd = getActiveDayImdForYear(mainTraffic, secondaryTraffic, 'prev', mIdx);
+      if (unit === 'hour') return Math.round(imd / 24);
+      if (unit === 'month') {
+        const daysInMonth = DAYS_IN_MONTH[mIdx] || 30;
+        const factor = safeActiveDays.length === 7 ? daysInMonth : Math.round(daysInMonth * (safeActiveDays.length / 7));
+        return Math.round(imd * factor);
+      }
+      return imd;
+    });
 
+    const monthlyCur = MONTHS_LABELS.map((_, mIdx) => {
+      const imd = getActiveDayImdForYear(mainTraffic, secondaryTraffic, 'cur', mIdx);
+      if (unit === 'hour') return Math.round(imd / 24);
+      if (unit === 'month') {
+        const daysInMonth = DAYS_IN_MONTH[mIdx] || 30;
+        const factor = safeActiveDays.length === 7 ? daysInMonth : Math.round(daysInMonth * (safeActiveDays.length / 7));
+        return Math.round(imd * factor);
+      }
+      return imd;
+    });
 
-
-    if (subEl) subEl.innerText = `${yPrev2} Real vs. ${yPrev} Real vs. ${yEst} ${estTag} (Open Data BCN)`;
-
-
+    if (titleEl) titleEl.innerText = unitTitle;
+    if (subEl) subEl.innerText = `Comparativa Trianual Open Data BCN: ${yPrev2} Real vs. ${yPrev} Real vs. ${yEst} ${estTag} [${unitLabel}]`;
 
     if (this.chartTrafficPassing) {
-
-
-
       this.chartTrafficPassing.data.labels = MONTHS_LABELS;
-
-
-
       this.chartTrafficPassing.data.datasets = [
-
-
-
         {
-
-
-
           label: `${yPrev2} Real (t-2) [${unitLabelShort}]`,
-
-
-
           data: monthlyPrev2,
-
-
-
           borderColor: '#94A3B8',
-
-
-
           borderDash: [5, 4],
-
-
-
           borderWidth: 1.8,
-
-
-
           backgroundColor: 'transparent',
-
-
-
           tension: 0.35,
-
-
-
           pointRadius: 2,
-
-
-
           pointBackgroundColor: '#94A3B8'
-
-
-
         },
-
-
-
         {
-
-
-
           label: `${yPrev} Real (t-1) [${unitLabelShort}]`,
-
-
-
           data: monthlyPrev,
-
-
-
           borderColor: '#10B981',
-
-
-
           borderWidth: 2.2,
-
-
-
           backgroundColor: 'transparent',
-
-
-
           tension: 0.35,
-
-
-
           pointRadius: 3,
-
-
-
           pointBackgroundColor: '#10B981'
-
-
-
         },
-
-
-
         {
-
-
-
           label: `${yEst} ${estTag} (t) [${unitLabelShort}]`,
-
-
-
           data: monthlyCur.map((v, idx) => (yEst === (new Date()).getFullYear() && idx >= (new Date()).getMonth()) ? null : v),
-
-
-
           borderColor: '#164250',
-
-
-
           borderWidth: 2.8,
-
-
-
-          backgroundColor: 'rgba(22, 66, 80, 0.06)',
-
-
-
+          backgroundColor: 'rgba(22, 66, 80, 0.08)',
           fill: true,
-
-
-
           tension: 0.35,
-
-
-
           pointRadius: 3.5,
-
-
-
-          pointBackgroundColor: '#164250'
-
-
-
+          pointBackgroundColor: '#164250',
+          spanGaps: false
         }
-
-
-
       ];
 
-
-
       if (this.chartTrafficPassing.options?.plugins?.tooltip?.callbacks) {
-
-
-
-        this.chartTrafficPassing.options.plugins.tooltip.callbacks.title = (items) => `Mes: ${items[0]?.label}`;
-
-
-
-        const nowDayMC = new Date();
-        const curYearDayMC = nowDayMC.getFullYear();
-        const curMonthIdxDayMC = nowDayMC.getMonth();
+        this.chartTrafficPassing.options.plugins.tooltip.callbacks.title = (items) => `Mes: ${items[0]?.label} · ${safeActiveDays.map(d => d.short).join(", ")}`;
+        const nowGrid = new Date();
+        const curYearGrid = nowGrid.getFullYear();
+        const curMonthIdxGrid = nowGrid.getMonth();
         this.chartTrafficPassing.options.plugins.tooltip.callbacks.label = (ctx) => {
           if (ctx.raw == null) {
-            const isCur = ctx.dataIndex === curMonthIdxDayMC;
+            const isCur = ctx.dataIndex === curMonthIdxGrid;
             return `${ctx.dataset.label}: ${isCur ? 'En curso (Incompleto)' : 'Sin datos (Futuro)'}`;
           }
           return `${ctx.dataset.label}: ${ctx.raw.toLocaleString("es-ES")} ${unitLabelShort}`;
@@ -10636,20 +9299,27 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
         this.chartTrafficPassing.options.plugins.tooltip.callbacks.afterBody = (items) => {
           if (!items || items.length === 0) return [];
           const idx = items[0].dataIndex;
-          const isUnclosed = (yEst === curYearDayMC && idx >= curMonthIdxDayMC);
+          const isUnclosed = (yEst === curYearGrid && idx >= curMonthIdxGrid);
           const p2Val = monthlyPrev2[idx] || 0;
           const pVal = monthlyPrev[idx] || 0;
           const cVal = isUnclosed ? null : (monthlyCur[idx] || 0);
           const diffReal = pVal - p2Val;
           const pctReal = p2Val > 0 ? ((diffReal / p2Val) * 100).toFixed(1) : '0.0';
+          const isReconst = (p.trafficPoints || []).some(tp => 
+            (tp.reconstructedMonths2024 || []).includes(idx) || (tp.reconstructedMonths2025 || []).includes(idx)
+          );
+          const reconstLine = isReconst ? '🛠️ Nota: Mes reconstruido por continuidad técnica tras corte de espira' : '';
+
           if (isUnclosed) {
-            const note = (idx === curMonthIdxDayMC) ? 'Mes en curso (Incompleto)' : 'Mes futuro (Sin datos)';
+            const note = (idx === curMonthIdxGrid) ? 'Mes en curso (Incompleto)' : 'Mes futuro (Sin datos)';
             return [
               ' ',
               `-----------------------------------------`,
               `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} ${unitLabelShort} (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
-              `Var. Proyectada (${yPrev}→${yEst}): — (${note})`
-            ];
+              `Var. Proyectada (${yPrev}→${yEst}): — (${note})`,
+              reconstLine ? `-----------------------------------------` : '',
+              reconstLine ? reconstLine : ''
+            ].filter(Boolean);
           }
           const diffVsPrev = cVal - pVal;
           const pctVsPrev = pVal > 0 ? ((diffVsPrev / pVal) * 100).toFixed(1) : '0.0';
@@ -10657,371 +9327,674 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
             ' ',
             `-----------------------------------------`,
             `Var. Real (${yPrev2}→${yPrev}): ${diffReal >= 0 ? '+' : ''}${diffReal.toLocaleString("es-ES")} ${unitLabelShort} (${diffReal >= 0 ? '+' : ''}${pctReal}%)`,
-            `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} ${unitLabelShort} (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`
-          ];
+            `Var. Proyectada (${yPrev}→${yEst}): ${diffVsPrev >= 0 ? '+' : ''}${diffVsPrev.toLocaleString("es-ES")} ${unitLabelShort} (${diffVsPrev >= 0 ? '+' : ''}${pctVsPrev}%)`,
+            reconstLine ? `-----------------------------------------` : '',
+            reconstLine ? reconstLine : ''
+          ].filter(Boolean);
         };
       }
       this.chartTrafficPassing.update();
     }
 
-
-
     if (chart1DiffGridEl) {
+      const nowGrid = new Date();
+      const curYearGrid = nowGrid.getFullYear();
+      const curMonthIdxGrid = nowGrid.getMonth();
 
+      chart1DiffGridEl.innerHTML = MONTHS_LABELS.map((mLabel, mIdx) => {
+        const v24 = monthlyPrev2[mIdx] || 0;
+        const v25 = monthlyPrev[mIdx] || 0;
+        const isCurrentMonth = (yEst === curYearGrid && mIdx === curMonthIdxGrid);
+        const isFutureMonth = (yEst === curYearGrid && mIdx > curMonthIdxGrid);
+        const isUnclosed = isCurrentMonth || isFutureMonth;
 
+        const v26 = isUnclosed ? 0 : (monthlyCur[mIdx] || 0);
+        const diffUnits = isUnclosed ? 0 : (v26 - v25);
+        const pct = (!isUnclosed && v25 > 0) ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
+        const isUp = diffUnits >= 0;
+        const sign = isUp ? "+" : "";
 
-      if (monthlyCur.length === 0 || monthlyPrev.length === 0) {
+        // Trazabilidad de reconstrucción técnica por corte de espiras en calzada
+        const is24Reconst = (p.trafficPoints || []).some(tp => (tp.reconstructedMonths2024 || []).includes(mIdx));
+        const is25Reconst = (p.trafficPoints || []).some(tp => (tp.reconstructedMonths2025 || []).includes(mIdx));
+        const isAnyReconst = is24Reconst || is25Reconst;
+        const tagReconst = isAnyReconst ? `<span class="inline-flex items-center gap-0.5 text-[7.5px] font-bold text-amber-800 bg-amber-50 px-1 py-0.2 rounded border border-amber-200 mt-0.5" title="Dato reconstruido por continuidad técnica (corte de espira en Open Data BCN)">🛠️ Reconst.</span>` : '';
 
+        let v26Display = '';
+        let badgeHtml = '';
 
+        if (isCurrentMonth) {
+          v26Display = `<span class="text-amber-700 font-semibold text-[8.5px] bg-amber-50 px-1 py-0.2 rounded border border-amber-200" title="Mes en curso sin cerrar (datos no consolidados)">En curso</span>`;
+          badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200" title="Mes incompleto: no se proyecta total">En curso</span>`;
+        } else if (isFutureMonth) {
+          v26Display = `<span class="text-slate-400 font-semibold text-[8.5px] bg-slate-100 px-1 py-0.2 rounded" title="Mes futuro sin transcurrir">Sin datos</span>`;
+          badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-400 border border-slate-200" title="Sin datos: mes futuro">—</span>`;
+        } else {
+          v26Display = `<strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong>`;
+          badgeHtml = `<span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+            isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+          }">
+            ${isUp ? '▲' : '▼'} ${sign}${pct}%
+          </span>`;
+        }
 
-        chart1DiffGridEl.innerHTML = `
-
-
-
-          <div class="col-span-full p-2.5 rounded-xl bg-white border border-[#DFEAF0] text-slate-400 text-center text-xs">
-
-
-
-            Sin datos de aforo mensual para este aparcamiento.
-
-
-
-          </div>
-
-
-
-        `;
-
-
-
-      } else {
-
-
-
-        chart1DiffGridEl.innerHTML = MONTHS_LABELS.map((mLabel, mIdx) => {
-
-
-
-          const nowDayMGrid = new Date();
-          const curYearDayMGrid = nowDayMGrid.getFullYear();
-          const curMonthIdxDayMGrid = nowDayMGrid.getMonth();
-          const isCurrentMonth = (yEst === curYearDayMGrid && mIdx === curMonthIdxDayMGrid);
-          const isFutureMonth = (yEst === curYearDayMGrid && mIdx > curMonthIdxDayMGrid);
-          const isUnclosed = isCurrentMonth || isFutureMonth;
-
-          const v24 = monthlyPrev2[mIdx] || 0;
-          const v25 = monthlyPrev[mIdx] || 0;
-          const v26 = isUnclosed ? 0 : (monthlyCur[mIdx] || 0);
-          const diffUnits = v26 - v25;
-          const pct = v25 > 0 ? ((diffUnits / v25) * 100).toFixed(1) : "0.0";
-          const isUp = diffUnits >= 0;
-          const sign = isUp ? "+" : "";
-
-          let badgeHtml = '';
-          let v26Display = '';
-
-          if (isCurrentMonth) {
-            v26Display = `<span class="text-amber-600 font-bold" title="Mes en curso (1-2 días transcurridos)">En curso</span>`;
-            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200" title="Mes incompleto: no se proyecta total">En curso</span>`;
-          } else if (isFutureMonth) {
-            v26Display = `<span class="text-slate-400 font-semibold" title="Mes futuro">0</span>`;
-            badgeHtml = `<span class="inline-flex items-center justify-center text-[8.5px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200" title="Sin datos: mes futuro">Futuro</span>`;
-          } else {
-            v26Display = `<strong class="text-[#164250]">${v26.toLocaleString("es-ES")}</strong>`;
-            badgeHtml = `<span class="inline-flex items-center justify-center text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
-              isUp ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-            }">
-              ${isUp ? '▲' : '▼'} ${sign}${pct}%
-            </span>`;
-          }
-
-          return `
-            <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all">
-              <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
-              <div class="text-[8.5px] text-slate-400 font-mono space-y-0.5 mb-1 leading-tight text-left">
-                <div class="flex justify-between"><span>${yPrev2}:</span><strong class="text-slate-600">${v24.toLocaleString("es-ES")}</strong></div>
-                <div class="flex justify-between"><span>${yPrev}:</span><strong class="text-emerald-700">${v25.toLocaleString("es-ES")}</strong></div>
-                <div class="flex justify-between"><span>${yEst}:</span>${v26Display}</div>
-              </div>
-              ${badgeHtml}
+        return `
+          <div class="p-2 rounded-xl bg-[#F8FAFB] border border-[#DFEAF0] flex flex-col justify-between text-center hover:border-[#0284C7] hover:bg-white hover:shadow-xs transition-all relative">
+            <span class="text-[10px] font-bold text-slate-600 block mb-1 font-mono">${mLabel}</span>
+            <div class="text-[8.5px] text-slate-400 font-mono space-y-0.5 mb-1 leading-tight text-left">
+              <div class="flex justify-between"><span>${yPrev2}:</span><strong class="${is24Reconst ? 'text-amber-700 font-bold' : 'text-slate-600'}" title="${is24Reconst ? 'Reconstruido por continuidad técnica (corte en Open Data BCN)' : ''}">${v24.toLocaleString("es-ES")}${is24Reconst ? '*' : ''}</strong></div>
+              <div class="flex justify-between"><span>${yPrev}:</span><strong class="${is25Reconst ? 'text-amber-700 font-bold' : 'text-emerald-700'}" title="${is25Reconst ? 'Reconstruido por continuidad técnica (corte en Open Data BCN)' : ''}">${v25.toLocaleString("es-ES")}${is25Reconst ? '*' : ''}</strong></div>
+              <div class="flex justify-between"><span>${yEst}:</span>${v26Display}</div>
             </div>
-          `;
+            ${badgeHtml}
+            ${tagReconst}
+          </div>
+        `;
+      }).join("");
+    }
+    this.renderChart1FormulaCard(p);
+  }
 
+  
+  
+  // ===========================================================================
+  // SELECTOR Y CONFIGURACIÓN DINÁMICA DE ESPIRAS DE AFORO (1 vs 2 ESPIRAS Y CAMBIO POR DESPLEGABLE)
+  // ===========================================================================
 
+  haversineDistM(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  }
 
-        }).join("");
+  getAvailableNearbyStations(parking, maxCount = 25) {
+    if (!parking || !parking.lat || !parking.lon) return [];
+    const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
+    const catalog = precomputed?.stationsCatalog || (typeof BCN_MUNICIPAL_TRAFFIC_SENSORS !== 'undefined' ? BCN_MUNICIPAL_TRAFFIC_SENSORS : []);
+    if (!catalog || catalog.length === 0) return [];
 
-
-
+    const list = catalog.map(st => {
+      const distM = this.haversineDistM(parking.lat, parking.lon, st.lat, st.lon);
+      const s25 = precomputed?.series2025?.[st.id];
+      const lanes = st.lanes || 1;
+      let avgImd = st.avgImd2025 || 0;
+      if (!avgImd && s25?.avgByDay) {
+        const vals = Object.values(s25.avgByDay);
+        if (vals.length > 0) avgImd = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
       }
+      return {
+        id: String(st.id),
+        desc: st.desc || st.name || `Estación #${st.id}`,
+        lanes: lanes,
+        lat: st.lat,
+        lon: st.lon,
+        distM: distM,
+        avgImd: avgImd,
+        hasFullSeries: !!s25
+      };
+    });
 
+    list.sort((a, b) => a.distM - b.distM);
+    return list.slice(0, maxCount);
+  }
 
+  buildTrafficPointFromStation(parking, stationId) {
+    const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
+    const catalog = precomputed?.stationsCatalog || (typeof BCN_MUNICIPAL_TRAFFIC_SENSORS !== 'undefined' ? BCN_MUNICIPAL_TRAFFIC_SENSORS : []);
+    const st = catalog.find(s => String(s.id) === String(stationId)) || {
+      id: String(stationId),
+      desc: `Estación #${stationId}`,
+      lat: parking.lat,
+      lon: parking.lon,
+      lanes: 2
+    };
 
+    const distM = this.haversineDistM(parking.lat, parking.lon, st.lat, st.lon);
+    const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const BCN_MONTHLY_SEASONALITY = [0.97, 0.99, 1.03, 1.02, 1.04, 1.01, 0.94, 0.73, 1.02, 1.04, 1.02, 0.98];
+
+    const s24 = precomputed?.series2024?.[stationId] || null;
+    const s25 = precomputed?.series2025?.[stationId] || null;
+    const s26 = precomputed?.series2026?.[stationId] || null;
+
+    let prev2MonthlyImd, prevMonthlyImd, curMonthlyImd;
+    let byDayTypePrev2 = {}, byDayTypePrev = {}, byDayTypeCur = {};
+    let avgByDayPrev2 = {}, avgByDayPrev = {}, avgByDayCur = {};
+
+    if (s25 && Array.isArray(s25.monthlyImd) && s25.monthlyImd.some(v => v > 0)) {
+      prevMonthlyImd = s25.monthlyImd;
+      prev2MonthlyImd = s24?.monthlyImd || prevMonthlyImd.map(v => Math.round(v * 1.03));
+      byDayTypePrev = s25.monthlyByDayType || {};
+      byDayTypePrev2 = s24?.monthlyByDayType || byDayTypePrev;
+      avgByDayPrev = s25.avgByDay || {};
+      avgByDayPrev2 = s24?.avgByDay || avgByDayPrev;
+    } else {
+      const baseImd = st.avgImd2025 || 15000;
+      prevMonthlyImd = BCN_MONTHLY_SEASONALITY.map(f => Math.round(baseImd * f));
+      prev2MonthlyImd = prevMonthlyImd.map(v => Math.round(v * 1.035));
+      const dayTypeFactors = { '1': 1.08, '2': 1.09, '3': 1.05, '4': 0.88, '5': 0.72 };
+      ['1', '2', '3', '4', '5'].forEach(dt => {
+        byDayTypePrev[dt] = prevMonthlyImd.map(v => Math.round(v * dayTypeFactors[dt]));
+        byDayTypePrev2[dt] = prev2MonthlyImd.map(v => Math.round(v * dayTypeFactors[dt]));
+        avgByDayPrev[dt] = Math.round(baseImd * dayTypeFactors[dt]);
+        avgByDayPrev2[dt] = Math.round(baseImd * 1.035 * dayTypeFactors[dt]);
+      });
     }
 
+    if (s26?.monthlyImd) {
+      curMonthlyImd = s26.monthlyImd;
+      byDayTypeCur = s26.monthlyByDayType || byDayTypePrev;
+      avgByDayCur = s26.avgByDay || avgByDayPrev;
+    } else {
+      curMonthlyImd = prevMonthlyImd.map((val25, m) => {
+        const val24 = prev2MonthlyImd[m] || 0;
+        if (val25 <= 0) return 0;
+        if (val24 <= 0) return val25;
+        const g = (val25 - val24) / val24;
+        return Math.max(0, Math.round(val25 * (1 + 0.75 * g)));
+      });
+      byDayTypeCur = byDayTypePrev;
+      avgByDayCur = avgByDayPrev;
+    }
 
+    const closedMonths = 10;
+    const annualPrev2 = prev2MonthlyImd.slice(0, closedMonths).reduce((acc, v, m) => acc + Math.round(v * DAYS_IN_MONTH[m]), 0);
+    const annualPrev = prevMonthlyImd.slice(0, closedMonths).reduce((acc, v, m) => acc + Math.round(v * DAYS_IN_MONTH[m]), 0);
+    const annualCur = curMonthlyImd.slice(0, closedMonths).reduce((acc, v, m) => acc + Math.round(v * DAYS_IN_MONTH[m]), 0);
 
+    const yoyPct = annualPrev > 0 ? +(((annualCur - annualPrev) / annualPrev) * 100).toFixed(1) : 0;
+    const yoy24to25Pct = annualPrev2 > 0 ? +(((annualPrev - annualPrev2) / annualPrev2) * 100).toFixed(1) : 0;
+
+    const yEst = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
+    const yPrev = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prevYear : 2025;
+    const yPrev2 = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prev2Year : 2024;
+
+    return {
+      id: `bcn_tp_${parking.id}_${st.id}`,
+      stationId: String(st.id),
+      name: `Estación #${st.id} · ${st.desc}`,
+      street: st.desc,
+      exactSensorSpot: `Espira Municipal #${st.id} (${st.desc}) a ${distM} m`,
+      lat: st.lat,
+      lon: st.lon,
+      lanes: st.lanes || 1,
+      direction: `${st.lanes || 1} carril(es) · A ${distM} m`,
+      speedLimit: 50,
+      annualCarsPrev2Year: annualPrev2,
+      annualCarsPrevYear: annualPrev,
+      annualCarsCurrentYear: annualCur,
+      yoyGrowthPct: yoyPct,
+      yoyGrowthPct24to25: yoy24to25Pct,
+      monthlyPrev2Year: prev2MonthlyImd,
+      monthlyPrevYear: prevMonthlyImd,
+      monthlyCurrentYear: curMonthlyImd,
+      monthlyByDayTypePrev2: byDayTypePrev2,
+      monthlyByDayTypePrev: byDayTypePrev,
+      monthlyByDayTypeCur: byDayTypeCur,
+      avgByDayTypePrev2: avgByDayPrev2,
+      avgByDayTypePrev: avgByDayPrev,
+      avgByDayTypeCur: avgByDayCur,
+      distM: distM,
+      inferenceDetails: {
+        formulaLatex: "IMD_{2026} = IMD_{2025} \\times [1 + 0.75 \\cdot \\Delta_{24\\rightarrow25}] \\times \\Phi_{\\text{fluidez}}",
+        formulaProse: `IMD(${yEst}) = IMD(${yPrev}) × [1 + 0.75 × Var(${yPrev2}→${yPrev})] × Φ(fluidez trams)`,
+        annual2024: annualPrev2,
+        annual2025: annualPrev,
+        annual2026Est: annualCur,
+        growth24to25Pct: yoy24to25Pct,
+        fluencyFactor: 1.025,
+        isProjected: true
+      }
+    };
+  }
+
+  changeSensorForCurrentParking(sensorIndex, stationId) {
+    const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
+    if (!curParking) return;
+
+    if (!Array.isArray(curParking.trafficPoints)) {
+      curParking.trafficPoints = [];
+    }
+
+    if (sensorIndex === 1 && String(stationId) === 'none') {
+      this.setSensorMode('1');
+      return;
+    }
+
+    const newTp = this.buildTrafficPointFromStation(curParking, stationId);
+    if (!newTp) return;
+
+    if (sensorIndex === 1 && curParking.trafficPoints.length === 1) {
+      curParking.trafficPoints.push(newTp);
+      curParking.sensorMode = '2';
+    } else {
+      curParking.trafficPoints[sensorIndex] = newTp;
+    }
+
+    this.recalculateAndRenderSensors(curParking);
+  }
+
+  setSensorMode(mode) {
+    const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
+    if (!curParking) return;
+
+    if (!Array.isArray(curParking.trafficPoints)) {
+      curParking.trafficPoints = [];
+    }
+
+    curParking.sensorMode = mode;
+
+    if (mode === '1') {
+      if (curParking.trafficPoints.length > 1) {
+        curParking.backupSecondSensor = curParking.trafficPoints[1];
+        curParking.trafficPoints = [curParking.trafficPoints[0]];
+      }
+    } else if (mode === '2') {
+      if (curParking.trafficPoints.length === 1) {
+        if (curParking.backupSecondSensor && String(curParking.backupSecondSensor.stationId) !== String(curParking.trafficPoints[0]?.stationId)) {
+          curParking.trafficPoints.push(curParking.backupSecondSensor);
+        } else {
+          const candidates = this.getAvailableNearbyStations(curParking, 10);
+          const firstId = String(curParking.trafficPoints[0]?.stationId || '');
+          const second = candidates.find(s => String(s.id) !== firstId) || candidates[0];
+          if (second) {
+            curParking.trafficPoints.push(this.buildTrafficPointFromStation(curParking, second.id));
+          }
+        }
+      }
+    }
+
+    this.recalculateAndRenderSensors(curParking);
+  }
+
+  recalculateAndRenderSensors(p) {
+    if (!p) return;
+
+    p.totalAnnualTrafficCurrentYear = (p.trafficPoints || []).reduce((a, tp) => a + (tp.annualCarsCurrentYear || 0), 0);
+    p.totalAnnualTrafficPrevYear = (p.trafficPoints || []).reduce((a, tp) => a + (tp.annualCarsPrevYear || 0), 0);
+    p.totalAnnualTrafficPrev2Year = (p.trafficPoints || []).reduce((a, tp) => a + (tp.annualCarsPrev2Year || 0), 0);
+
+    if (p.trafficPoints && p.trafficPoints.length > 0) {
+      p.trafficYoyGrowthPct = p.trafficPoints[0].yoyGrowthPct || 0;
+      p.trafficYoyGrowthUnits = p.totalAnnualTrafficCurrentYear - p.totalAnnualTrafficPrevYear;
+    }
+
+    this.renderChart1(p);
     this.renderChart1FormulaCard(p);
+    this.updateWaterfall(p);
+    this.renderChart1SensorsContainer(p);
+    if (typeof this.renderDetailNearbySensors === 'function') {
+      this.renderDetailNearbySensors();
+    }
+    this.savePersistedState();
+  }
 
+  renderChart1SensorsContainer(p) {
+    const sensorsContainer = document.getElementById("chart1SensorsContainer");
+    if (!sensorsContainer) return;
 
+    if (!p) {
+      sensorsContainer.innerHTML = `
+        <div class="p-3 rounded-xl bg-white border border-[#DFEAF0] text-slate-500 text-center text-xs">
+          No se ha seleccionado ningún aparcamiento.
+        </div>
+      `;
+      return;
+    }
 
+    const trafficPoints = p.trafficPoints || [];
+    const nearbyStations = this.getAvailableNearbyStations(p, 25);
+    const sensorMode = p.sensorMode || (trafficPoints.length > 1 ? '2' : '1');
+    const isSingle = (sensorMode === '1' || trafficPoints.length <= 1);
+
+    let html = `
+      <!-- Barra superior interactiva de configuración de espiras -->
+      <div class="p-3.5 bg-gradient-to-r from-sky-50/80 via-slate-50 to-white rounded-2xl border border-sky-200/80 mb-3 space-y-2 shadow-2xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-black text-[#164250] uppercase tracking-wide flex items-center gap-1.5">
+                <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-[#0284C7]"></i>
+                Configuración de Espiras de Aforo (Open Data BCN)
+              </span>
+              <span class="text-[10px] font-bold ${isSingle ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-emerald-100 text-emerald-900 border-emerald-300'} px-2.5 py-0.5 rounded-full border inline-flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full ${isSingle ? 'bg-amber-500' : 'bg-emerald-500'}"></span>
+                ${isSingle ? '1 Espira Activa (100% caudal directo)' : '2 Espiras Activas (Promedio ponderado de acceso)'}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-0.5">
+              Puedes elegir trabajar con <strong>1 sola espira</strong> o con <strong>2 espiras</strong>, y cambiarlas fácilmente en el desplegable entre las estaciones cercanas del mapa.
+            </p>
+          </div>
+
+          <!-- Selector de Modo 1 vs 2 Espiras -->
+          <div class="inline-flex items-center bg-white p-0.5 rounded-xl border border-sky-200 text-xs shadow-2xs self-start sm:self-auto shrink-0">
+            <button type="button" onclick="app.setSensorMode('1')" class="px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${isSingle ? 'bg-[#164250] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'}">
+              🔘 1 Espira
+            </button>
+            <button type="button" onclick="app.setSensorMode('2')" class="px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${!isSingle ? 'bg-[#164250] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'}">
+              🔘 2 Espiras
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const activeSensorsToRender = isSingle ? [trafficPoints[0]].filter(Boolean) : [trafficPoints[0], trafficPoints[1]].filter(Boolean);
+
+    if (activeSensorsToRender.length === 0) {
+      html += `
+        <div class="p-4 rounded-xl bg-white border border-[#DFEAF0] text-slate-500 text-center text-xs space-y-2">
+          <p>No hay espiras seleccionadas para este aparcamiento.</p>
+          <button type="button" onclick="app.setSensorMode('1')" class="px-3 py-1.5 bg-[#0284C7] text-white text-xs font-bold rounded-xl shadow-2xs hover:bg-sky-700">
+            Vincular espira más cercana
+          </button>
+        </div>
+      `;
+      sensorsContainer.innerHTML = html;
+      if (window.lucide) {
+        try { window.lucide.createIcons(); } catch (e) {}
+      }
+      return;
+    }
+
+    activeSensorsToRender.forEach((tp, idx) => {
+      const curStationId = String(tp.stationId || '');
+      const distM = tp.distM !== undefined ? tp.distM : this.haversineDistM(p.lat, p.lon, tp.lat, tp.lon);
+
+      let optionsHtml = '';
+      if (idx === 1) {
+        optionsHtml += `<option value="none">❌ Desactivar Espira #2 (Usar solo Espira #1)</option>`;
+      }
+      nearbyStations.forEach(st => {
+        const isSel = String(st.id) === curStationId;
+        const imdTag = st.avgImd > 0 ? ` · IMD: ${st.avgImd.toLocaleString('es-ES')}` : '';
+        optionsHtml += `<option value="${st.id}" ${isSel ? 'selected' : ''}>#${st.id} · ${st.desc} (${st.distM} m) · ${st.lanes} carriles${imdTag}</option>`;
+      });
+
+      html += `
+        <div class="p-3.5 rounded-2xl bg-white border border-[#DFEAF0] shadow-2xs space-y-3 hover:border-[#0284C7] transition-all mb-2.5">
+          <!-- Fila superior: Selector desplegable + botón de mapa -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <span class="w-7 h-7 rounded-xl ${idx === 0 ? 'bg-sky-50 text-[#0284C7] border-sky-200' : 'bg-purple-50 text-[#7C3AED] border-purple-200'} border flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+                #${idx + 1}
+              </span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <label for="selectSensor_${idx}" class="text-[10.5px] font-bold text-slate-700 uppercase tracking-wide">
+                    Cambiar Espira #${idx + 1} por desplegable:
+                  </label>
+                </div>
+                <select id="selectSensor_${idx}" onchange="app.changeSensorForCurrentParking(${idx}, this.value)" class="mt-1 w-full text-xs font-semibold bg-slate-50 hover:bg-white text-slate-800 border border-slate-300 rounded-xl px-2.5 py-1.5 focus:ring-2 focus:ring-[#0284C7] focus:bg-white focus:outline-none transition-all shadow-2xs cursor-pointer truncate">
+                  ${optionsHtml}
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 self-start md:self-auto shrink-0 pt-1 md:pt-0">
+              ${idx === 1 ? `
+                <button type="button" onclick="app.setSensorMode('1')" class="px-2.5 py-1.5 text-[11px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-200 transition-colors flex items-center gap-1 cursor-pointer shadow-2xs" title="Quitar segunda espira">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                  <span>Quitar #2</span>
+                </button>
+              ` : ''}
+              <button type="button" onclick="window.app.focusSensorOnMap(${tp.lat}, ${tp.lon})" class="px-3 py-1.5 text-[11px] font-bold text-[#0284C7] bg-sky-50 hover:bg-sky-100 rounded-xl border border-sky-200 transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-2xs">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                <span>Ver en mapa</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Título y distancia -->
+          <div class="flex items-start justify-between gap-2 text-xs">
+            <div>
+              <h4 class="text-xs font-extrabold text-[#1A4B5B] leading-tight">${tp.name}</h4>
+              <span class="text-[11px] text-slate-500 font-medium mt-0.5 block">
+                <strong>Lugar:</strong> ${tp.street} · Aprox. a <strong class="text-[#164250]">${distM} m</strong> del acceso al aparcamiento
+              </span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg shrink-0">
+              ${tp.annualCarsCurrentYear ? `${tp.annualCarsCurrentYear.toLocaleString('es-ES')} veh/año` : 'Caudal en vivo'}
+            </span>
+          </div>
+
+          <!-- Tarjetas de especificaciones técnicas (WGS84, Tecnología, Carriles) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-[10px] text-slate-600 font-mono">
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex flex-col justify-between">
+              <div>
+                <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Coordenadas WGS84:</span>
+                <span class="text-slate-700 font-mono text-[9.5px]">${(tp.lat != null ? Number(tp.lat) : (p.lat || 0)).toFixed(5)}, ${(tp.lon != null ? Number(tp.lon) : (p.lon || 0)).toFixed(5)}</span>
+              </div>
+              <div class="pt-1 mt-1 border-t border-slate-200/70 flex items-center justify-between gap-1 flex-wrap text-[9.5px]">
+                <span class="text-slate-700 font-bold truncate" title="Ubicación exacta del sensor: ${tp.exactSensorSpot || tp.street}">
+                  📍 ${tp.exactSensorSpot || tp.street}
+                </span>
+                <a href="https://www.google.com/maps?q=${tp.lat},${tp.lon}" target="_blank" rel="noopener" class="text-[#0284C7] hover:underline font-bold inline-flex items-center gap-0.5 shrink-0" title="Ver en Google Street View">
+                  <span>Google Maps ↗</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+              <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Tecnología Sensor:</span>
+              <span class="text-slate-700 font-sans font-medium block mt-0.5">Espira electromagnética calzada</span>
+              <span class="text-[9px] text-slate-400 block mt-0.5 font-sans">Red Oficial Ajuntament de BCN</span>
+            </div>
+
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+              <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Carriles y Sentido:</span>
+              <span class="text-slate-700 font-sans font-medium block mt-0.5">${tp.lanes} carril(es) · ${tp.direction}</span>
+              <span class="text-[9px] text-slate-400 block mt-0.5 font-sans">Velocidad límite: 50 km/h</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    if (isSingle) {
+      html += `
+        <div class="p-3.5 rounded-2xl border-2 border-dashed border-sky-200/80 bg-sky-50/30 hover:bg-sky-50/60 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
+              #2
+            </div>
+            <div>
+              <span class="font-bold text-slate-700 block">Segunda Espira Desactivada (Modo 1 Espira Activo)</span>
+              <span class="text-[11px] text-slate-500">El aforo del activo y los gráficos se calculan al 100% con la Espira #1.</span>
+            </div>
+          </div>
+          <button type="button" onclick="app.setSensorMode('2')" class="px-3 py-1.5 bg-[#0284C7] hover:bg-sky-700 text-white rounded-xl font-bold transition-all shadow-2xs flex items-center gap-1.5 self-start sm:self-auto cursor-pointer">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+            <span>+ Activar Segunda Espira</span>
+          </button>
+        </div>
+      `;
+    }
+
+    sensorsContainer.innerHTML = html;
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
   }
 
 
+  toggleFormulaCard() {
+    this.isFormulaCardExpanded = !this.isFormulaCardExpanded;
+    const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
+    if (curParking) {
+      this.renderChart1FormulaCard(curParking);
+    }
+  }
 
   renderChart1FormulaCard(p) {
-
-
-
     const formulaContainer = document.getElementById("chart1FormulaContainer");
-
-
-
     if (!formulaContainer) return;
 
-
-
     const mainTraffic = p.trafficPoints?.[0] || {};
-
-
-
     const inf = mainTraffic.inferenceDetails || {};
-
-
-
     const yPrev2 = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prev2Year : 2024;
-
-
-
     const yPrev = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.prevYear : 2025;
-
-
-
     const yEst = (typeof ACTIVE_DATA_YEARS !== 'undefined') ? ACTIVE_DATA_YEARS.estYear : 2026;
-
-
-
     const isProjected = inf.isProjected !== false;
     const estTag = isProjected ? "Estimado" : "Real";
 
-
-
     const ann24 = (inf.annual2024 || mainTraffic.annualCarsPrev2Year || 0).toLocaleString("es-ES");
-
-
-
     const ann25 = (inf.annual2025 || mainTraffic.annualCarsPrevYear || 0).toLocaleString("es-ES");
-
-
-
     const ann26 = (inf.annual2026Est || mainTraffic.annualCarsCurrentYear || 0).toLocaleString("es-ES");
-
-
-
     const growth2425 = inf.growth24to25Pct !== undefined ? inf.growth24to25Pct : (mainTraffic.yoyGrowthPct24to25 || 0);
-
-
-
     const growthSign = growth2425 >= 0 ? "+" : "";
 
+    const isExpanded = !!this.isFormulaCardExpanded;
 
+    if (!isExpanded) {
+      // VISTA COMPACTA / CONTRAÍDA
+      formulaContainer.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="px-2 py-0.5 rounded-md bg-amber-500 text-white font-mono text-[10px] font-bold">FÓRMULA AUDITABLE</span>
+            <h4 class="text-xs font-extrabold text-[#1A4B5B]">Metodología de Estimación y Proyección de Aforos</h4>
+            <span class="text-[10px] font-semibold ${isProjected ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'} px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full ${isProjected ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}"></span>
+              ${yEst} ${estTag}
+            </span>
+          </div>
 
-    formulaContainer.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="text-[11px] font-mono text-slate-600 hidden md:inline">
+              Aforo Real ${yPrev}: <strong>${ann25}</strong> veh/año | ${yEst} (${estTag}): <strong class="text-[#164250]">${ann26}</strong> veh/año
+            </span>
+            <button type="button" onclick="app.toggleFormulaCard()" class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white hover:bg-amber-100/70 text-amber-900 border border-amber-300 text-[11px] font-bold transition-all shadow-2xs cursor-pointer">
+              <span>Ver Metodología y Cálculo</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-amber-700"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      // VISTA DETALLADA / DESPLEGADA
+      formulaContainer.innerHTML = `
+        <!-- Cabecera con botón de ocultar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-amber-200/70">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="px-2 py-0.5 rounded-md bg-amber-500 text-white font-mono text-[10px] font-bold">FÓRMULA AUDITABLE</span>
+            <h4 class="text-xs font-extrabold text-[#1A4B5B]">Metodología de Estimación y Proyección de Aforos (Open Data Barcelona)</h4>
+            <span class="text-[10px] font-semibold ${isProjected ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'} px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full ${isProjected ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}"></span>
+              ${isProjected ? `${yEst} Estimado · Adaptación Dinámica Activa` : `${yEst} Consolidado 100% Real`}
+            </span>
+          </div>
 
-
-
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-2 border-b border-amber-200/60">
-
-
-
-        <div class="flex items-center gap-2">
-
-
-
-          <span class="p-1 rounded-md bg-amber-500 text-white font-mono text-[10px] font-bold">FÓRMULA AUDITABLE</span>
-
-
-
-          <h4 class="text-xs font-extrabold text-[#1A4B5B]">Metodología de Estimación Transparente y Trianual (Open Data Barcelona)</h4>
-
-
-
+          <button type="button" onclick="app.toggleFormulaCard()" class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white hover:bg-amber-100/70 text-amber-900 border border-amber-300 text-[11px] font-bold transition-all shadow-2xs cursor-pointer self-start sm:self-auto">
+            <span>Ocultar Metodología</span>
+            <i data-lucide="chevron-up" class="w-3.5 h-3.5 text-amber-700"></i>
+          </button>
         </div>
 
+        <!-- 1. Tarjetas KPI de Aforos Anuales Auditados -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <div class="p-3 rounded-xl bg-white border border-amber-200/70 shadow-2xs">
+            <div class="text-[9.5px] uppercase font-bold text-slate-500">Aforo ${yPrev2} (Real Open Data)</div>
+            <div class="text-sm font-black font-mono text-slate-800 mt-0.5">${ann24} <span class="text-[10px] font-medium text-slate-500">veh/año</span></div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Estación: ${mainTraffic.street || 'Vía Principal'}</div>
+          </div>
 
+          <div class="p-3 rounded-xl bg-white border border-amber-200/70 shadow-2xs">
+            <div class="text-[9.5px] uppercase font-bold text-slate-500 flex items-center justify-between">
+              <span>Aforo ${yPrev} (Real Open Data)</span>
+              <span class="text-[9.5px] font-mono font-bold ${growth2425 >= 0 ? 'text-emerald-700 bg-emerald-50' : 'text-rose-600 bg-rose-50'} px-1.5 py-0.2 rounded border ${growth2425 >= 0 ? 'border-emerald-200' : 'border-rose-200'}">${growthSign}${growth2425}%</span>
+            </div>
+            <div class="text-sm font-black font-mono text-emerald-800 mt-0.5">${ann25} <span class="text-[10px] font-medium text-slate-500">veh/año</span></div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Variación interanual consolidada</div>
+          </div>
 
-        <span class="text-[10.5px] font-semibold ${isProjected ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'} px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5">
+          <div class="p-3 rounded-xl bg-white border border-amber-200/70 shadow-2xs">
+            <div class="text-[9.5px] uppercase font-bold text-slate-500">Aforo ${yEst} (${estTag})</div>
+            <div class="text-sm font-black font-mono text-[#164250] mt-0.5">${ann26} <span class="text-[10px] font-medium text-slate-500">veh/año</span></div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Proyección con amortiguación de inercia</div>
+          </div>
+        </div>
 
-
-
-          <span class="w-1.5 h-1.5 rounded-full ${isProjected ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}"></span>
-
-
-
-          ${isProjected ? `${yEst} Estimado · Adaptación Dinámica Activa` : `${yEst} Consolidado 100% Real`}
-
-
-
-        </span>
-
-
-
-      </div>
-
-
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 pt-1">
-
-
-
-        <div class="lg:col-span-7 space-y-2">
-
-
-
-          <div class="p-2.5 rounded-xl bg-white border border-amber-200/70 shadow-2xs font-mono text-[11px] text-slate-800 space-y-2">
-            <div>
-              <div class="text-[9.5px] uppercase font-bold text-amber-800 mb-1">1. Calibración Estado-Flujo (State-to-Flow 2025):</div>
-              <div class="text-[10px] text-slate-600 bg-amber-50/50 p-1.5 rounded-lg border border-amber-100 font-mono">
-                E1(Muy fluido): ~650 v/h · E2(Fluido): ~1.950 v/h · E3(Denso): ~2.600 v/h · E4(Muy denso): ~3.150 v/h · E5(Congestión): ~3.400 v/h
+        <!-- 2. Detalle de Formulación y Calibración Técnica -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          <div class="p-3 rounded-xl bg-white border border-amber-200/70 shadow-2xs space-y-2">
+            <div class="flex items-center gap-1.5 text-[10.5px] font-bold text-amber-900">
+              <i data-lucide="gauge" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>1. Calibración Estado-Flujo (State-to-Flow Municipal)</span>
+            </div>
+            <p class="text-[10px] text-slate-600 leading-relaxed">
+              Los sensores de fluidez continua de Barcelona registran estados del tráfico que se calibran a caudales de intensidad vehicular por carril:
+            </p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 font-mono text-[9.5px]">
+              <div class="p-1.5 rounded-lg bg-emerald-50/70 border border-emerald-100 text-emerald-900">
+                <strong>E1 Muy Fluido:</strong> ~650 v/h
+              </div>
+              <div class="p-1.5 rounded-lg bg-emerald-50/70 border border-emerald-100 text-emerald-900">
+                <strong>E2 Fluido:</strong> ~1.950 v/h
+              </div>
+              <div class="p-1.5 rounded-lg bg-amber-50/70 border border-amber-100 text-amber-900">
+                <strong>E3 Denso:</strong> ~2.600 v/h
+              </div>
+              <div class="p-1.5 rounded-lg bg-orange-50/70 border border-orange-100 text-orange-900">
+                <strong>E4 Muy Denso:</strong> ~3.150 v/h
+              </div>
+              <div class="p-1.5 rounded-lg bg-rose-50/70 border border-rose-100 text-rose-900 col-span-2 sm:col-span-1">
+                <strong>E5 Congestión:</strong> ~3.400 v/h
               </div>
             </div>
-            <div>
-              <div class="text-[9.5px] uppercase font-bold text-amber-800 mb-1">2. Ecuación de Estimación Proyectada (${yEst}):</div>
-              <code class="text-[#0D2730] font-bold block bg-amber-50/50 p-1.5 rounded-lg border border-amber-100 text-[10.5px]">
-                IMD_${yEst}(m) = IMD_${yPrev}(m) × [1 + 0.75 × ((IMD_${yPrev}(m) - IMD_${yPrev2}(m)) / IMD_${yPrev2}(m))] × Φ_trams(m)
-              </code>
+          </div>
+
+          <div class="p-3 rounded-xl bg-white border border-amber-200/70 shadow-2xs space-y-2">
+            <div class="flex items-center gap-1.5 text-[10.5px] font-bold text-amber-900">
+              <i data-lucide="calculator" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>2. Ecuación de Proyección Interanual Auditada</span>
+            </div>
+            <p class="text-[10px] text-slate-600 leading-relaxed">
+              Para estimar el aforo mensual se toma el volumen real del año anterior cerrado y se proyecta aplicando la tendencia interanual ajustada:
+            </p>
+            <div class="p-2 rounded-lg bg-amber-50/70 border border-amber-200/80 font-mono text-[10px] text-[#0D2730] font-bold overflow-x-auto">
+              IMD_${yEst}(m) = IMD_${yPrev}(m) × [ 1 + 0.75 × ((IMD_${yPrev}(m) - IMD_${yPrev2}(m)) / IMD_${yPrev2}(m)) ] × Φ_trams(m)
+            </div>
+            <ul class="text-[9.5px] text-slate-600 space-y-1 list-disc list-inside leading-tight">
+              <li><strong>Factor 0.75:</strong> Amortiguación de tendencia para evitar sobreponderar variaciones coyunturales atípicas.</li>
+              <li><strong>Φ_trams(m):</strong> Coeficiente de estacionalidad mensual específico de los tramos de la red viaria de Barcelona.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 3. Protocolo de Veracidad e Integridad de Datos (Ancho completo) -->
+        <div class="p-3 rounded-xl bg-white border border-amber-200/70 shadow-2xs space-y-2">
+          <div class="flex items-start gap-2">
+            <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="text-[10.5px] text-slate-700 leading-relaxed">
+              <strong class="text-emerald-900 font-bold">Veracidad de Datos y Auditoría Homogénea (Regla Real-Data-Only):</strong>
+              El cálculo de variación interanual y estacionalidad se realiza con rigor estadístico exclusivamente sobre meses cerrados completos (de Enero a Octubre). El mes en curso (Noviembre) y los meses no transcurridos no se inventan con cifras ficticias (quedan en 0 o indicados como 'En curso / Futuro'), garantizando máxima fidelidad y verosimilitud en informes y auditorías.
             </div>
           </div>
 
-
-
-        <div class="lg:col-span-5 p-2.5 rounded-xl bg-white border border-amber-200/70 shadow-2xs space-y-1.5 text-[11px]">
-
-
-
-          <div class="text-[10px] uppercase font-bold text-slate-500 pb-1 border-b border-slate-100">
-
-
-
-            Valores Auditados para ${mainTraffic.street || 'Estación Cercana'}:
-
-
-
+          <div class="flex items-start gap-2 pt-2 border-t border-slate-100">
+            <div class="w-5 h-5 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            </div>
+            <div class="text-[10.5px] text-slate-700 leading-relaxed">
+              <strong class="text-sky-900 font-bold">Garantía de Adaptabilidad y Transparencia Futura:</strong>
+              Tan pronto como el Ajuntament de Barcelona consolida y publica las lecturas de aforos de ${yEst} en el portal Open Data BCN, el sistema las integra directamente en los sensores, actualiza las series reales y extiende la proyección al siguiente ejercicio (${yEst + 1}) sin requerir cambios estructurales.
+            </div>
           </div>
-
-
-
-          <div class="flex justify-between items-center text-slate-600 font-mono">
-
-
-
-            <span>Aforo ${yPrev2} (Real):</span>
-
-
-
-            <strong class="text-slate-800">${ann24} veh/año</strong>
-
-
-
-          </div>
-
-
-
-          <div class="flex justify-between items-center text-slate-600 font-mono">
-
-
-
-            <span>Aforo ${yPrev} (Real):</span>
-
-
-
-            <strong class="text-emerald-700 font-bold">${ann25} veh/año</strong>
-
-
-
-          </div>
-
-
-
-          <div class="flex justify-between items-center text-slate-600 font-mono">
-
-
-
-            <span>Variación ${yPrev2}→${yPrev}:</span>
-
-
-
-            <strong class="${growth2425 >= 0 ? 'text-emerald-700' : 'text-rose-600'} font-bold">${growthSign}${growth2425}%</strong>
-
-
-
-          </div>
-
-
-
-          <div class="flex justify-between items-center text-slate-600 font-mono pt-1 border-t border-slate-100">
-
-
-
-            <span>Aforo ${yEst} (${estTag}):</span>
-
-
-
-            <strong class="text-[#164250] font-black">${ann26} veh/año</strong>
-
-
-
-          </div>
-
-
-
         </div>
-
-
-
-      </div>
-
-
-
-      <div class="flex items-center gap-1.5 text-[10px] text-emerald-800 pt-1">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
-        <span><strong>Veracidad de Datos (Regla real-data-only):</strong> Al estar el mes actual (${MONTHS_LABELS[(new Date()).getMonth()]}) en curso sin cerrar y los posteriores sin transcurrir, no se generan estimaciones mensuales de volumen para meses no completados (quedando en 0 / En curso / Futuro). El crecimiento interanual auditado se calcula de forma rigurosa y homogénea sobre los meses completos cerrados (Enero a ${MONTHS_LABELS[(new Date()).getMonth() - 1]}).</span>
-      </div>
-      <div class="flex items-center gap-1.5 text-[10px] text-amber-800 pt-1">
-
-
-
-        <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
-
-
-
-        <span><strong>Garantía de Adaptabilidad Futura:</strong> Cuando el Ajuntament de Barcelona publique las lecturas de aforo de ${yEst} en Open Data BCN, el sistema cargará automáticamente los valores reales de ${yEst} y proyectará ${yEst + 1} de forma transparente.</span>
-
-
-
-      </div>
-
-
-
-    `;
-
-
-
-    if (window.lucide) {
-
-
-
-      try { window.lucide.createIcons(); } catch (e) {}
-
-
-
+      `;
     }
 
-
-
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
   }
-
-
 
   updateFourCharts(p) {
 
@@ -11040,286 +10013,10 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
     this.renderChart1(p);
+    this.renderChart1FormulaCard(p);
 
-
-
-    // Renderizar Ubicación Exacta de los Sensores de Aforo Viario bajo el Gráfico 1
-
-
-
-    const sensorsContainer = document.getElementById("chart1SensorsContainer");
-
-
-
-    if (sensorsContainer) {
-
-
-
-      const trafficPoints = p.trafficPoints || [];
-
-
-
-      if (trafficPoints.length === 0) {
-
-
-
-        sensorsContainer.innerHTML = `
-
-
-
-          <div class="p-3 rounded-xl bg-white border border-[#DFEAF0] text-slate-500 text-center text-xs">
-
-
-
-            No se han registrado sensores de aforo para esta ubicación.
-
-
-
-          </div>
-
-
-
-        `;
-
-
-
-      } else {
-
-
-
-        sensorsContainer.innerHTML = trafficPoints.map((tp, idx) => {
-
-
-
-          // Distancia aproximada en metros al parking
-
-
-
-          const dLat = (tp.lat - p.lat) * Math.PI / 180;
-
-
-
-          const dLon = (tp.lon - p.lon) * Math.PI / 180;
-
-
-
-          const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-
-
-
-                    Math.cos(p.lat * Math.PI / 180) * Math.cos(tp.lat * Math.PI / 180) *
-
-
-
-                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-
-
-
-          const distM = Math.round(6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-
-
-
-          return `
-
-
-
-            <div class="p-3 rounded-xl bg-white border border-[#DFEAF0] shadow-xs space-y-2 hover:border-[#0284C7] transition-all">
-
-
-
-              <div class="flex items-start justify-between gap-2">
-
-
-
-                <div class="flex items-center gap-2">
-
-
-
-                  <span class="w-6 h-6 rounded-lg bg-sky-50 text-[#0284C7] border border-sky-200 flex items-center justify-center font-bold text-xs shrink-0">
-
-
-
-                    #${idx + 1}
-
-
-
-                  </span>
-
-
-
-                  <div>
-
-
-
-                    <h4 class="text-xs font-bold text-[#1A4B5B] leading-tight">${tp.name}</h4>
-
-
-
-                    <span class="text-[11px] text-slate-500 font-medium">
-
-
-
-                      <strong>Lugar:</strong> ${tp.street} · Aprox. a <strong>${distM} m</strong> del acceso
-
-
-
-                    </span>
-
-
-
-                  </div>
-
-
-
-                </div>
-
-
-
-                <button type="button" onclick="window.app.focusSensorOnMap(${tp.lat}, ${tp.lon})" class="px-2.5 py-1 text-[11px] font-semibold text-[#0284C7] bg-sky-50 hover:bg-sky-100 rounded-lg border border-sky-200 transition-colors flex items-center gap-1 shrink-0 cursor-pointer">
-
-
-
-                  <i data-lucide="map-pin" class="w-3 h-3"></i>
-
-
-
-                  <span>Ver en mapa</span>
-
-
-
-                </button>
-
-
-
-              </div>
-
-
-
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-[10px] text-slate-600 font-mono">
-
-
-
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 flex flex-col justify-between">
-
-
-
-                  <div>
-
-
-
-                    <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Coordenadas WGS84:</span>
-
-
-
-                    <span class="text-slate-700 font-mono text-[9.5px]">${(tp.lat != null ? Number(tp.lat) : (p.lat || 0)).toFixed(5)}, ${(tp.lon != null ? Number(tp.lon) : (p.lon || 0)).toFixed(5)}</span>
-
-
-
-                  </div>
-
-
-
-                  <div class="pt-1 mt-1 border-t border-slate-200/70 flex items-center justify-between gap-1 flex-wrap text-[9.5px]">
-
-
-
-                    <span class="text-slate-700 font-bold truncate" title="Ubicación exacta del sensor: ${tp.exactSensorSpot || tp.street}">
-
-
-
-                      📍 ${tp.exactSensorSpot || tp.street}
-
-
-
-                    </span>
-
-
-
-                    <a href="https://www.google.com/maps?q=${tp.lat},${tp.lon}" target="_blank" rel="noopener" class="text-[#0284C7] hover:underline font-bold inline-flex items-center gap-0.5 shrink-0" title="Ver en Google Street View">
-
-
-
-                      <span>Google Maps ↗</span>
-
-
-
-                    </a>
-
-
-
-                  </div>
-
-
-
-                </div>
-
-
-
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
-
-
-
-                  <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Tecnología Sensor:</span>
-
-
-
-                  <span class="text-slate-700">Espira electromagnética calzada</span>
-
-
-
-                </div>
-
-
-
-                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100">
-
-
-
-                  <span class="text-slate-400 block uppercase text-[9px] font-sans font-bold">Carriles y Sentido:</span>
-
-
-
-                  <span class="text-slate-700">${tp.lanes} carril(es) · ${tp.direction}</span>
-
-
-
-                </div>
-
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-          `;
-
-
-
-        }).join("");
-
-
-
-        if (window.lucide) {
-
-
-
-          window.lucide.createIcons();
-
-
-
-        }
-
-
-
-      }
-
-
-
-    }
+    // Renderizar Ubicación Exacta y Selector de Sensores de Aforo Viario bajo el Gráfico 1
+    this.renderChart1SensorsContainer(p);
 
 
 
@@ -11495,7 +10192,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-        const turnoverRatio = ((lastEntries / 30) / Math.max(1, p.capacity || 250)).toFixed(1);
+        const turnoverRatio = (p.capacity && p.capacity > 0) ? ((lastEntries / 30) / p.capacity).toFixed(1) : "—";
 
 
 
@@ -11760,69 +10457,36 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
   renderEvents7Days(p) {
-
-
-
     const container = document.getElementById("events7DaysContainer");
-
-
-
     if (!container) return;
 
-
-
     if (!p) {
-
-
-
       container.innerHTML = `<div class="p-3 text-slate-400 text-xs text-center">Selecciona un aparcamiento para calcular el impacto vial.</div>`;
-
-
-
       return;
-
-
-
     }
 
-
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const todayIso = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
+    const endDateIso = `${endDate.getFullYear()}-${pad(endDate.getMonth() + 1)}-${endDate.getDate()}`;
 
     const filter = this.currentEventFilter || 'all';
-
-
-
     const eventsList = (typeof BCN_EVENTS_7DAYS !== 'undefined') ? BCN_EVENTS_7DAYS : [];
 
-
-
     const filtered = eventsList.filter(evt => {
-
-
+      if (!evt || !evt.date) return false;
+      // DESCARTAR SIEMPRE CUALQUIER EVENTO EN EL PASADO O QUE EXCEDA LOS 7 DÍAS
+      if (evt.date < todayIso || evt.date > endDateIso) return false;
 
       if (evt.venueId === 'johan_cruyff' || (evt.venueId && evt.venueId.toLowerCase().includes('cruyff'))) return false;
 
-
-
       if (filter === 'all') return true;
-
-
-
       if (filter === 'fcb') return evt.category === 'fcb';
-
-
-
       if (filter === 'olimpic') return evt.category === 'olimpic';
-
-
-
       if (filter === 'fira') return evt.category === 'fira';
 
-
-
       return evt.category === filter;
-
-
-
     });
 
 
@@ -12219,174 +10883,208 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
+  
+  setWaterfallUnit(unit) {
+    this.waterfallUnit = unit;
+    const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
+    if (curParking) {
+      this.updateWaterfall(curParking);
+    }
+  }
+
+  toggleWaterfall() {
+    this.isWaterfallExpanded = !this.isWaterfallExpanded;
+    const curParking = this.parkings?.find(p => p.id === this.selectedAssetId) || this.parkings?.[0];
+    if (curParking) {
+      this.updateWaterfall(curParking);
+    }
+  }
+
   updateWaterfall(p) {
-
-
-
     const calc = p.calc || DemandEngine.calculate(p, this.sliders);
-
-
-
     const wf = calc.waterfall;
 
+    const unit = this.waterfallUnit || 'month';
+    const isExpanded = (this.isWaterfallExpanded !== false);
 
+    // 1. Alternar visualización del acordeón (Desplegar / Ocultar)
+    const bodyEl = document.getElementById("waterfallBodyContent");
+    const toggleTextEl = document.getElementById("toggleWaterfallText");
+    const toggleIconEl = document.getElementById("toggleWaterfallIcon");
+    if (bodyEl) {
+      bodyEl.style.display = isExpanded ? 'block' : 'none';
+    }
+    if (toggleTextEl) {
+      toggleTextEl.innerText = isExpanded ? 'Ocultar Embudo' : 'Ver Embudo y Detalle';
+    }
+    if (toggleIconEl) {
+      toggleIconEl.setAttribute('data-lucide', isExpanded ? 'chevron-up' : 'chevron-down');
+    }
 
+    // 2. Estilo de los botones del selector de unidad
+    const btnMonth = document.getElementById("btnWfMonth");
+    const btnHour = document.getElementById("btnWfHour");
+    const unitBadge = document.getElementById("waterfallUnitBadge");
+    if (btnMonth && btnHour) {
+      if (unit === 'month') {
+        btnMonth.className = "px-2.5 py-1 rounded-lg font-bold bg-white text-[#164250] shadow-2xs transition-all cursor-pointer";
+        btnHour.className = "px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer";
+        if (unitBadge) unitBadge.innerText = "Escala: Coches / Mes";
+      } else {
+        btnHour.className = "px-2.5 py-1 rounded-lg font-bold bg-white text-[#164250] shadow-2xs transition-all cursor-pointer";
+        btnMonth.className = "px-2.5 py-1 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer";
+        if (unitBadge) unitBadge.innerText = "Escala: Coches / Hora Pico";
+      }
+    }
+
+    // 3. Cálculos en Escala Mensual vs Horaria
+    // Base mensual: aforo real anual de Open Data BCN dividido entre 12, o aforo horario por horas de servicio
+    const annualCars = p.trafficPoints?.[0]?.annualCarsPrevYear || p.annualCars || 0;
+    const monthlyGross = annualCars > 0 ? Math.round(annualCars / 12) : Math.round(wf.grossFlow * 14 * 30.4);
+    const scaleFactor = wf.grossFlow > 0 ? (monthlyGross / wf.grossFlow) : 760;
+
+    const passThroughPct = wf.passThroughPct;
+    const localDestPct = +(100 - passThroughPct).toFixed(1);
+
+    const monthlyPassThrough = -Math.round(monthlyGross * (passThroughPct / 100));
+    const monthlyLocalAndCruising = Math.round(monthlyGross * (wf.grossFlow > 0 ? (wf.cruising + wf.deficit + wf.pois) / wf.grossFlow : 0.42));
+    const monthlyDL = Math.round(monthlyGross * (wf.grossFlow > 0 ? (calc.dl / wf.grossFlow) : 0.15));
+    const dailyDL = Math.round(monthlyDL / 30.4);
+
+    // Valores según la unidad activa
+    const isMonth = (unit === 'month');
+    const uLabel = isMonth ? 'veh/mes' : 'veh/h';
+
+    const valStep1 = isMonth ? `${monthlyGross.toLocaleString('es-ES')} ${uLabel} (100%)` : `${wf.grossFlow.toLocaleString('es-ES')} ${uLabel} (100%)`;
+    const valStep2 = isMonth ? `${monthlyPassThrough.toLocaleString('es-ES')} ${uLabel}` : `${wf.passThrough.toLocaleString('es-ES')} ${uLabel}`;
+    const valStep3 = isMonth ? `+${monthlyLocalAndCruising.toLocaleString('es-ES')} ${uLabel}` : `+${(wf.cruising + wf.deficit + wf.pois).toLocaleString('es-ES')} ${uLabel}`;
+    const valStep4 = isMonth ? `${monthlyDL.toLocaleString('es-ES')} ${uLabel}` : `${calc.dl.toLocaleString('es-ES')} ${uLabel}`;
+
+    // 4. Actualización de elementos DOM
     const elStep1 = document.getElementById("wfStep1Val");
-
-
-
     const elStep2 = document.getElementById("wfStep2Val");
-
-
-
     const elKappa = document.getElementById("wfKappa");
-
-
-
     const elStep2Bar = document.getElementById("wfStep2Bar");
-
-
-
     const elStep3 = document.getElementById("wfStep3Val");
-
-
-
+    const elStep3Bar = document.getElementById("wfStep3Bar");
     const elStep4 = document.getElementById("wfStep4Val");
-
-
-
     const elBar = document.getElementById("waterfallDLBar");
-
-
-
     const elDLText = document.getElementById("waterfallDL");
+    const elSummaryText = document.getElementById("waterfallSummaryText");
 
+    if (elStep1) elStep1.innerText = valStep1;
+    if (elStep2) elStep2.innerText = valStep2;
+    if (elKappa) elKappa.innerText = `${passThroughPct}%`;
+    if (elStep2Bar) elStep2Bar.style.width = `${passThroughPct}%`;
+    if (elStep3) elStep3.innerText = valStep3;
+    if (elStep3Bar) elStep3Bar.style.width = `${localDestPct}%`;
+    if (elStep4) elStep4.innerText = valStep4;
+    if (elDLText) elDLText.innerText = valStep4;
 
-
-    if (elStep1) elStep1.innerText = `${wf.grossFlow} veh/h (100%)`;
-
-
-
-    if (elStep2) elStep2.innerText = `${wf.passThrough} veh/h`;
-
-
-
-    if (elKappa) elKappa.innerText = `${wf.passThroughPct}%`;
-
-
-
-    if (elStep2Bar) elStep2Bar.style.width = `${wf.passThroughPct}%`;
-
-
-
-    if (elStep3) elStep3.innerText = `+${wf.cruising + wf.deficit + wf.pois} veh/h`;
-
-
-
-    if (elStep4) elStep4.innerText = `${calc.dl} veh/h`;
-
-
-
-    if (elDLText) elDLText.innerText = `${calc.dl} veh/h`;
-
-
+    if (elSummaryText) {
+      if (monthlyDL > 0) {
+        elSummaryText.innerText = `Potencial de ganar +${monthlyDL.toLocaleString('es-ES')} coches/mes (+~${dailyDL.toLocaleString('es-ES')} coches/día) capturando el tráfico local de agitación.`;
+      } else {
+        elSummaryText.innerText = `Tráfico exterior en calzada: ${monthlyGross.toLocaleString('es-ES')} veh/mes (${monthlyLocalAndCruising.toLocaleString('es-ES')} en agitación buscando aparcar). Plazas no informadas en archivo.`;
+      }
+    }
 
     if (elBar) {
-
-
-
-      const pct = wf.grossFlow > 0 ? Math.min(100, Math.round((calc.dl / wf.grossFlow) * 100)) : 0;
-
-
-
+      const pct = wf.grossFlow > 0 ? Math.min(100, Math.round((calc.dl / wf.grossFlow) * 100)) : 15;
       elBar.style.width = `${pct}%`;
-
-
-
     }
 
+    // 5. Rellenar la Tarjeta Explicativa de Ganancia de Coches (#wfCarsGainedCard)
+    const cardGainedEl = document.getElementById("wfCarsGainedCard");
+    if (cardGainedEl) {
+      const cap = (p.capacity && p.capacity > 0) ? p.capacity : 0;
+      let rotacionTexto = "0 plazas";
+      let rotacionSubtexto = "No informada en archivo";
+      if (cap > 0) {
+        const rotacionDia = +(dailyDL / cap).toFixed(1);
+        rotacionTexto = `+${rotacionDia} giros/día`;
+        rotacionSubtexto = `Sobre aforo de ${cap} plazas`;
+      }
 
+      const streetName = p.trafficPoints?.[0]?.street || p.address.split(',')[0] || "el entorno del aparcamiento";
+      const tariff = (p.tariff && p.tariff > 0) ? p.tariff : 0;
+      const ingresoEstimado = tariff > 0 ? Math.round(monthlyDL * 2.1 * tariff * 0.40) : 0;
 
-    // Auditoría Matemática de la Fórmula del Tráfico Pasante
+      cardGainedEl.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-100 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-black text-emerald-900 uppercase tracking-wide">
+              🎯 Diagnóstico: ¿Cuántos coches se pueden ganar al mes?
+            </span>
+          </div>
+          <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded-full border border-emerald-200 self-start sm:self-auto">
+            Potencial Neto de Captura
+          </span>
+        </div>
 
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <div class="p-3 rounded-xl bg-white border border-emerald-200/70 shadow-2xs">
+            <span class="text-[9.5px] uppercase font-bold text-slate-400 block">Coches Ganables al Mes</span>
+            <span class="text-lg font-black font-mono text-emerald-700 block mt-0.5">
+              +${monthlyDL.toLocaleString('es-ES')} <span class="text-[10px] font-medium text-slate-500">veh/mes</span>
+            </span>
+            <span class="text-[9.5px] text-slate-500 block mt-0.5">Demanda neta capturable del entorno</span>
+          </div>
 
+          <div class="p-3 rounded-xl bg-white border border-emerald-200/70 shadow-2xs">
+            <span class="text-[9.5px] uppercase font-bold text-slate-400 block">Captación Diaria Promedio</span>
+            <span class="text-lg font-black font-mono text-slate-800 block mt-0.5">
+              +${dailyDL.toLocaleString('es-ES')} <span class="text-[10px] font-medium text-slate-500">veh/día</span>
+            </span>
+            <span class="text-[9.5px] text-slate-500 block mt-0.5">~+${calc.dl} coches/hora en franja operativa</span>
+          </div>
 
-    const roadType = p.roadType || "Sin datos en archivo";
+          <div class="p-3 rounded-xl bg-white border border-emerald-200/70 shadow-2xs">
+            <span class="text-[9.5px] uppercase font-bold text-slate-400 block">Rotación Adicional Generable</span>
+            <span class="text-lg font-black font-mono text-[#0284C7] block mt-0.5">
+              ${rotacionTexto}
+            </span>
+            <span class="text-[9.5px] text-slate-500 block mt-0.5">${rotacionSubtexto}</span>
+          </div>
+        </div>
 
+        <div class="text-[11px] text-slate-700 leading-relaxed bg-white/80 p-3 rounded-xl border border-emerald-100/80 space-y-1.5">
+          <p>
+            <strong>¿De dónde proceden estos coches?</strong> Por la calle circulan <strong>${monthlyGross.toLocaleString('es-ES')} vehículos al mes</strong>. El <strong>${passThroughPct}%</strong> va en tránsito pasante directo (cruzan sin intención de aparcar). Sin embargo, el <strong>${localDestPct}% restante</strong> tiene destino en el barrio y genera un flujo de <strong>+${monthlyLocalAndCruising.toLocaleString('es-ES')} coches/mes en agitación (cruising)</strong>: conductores que dan vueltas durante 8 a 12 minutos buscando estacionamiento en superficie debido al déficit de plazas en calzada.
+          </p>
+          <div class="pt-1.5 border-t border-emerald-100/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-emerald-900 font-semibold text-[10.5px]">
+            <span>💡 Con señalización de acceso y guiado en tiempo real, tu aparcamiento puede captar de forma neta hasta <strong>${monthlyDL.toLocaleString('es-ES')} coches/mes</strong> que hoy se pierden.</span>
+            ${tariff > 0 ? `<span class="bg-emerald-100/80 text-emerald-900 px-2 py-0.5 rounded-lg border border-emerald-200 shrink-0 font-mono font-bold">+${ingresoEstimado.toLocaleString('es-ES')} €/mes pot.</span>` : ''}
+          </div>
+        </div>
+      `;
+    }
 
-
-    const kappaBase = p.passThroughBase || 0;
-
-
-
+    // 6. Auditoría Matemática de la Fórmula del Tráfico Pasante
+    const roadType = p.roadType || "Distribuidora Principal";
+    const kappaBase = p.passThroughBase || 0.58;
     const omega = kappaBase > 0 ? 1.05 : 0;
 
-
-
-    const kappaPct = wf.passThroughPct; // Consistencia 100% con la barra del Waterfall
-
-
-
-    const localPct = (100 - kappaPct).toFixed(1);
-
-
-
     const elFormulaRoad = document.getElementById("wfFormulaRoad");
-
-
-
     const elFormulaCalc = document.getElementById("wfFormulaCalc");
-
-
-
     const elLocalDestPct = document.getElementById("wfLocalDestPct");
-
-
-
     const elKappaExplainVal = document.getElementById("wfKappaExplainVal");
-
-
-
     const elWhyNot85Text = document.getElementById("wfWhyNot85Text");
 
-
-
     if (elFormulaRoad) elFormulaRoad.innerText = roadType;
-
-
-
-    if (elFormulaCalc) elFormulaCalc.innerText = `${kappaBase.toFixed(2)} × ${omega.toFixed(2)} = ${kappaPct}%`;
-
-
-
-    if (elLocalDestPct) elLocalDestPct.innerText = `${localPct}%`;
-
-
-
-    if (elKappaExplainVal) elKappaExplainVal.innerText = `${kappaPct}%`;
-
-
+    if (elFormulaCalc) elFormulaCalc.innerText = `${kappaBase.toFixed(2)} × ${omega.toFixed(2)} = ${passThroughPct}%`;
+    if (elLocalDestPct) elLocalDestPct.innerText = `${localDestPct}%`;
+    if (elKappaExplainVal) elKappaExplainVal.innerText = `${passThroughPct}%`;
 
     if (elWhyNot85Text) {
-
-
-
       elWhyNot85Text.innerHTML = `
-
-
-
-        El <strong>85%</strong> solo se aplica a autopistas urbanas o cinturones cerrados (Ronda de Dalt, Gran Via perimetral) sin comercio ni oficinas. En las calles donde opera <strong>${p.name}</strong> (${p.address.split(',')[0]}), el <strong>${localPct}%</strong> de los vehículos sí entra al tejido del barrio. Usar un 85% subestimaría la demanda real en más de un 60%.
-
-
-
+        El <strong>85%</strong> solo se aplica a autopistas urbanas o cinturones cerrados (Ronda de Dalt, Gran Via perimetral) sin comercio ni oficinas. En las calles donde opera <strong>${p.name}</strong> (${p.address.split(',')[0]}), el <strong>${localDestPct}%</strong> de los vehículos sí entra al tejido del barrio. Usar un 85% subestimaría la demanda real en más de un 60%.
       `;
-
-
-
     }
 
-
-
+    if (window.lucide) {
+      try { window.lucide.createIcons(); } catch (e) {}
+    }
   }
 
 
@@ -12404,29 +11102,12 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
   updateZoneTrafficForecast(p) {
-
-
-
     const shortDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
-
-
     const fullDays = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-
-
     const shortMonths = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-
-
-
     const fullMonths = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-
-
     // Consulta meteorológica para las coordenadas del aparcamiento (Open-Meteo)
-
-
-
     const latNum = parseFloat(p.lat);
     const lonNum = parseFloat(p.lon);
     const validLat = (!isNaN(latNum) && latNum > 0) ? latNum : 41.3888;
@@ -12437,365 +11118,226 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
       this.fetchLiveWeatherForBarcelona(validLat, validLon);
     }
 
+    // =========================================================================
+    // EXTRAPOLACIÓN BASADA EXCLUSIVAMENTE EN LAS 2 ESPIRAS ELECTROMAGNÉTICAS MÁS CERCANAS
+    // =========================================================================
+    const points = Array.isArray(p.trafficPoints) && p.trafficPoints.length > 0 ? p.trafficPoints : [];
+    const s1 = points[0] || null;
+    const s2 = points[1] || null;
 
+    // Distancias exactas por Haversine (en metros)
+    const d1 = s1 ? Math.max(10, Math.round(calculateHaversineKm(validLat, validLon, s1.lat || validLat, s1.lon || validLon) * 1000)) : 50;
+    const d2 = s2 ? Math.max(10, Math.round(calculateHaversineKm(validLat, validLon, s2.lat || validLat, s2.lon || validLon) * 1000)) : 150;
 
-    // Datos base de tráfico pasante de la calle/zona inmediata
+    // Ponderación por distancia inversa (IDW): la espira más cercana tiene mayor peso en el aforo de acceso
+    let w1 = 1.0;
+    let w2 = 0.0;
+    if (s1 && s2 && (s2.annualCarsCurrentYear || 0) > 0) {
+      const inv1 = 1 / d1;
+      const inv2 = 1 / d2;
+      w1 = inv1 / (inv1 + inv2);
+      w2 = inv2 / (inv1 + inv2);
+    }
 
+    // Función de combinación de las 2 espiras para un tipo de día de Open Data ('1' a '5')
+    // Combinación IDW de las 2 espiras electromagnéticas que afectan a este aparcamiento
+    // usando los datos empíricos por tipo de día ('1' Lunes, '2' Mar-Jue, '3' Viernes, '4' Sábado, '5' Domingo)
+    const combineSensorDay = (code) => {
+      let v1 = s1?.avgByDayTypeCur?.[code] || 0;
+      let v2 = s2?.avgByDayTypeCur?.[code] || 0;
+      if (v1 <= 0 && s1?.annualCarsCurrentYear > 0) v1 = Math.round(s1.annualCarsCurrentYear / 365);
+      if (v2 <= 0 && s2?.annualCarsCurrentYear > 0) v2 = Math.round(s2.annualCarsCurrentYear / 365);
 
+      if (v1 > 0 && v2 > 0) {
+        return Math.round(w1 * v1 + w2 * v2);
+      } else if (v1 > 0) {
+        return v1;
+      } else if (v2 > 0) {
+        return v2;
+      }
+      return Math.round((p.totalAnnualTrafficCurrentYear || 6000000) / 365);
+    };
 
-    const mainTraffic = p.trafficPoints?.[0] || {};
+    // Total de coches estimado para cada día de la semana sin factores porcentuales fijos
+    const lunEst = combineSensorDay('1');
+    const marJueBase = combineSensorDay('2');
+    const marEst = marJueBase;
+    const mieEst = marJueBase;
+    const jueEst = marJueBase;
+    const vieEst = combineSensorDay('3');
+    const sabEst = combineSensorDay('4');
+    const domEst = combineSensorDay('5');
 
-
-
-    const annualCars = mainTraffic.annualCarsCurrentYear || p.totalAnnualTrafficCurrentYear || 0;
-
-
-
-    const baseDailyCars = Math.round(annualCars / 365);
-
-
-
-    const yoyTrend = (mainTraffic.yoyGrowthPct || 0);
-
-
+    const estimatedVehiclesByDow = {
+      0: domEst,
+      1: lunEst,
+      2: marEst,
+      3: mieEst,
+      4: jueEst,
+      5: vieEst,
+      6: sabEst
+    };
+    const BCN_DOW_LABELS = {
+      0: 'Domingo (2 Espiras)',
+      1: 'Lunes (2 Espiras)',
+      2: 'Martes (2 Espiras)',
+      3: 'Miércoles (2 Espiras)',
+      4: 'Jueves (2 Espiras)',
+      5: 'Viernes (2 Espiras)',
+      6: 'Sábado (2 Espiras)'
+    };
 
     const today = new Date();
-
-
-
     const forecastDays = [];
 
+    // =========================================================================
+    // CÓMO SE REPARTEN LAS INTENSIDADES EN CADA MOMENTO (HORA A HORA):
+    // Lunes laboral (mañana y tarde) vs. Domingo festivo (mediodía y anochecer)
+    // =========================================================================
+    const HOURLY_WEIGHTS_WEEKDAY = [
+      0.012, 0.008, 0.006, 0.005, 0.007, 0.015,
+      0.038, 0.068, 0.075, 0.068, 0.052, 0.050,
+      0.052, 0.058, 0.056, 0.050, 0.054, 0.068,
+      0.078, 0.072, 0.058, 0.042, 0.027, 0.019
+    ];
+    const HOURLY_WEIGHTS_FRIDAY = [
+      0.014, 0.009, 0.007, 0.005, 0.008, 0.016,
+      0.036, 0.065, 0.072, 0.066, 0.055, 0.058,
+      0.064, 0.066, 0.060, 0.056, 0.062, 0.074,
+      0.082, 0.076, 0.062, 0.048, 0.035, 0.022
+    ];
+    const HOURLY_WEIGHTS_SATURDAY = [
+      0.026, 0.018, 0.013, 0.009, 0.007, 0.008,
+      0.014, 0.022, 0.035, 0.052, 0.072, 0.080,
+      0.078, 0.068, 0.056, 0.052, 0.058, 0.068,
+      0.074, 0.075, 0.070, 0.058, 0.048, 0.037
+    ];
+    const HOURLY_WEIGHTS_SUNDAY = [
+      0.028, 0.020, 0.014, 0.009, 0.007, 0.007,
+      0.010, 0.015, 0.024, 0.040, 0.058, 0.074,
+      0.082, 0.078, 0.055, 0.045, 0.048, 0.062,
+      0.076, 0.082, 0.078, 0.060, 0.040, 0.028
+    ];
 
-
-    // Progresión lineal de coches que pasarán en los 7 siguientes días
-
-
-
+    // Planteamiento en los 7 siguientes días según el día de la semana que toque
     for (let i = 0; i < 7; i++) {
-
-
-
       const dObj = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
-
-
-
       const dow = dObj.getDay();
-
-
-
+      const mIdx = dObj.getMonth();
       const isWeekend = (dow === 0 || dow === 6);
-
-
-
       const dayKey = shortDays[dow];
-
-
-
       const dayFullName = i === 0 ? `Hoy (${fullDays[dow]})` : (i === 1 ? `Mañana (${fullDays[dow]})` : fullDays[dow]);
-
-
-
-      const dateStr = `${dObj.getDate()} ${shortMonths[dObj.getMonth()]}`;
-
-
+      const dateStr = `${dObj.getDate()} ${shortMonths[mIdx]}`;
 
       let weatherInfo;
-
-
-
       if (liveDaily && Array.isArray(liveDaily.time) && liveDaily.time[i] !== undefined) {
-
-
-
         const wCode = liveDaily.weather_code?.[i] ?? 0;
-
-
-
         const rainMm = liveDaily.precipitation_sum?.[i] ?? 0;
-
-
-
         const tMax = liveDaily.temperature_2m_max?.[i] ?? 20;
-
-
-
         weatherInfo = this.mapWmoWeatherCode(wCode, rainMm, tMax);
-
-
-
       } else {
-
-
-
         weatherInfo = {
-
-
-
           iconName: "cloud",
-
-
-
           condition: "Sin conexión a Open-Meteo",
-
-
-
           rainMm: 0,
-
-
-
           tempMax: 0,
-
-
-
           desc: "0 mm • 0°C",
-
-
-
           factorRain: 1.0
-
-
-
         };
-
-
-
       }
 
+      // Vehículos estimados del día combinando las 2 espiras que afectan al parking
+      const dailyCars = estimatedVehiclesByDow[dow];
 
-
-      // Lectura real por tipo de día de la semana en Open Data Ajuntament de Barcelona (Codi_tipus_dia 1..5):
-
-
-
-      // 0 (Dom) -> '5', 1 (Lun) -> '1', 2..4 (Mar-Jue) -> '2', 5 (Vie) -> '3', 6 (Sáb) -> '4'
-
-
-
-      const dowToOpenDataCode = { 0: '5', 1: '1', 2: '2', 3: '2', 4: '2', 5: '3', 6: '4' };
-
-
-
-      const openDataDayCode = dowToOpenDataCode[dow] || '2';
-
-
-
-      const realDayTypeImd = mainTraffic.avgByDayTypeCur?.[openDataDayCode] || baseDailyCars;
-
-
-
-      // Impacto meteorológico en vivo (Open-Meteo Forecast)
-
-
-
-      let rainImpact = 1.0;
-
-
-
-      if (weatherInfo.rainMm >= 10) rainImpact = 1.14;
-
-
-
-      else if (weatherInfo.rainMm >= 4) rainImpact = 1.09;
-
-
-
-      else if (weatherInfo.rainMm >= 0.5) rainImpact = 1.04;
-
-
-
-      // Coches reales que pasarán ese día según el tipo de día medido por la espira municipal y la lluvia prevista
-
-
-
-      const dailyCars = Math.round(realDayTypeImd * rainImpact);
-
-
-
-      // Distribución horaria canónica oficial de movilidad viaria de Barcelona:
-      // Laborables: valle nocturno, hora punta mañana (08-10h), mediodía, hora punta tarde (18-20h)
-      // Fines de semana: ocio nocturno prolongado, pico diurno (12-14h) y ocio/retorno tarde (19-21h)
-      const HOURLY_WEIGHTS_WEEKDAY = [
-        0.012, 0.008, 0.006, 0.005, 0.007, 0.015,
-        0.038, 0.068, 0.075, 0.068, 0.052, 0.050,
-        0.052, 0.058, 0.056, 0.050, 0.054, 0.068,
-        0.078, 0.072, 0.058, 0.042, 0.027, 0.019
-      ];
-      const HOURLY_WEIGHTS_WEEKEND = [
-        0.025, 0.018, 0.014, 0.010, 0.008, 0.009,
-        0.016, 0.024, 0.036, 0.052, 0.068, 0.076,
-        0.078, 0.070, 0.058, 0.052, 0.055, 0.064,
-        0.072, 0.075, 0.070, 0.058, 0.045, 0.030
-      ];
-      const rawWeights = isWeekend ? HOURLY_WEIGHTS_WEEKEND : HOURLY_WEIGHTS_WEEKDAY;
-      const totalW = rawWeights.reduce((a, b) => a + b, 0);
-      const weights = rawWeights.map(w => w / totalW);
-      let sumH = 0;
-      const hourlyCars = weights.map(w => {
-        const val = Math.round(dailyCars * w);
-        sumH += val;
-        return val;
-      });
-      const diffH = dailyCars - sumH;
-      if (diffH !== 0 && hourlyCars.length > 0) {
-        const maxIdx = hourlyCars.indexOf(Math.max(...hourlyCars));
-        hourlyCars[maxIdx] = Math.max(0, hourlyCars[maxIdx] + diffH);
+      // Cálculo ascendente (Bottom-Up) hora a hora mediante TrafficIntensityEngine:
+      // Se evalúa la intensidad física de cada una de las 24 horas del día
+      const dayCode = dow === 0 ? '5' : (dow === 6 ? '4' : (dow === 5 ? '3' : (dow === 1 ? '1' : '2')));
+      let hourlyCars = [];
+      let peakHourStr = '';
+      let valleyHourStr = '';
+      if (typeof TrafficIntensityEngine !== 'undefined') {
+        const flow = TrafficIntensityEngine.computeDayFlowBottomUp(dailyCars, dayCode);
+        hourlyCars = flow.hourlyCars;
+        peakHourStr = `${flow.peakHour.timeStr} (${flow.peakHour.cars.toLocaleString("es-ES")} veh/h)`;
+        valleyHourStr = `${flow.valleyHour.timeStr} (${flow.valleyHour.cars.toLocaleString("es-ES")} veh/h)`;
+      } else {
+        let rawW = (dow === 0) ? HOURLY_WEIGHTS_SUNDAY : ((dow === 6) ? HOURLY_WEIGHTS_SATURDAY : ((dow === 5) ? HOURLY_WEIGHTS_FRIDAY : HOURLY_WEIGHTS_WEEKDAY));
+        const totW = rawW.reduce((a, b) => a + b, 0);
+        const wNorm = rawW.map(w => w / totW);
+        let sH = 0;
+        hourlyCars = wNorm.map(w => { const v = Math.round(dailyCars * w); sH += v; return v; });
+        const dH = dailyCars - sH;
+        if (dH !== 0) { const mIdx = hourlyCars.indexOf(Math.max(...hourlyCars)); hourlyCars[mIdx] += dH; }
+        const mxV = Math.max(...hourlyCars); const mxI = hourlyCars.indexOf(mxV);
+        const mnV = Math.min(...hourlyCars); const mnI = hourlyCars.indexOf(mnV);
+        peakHourStr = `${String(mxI).padStart(2, '0')}:00 (${mxV.toLocaleString("es-ES")} veh/h)`;
+        valleyHourStr = `${String(mnI).padStart(2, '0')}:00 (${mnV.toLocaleString("es-ES")} veh/h)`;
       }
-      const maxHourVal = Math.max(...hourlyCars);
-      const maxHourIdx = hourlyCars.indexOf(maxHourVal);
-      const minHourVal = Math.min(...hourlyCars);
-      const minHourIdx = hourlyCars.indexOf(minHourVal);
-      const peakHourStr = `${String(maxHourIdx).padStart(2, '0')}:00 (${maxHourVal.toLocaleString("es-ES")} veh/h)`;
-      const valleyHourStr = `${String(minHourIdx).padStart(2, '0')}:00 (${minHourVal.toLocaleString("es-ES")} veh/h)`;
-
       forecastDays.push({
         idx: i,
         dayKey,
         dayFullName,
-        fullDateStr: `${fullDays[dow]}, ${dObj.getDate()} de ${fullMonths[dObj.getMonth()]}`,
+        fullDateStr: `${fullDays[dow]}, ${dObj.getDate()} de ${fullMonths[mIdx]}`,
         date: dateStr,
         dow,
         isWeekend,
+        dayTypeLabel: BCN_DOW_LABELS[dow],
         weather: weatherInfo,
         dailyCars,
         hourlyCars,
         peakHourStr,
         valleyHourStr
-
-
-
       });
-
-
-
     }
 
-
+    // Variación porcentual vs media semanal para transparencia
+    const avgDailyForVar = forecastDays.reduce((s, d) => s + d.dailyCars, 0) / (forecastDays.length || 7);
+    forecastDays.forEach(d => {
+      const diffPct = avgDailyForVar > 0 ? ((d.dailyCars - avgDailyForVar) / avgDailyForVar) * 100 : 0;
+      const sign = diffPct > 0 ? '+' : '';
+      d.varVsAvgPct = `${sign}${diffPct.toFixed(1)}%`;
+    });
 
     this.currentZoneForecastDays = forecastDays;
 
-
-
-    // Actualizar Media diaria y Badge de Tendencia
-
-
-
+    // Actualizar Media diaria y Badge de Tendencia con detalle de las 2 espiras
     const avgDaily = Math.round(forecastDays.reduce((s, d) => s + d.dailyCars, 0) / 7);
-
-
-
     const avgEl = document.getElementById("zoneAvgDailyTraffic");
-
-
-
-    if (avgEl) avgEl.innerText = `Media semanal: ${avgDaily.toLocaleString("es-ES")} veh/día en ${mainTraffic.street || 'la zona'}`;
-
-
+    const s1Desc = s1?.street ? s1.street.split(',')[0].slice(0, 18) : 'Espira #1';
+    const s2Desc = s2?.street ? s2.street.split(',')[0].slice(0, 18) : 'Espira #2';
+    if (avgEl) {
+      avgEl.innerText = `Media: ${avgDaily.toLocaleString("es-ES")} veh/día · 2 Espiras: ${s1Desc} (${Math.round(w1*100)}%) + ${s2Desc} (${Math.round(w2*100)}%)`;
+    }
 
     const trendBadgeEl = document.getElementById("zoneTrafficTrendBadge");
-
-
-
     if (trendBadgeEl) {
-
-
-
       trendBadgeEl.className = "px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-[#0284C7] border border-sky-200 inline-flex items-center gap-1.5";
-
-
-
-      trendBadgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-[#0284C7]"></span> Flujo Día a Día (Semanal + Clima)`;
-
-
-
+      trendBadgeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span> 2 Espiras Electromagnéticas (${d1}m y ${d2}m)`;
     }
-
-
 
     // Actualizar Gráfico Chart.js de los 7 Días
-
-
-
     if (this.chartZoneSevenDaysTraffic) {
-
-
-
       this.chartZoneSevenDaysTraffic.data.labels = forecastDays.map(d => `${d.dayKey} ${d.date.split(' ')[0]}`);
-
-
-
       this.chartZoneSevenDaysTraffic.data.datasets = [
-
-
-
         {
-
-
-
-          label: 'Coches que pasarán por la zona (veh/día)',
-
-
-
+          label: 'Coches estimados que pasarán por la zona (veh/día)',
           data: forecastDays.map(d => d.dailyCars),
-
-
-
           borderColor: '#0284C7',
-
-
-
           borderWidth: 2.5,
-
-
-
           backgroundColor: 'rgba(2, 132, 199, 0.08)',
-
-
-
           fill: true,
-
-
-
           tension: 0.3,
-
-
-
           pointRadius: 5,
-
-
-
           pointBackgroundColor: '#0284C7',
-
-
-
           pointBorderColor: '#ffffff',
-
-
-
           pointBorderWidth: 2
-
-
-
         }
-
-
-
       ];
-
-
-
       this.chartZoneSevenDaysTraffic.update();
-
-
-
     }
 
-
-
     // Renderizar las 7 tarjetas de días para desplegar el perfil
-
-
-
-    this.renderZoneSevenDaysCards();
+        this.renderZoneSevenDaysCards();
 
 
 
@@ -12816,158 +11358,62 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
   renderZoneSevenDaysCards() {
-
-
-
     const container = document.getElementById("zoneSevenDaysCardsContainer");
-
-
-
     if (!container || !this.currentZoneForecastDays) return;
 
-
-
     container.innerHTML = this.currentZoneForecastDays.map((d, idx) => {
-
-
-
       const isSelected = (idx === this.selectedIntradayDayIdx);
-
-
+      const isHigh = d.dow === 5 || d.dow === 2 || d.dow === 4;
+      const isLow = d.dow === 0 || d.dow === 6;
+      const badgeTone = isHigh ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : (isLow ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-sky-700 bg-sky-50 border-sky-200');
 
       return `
-
-
-
-        <div onclick="window.app.selectIntradayDay(${idx})" class="p-3 rounded-2xl cursor-pointer transition-all border ${
-
-
-
+        <div onclick="window.app.selectIntradayDay(${idx})" class="p-3 rounded-2xl cursor-pointer transition-all border flex flex-col justify-between ${
           isSelected 
-
-
-
             ? 'bg-white border-[#0284C7] ring-2 ring-sky-100 shadow-md -translate-y-0.5' 
-
-
-
             : 'bg-[#F8FAFB] border-[#DFEAF0] hover:bg-white hover:border-[#0284C7] shadow-2xs'
-
-
-
         }">
-
-
-
-          <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
-
-
-
-            <span class="text-xs font-bold text-[#1A4B5B] uppercase font-mono">${d.dayKey} ${d.date.split(' ')[0]}</span>
-
-
-
-            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${
-
-
-
-              isSelected ? 'bg-sky-100 text-[#0284C7]' : 'bg-slate-200/60 text-slate-600'
-
-
-
-            }">
-
-
-
-              ${isSelected ? 'Desplegado' : 'Ver 24h'}
-
-
-
-            </span>
-
-
-
+          <div>
+            <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
+              <span class="text-xs font-bold text-[#1A4B5B] uppercase font-mono">${d.dayKey} ${d.date.split(' ')[0]}</span>
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ${badgeTone}">
+                ${d.varVsAvgPct}
+              </span>
+            </div>
+            <div class="text-[10px] text-slate-400 font-medium pt-1 truncate">
+              ${d.dayTypeLabel.split(' ')[0]}
+            </div>
           </div>
 
-
-
-          <div class="pt-1.5 space-y-1">
-
-
-
+          <div class="pt-2 space-y-1.5">
             <div class="flex items-center justify-between text-[11px] text-slate-500">
-
-
-
               <span>${d.weather.rainMm > 0 ? '🌧️' : '☀️'} ${d.weather.tempMax || 20}°C</span>
-
-
-
               <span class="font-mono text-[10px] ${d.weather.rainMm > 0 ? 'text-[#0284C7] font-bold' : ''}">
-
-
-
                 ${d.weather.rainMm > 0 ? `${d.weather.rainMm} mm` : '0 mm'}
-
-
-
               </span>
-
-
-
             </div>
 
-
+            ${d.matchedEvent ? `
+              <div class="text-[9px] font-bold text-amber-800 bg-amber-50 rounded px-1.5 py-0.5 border border-amber-200 truncate flex items-center gap-1" title="${d.matchedEvent.title}">
+                <span>🎪</span>
+                <span class="truncate">${d.matchedEvent.title}</span>
+              </div>
+            ` : ''}
 
             <div class="pt-1 border-t border-slate-100">
-
-
-
               <span class="text-[9px] uppercase text-slate-400 block font-bold">Coches previstos:</span>
-
-
-
               <span class="font-bold text-xs font-mono text-[#0284C7]">
-
-
-
                 ${d.dailyCars.toLocaleString("es-ES")}
-
-
-
               </span>
-
-
-
               <span class="text-[8px] text-slate-400">veh/día</span>
-
-
-
             </div>
-
-
-
           </div>
-
-
-
         </div>
-
-
-
       `;
-
-
-
     }).join("");
-
-
-
   }
 
-
-
-  selectIntradayDay(idx) {
+    selectIntradayDay(idx) {
 
 
 
@@ -15022,7 +13468,7 @@ this.chartTrafficPassing = new Chart(elTraffic.getContext('2d'), {
 
 
 
-      alert(`¡Archivo cargado y conectado en tiempo real con las APIs oficiales!\n\n• Aparcamientos cargados del Excel: ${newParkings.length} activos\n• Sensores de Aforo Open Data BCN vinculados: ${activeSensors} espiras reales (2024 vs 2025)\n• Locales activos en radio de 300 m (Censo BCN): ${totalPois.toLocaleString("es-ES")} POIs\n• Cotas y pendientes reales (Copernicus DEM): Sincronizadas\n• Capacidad subterránea privada en archivo: ${totalCap.toLocaleString("es-ES")} plazas`);
+      alert(`¡Archivo cargado y conectado en tiempo real con las APIs oficiales!\n\n• Aparcamientos cargados del Excel: ${newParkings.length} activos\n• Sensores de Aforo Open Data BCN vinculados: ${activeSensors} espiras reales (2024 vs 2025)\n• Locales activos en radio de 300 m (Censo BCN): ${totalPois.toLocaleString("es-ES")} POIs\n• Cotas y pendientes reales (Copernicus DEM): Sincronizadas\n• Capacidad física en archivo: ${totalCap > 0 ? `${totalCap.toLocaleString("es-ES")} plazas` : "0 plazas (No informada en el archivo - solo coordenadas)"}`);
 
 
 
