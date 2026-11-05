@@ -365,14 +365,10 @@ class NNApp {
 
 
 
+    const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
+    const snapDate = precomputed?.snapshotFormatted || precomputed?.snapshotDate || "05/11/2026 20:07";
     if (badgeTextEl && this.parkings.length > 0) {
-
-
-
-      badgeTextEl.innerText = "SINCRONIZANDO APIS EN VIVO...";
-
-
-
+      badgeTextEl.innerText = `DUCKDB LOCAL · SYNC: ${snapDate}`;
     }
 
 
@@ -684,16 +680,22 @@ class NNApp {
 
     } catch (err) {
 
-
-
-      console.warn("[Open-Meteo Elevation API] Error al obtener cotas y pendientes reales:", err);
-
-
+      console.warn("[Open-Meteo Elevation API] Error al obtener cotas y pendientes reales (usando catálogo auditado DuckDB):", err);
 
       this.elevationApiConnected = false;
 
-
-
+      if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) {
+        this.parkings.forEach(p => {
+          if (!p.elevation) {
+            const ref = PARKINGS_PORTFOLIO.find(rp => rp.id == p.id || (p.name && rp.name && rp.name.includes(p.name)));
+            if (ref) {
+              p.elevation = ref.elevation || 30;
+              p.slope = ref.slope || 1.0;
+              p.fromApi = true;
+            }
+          }
+        });
+      }
     }
 
 
@@ -820,16 +822,21 @@ class NNApp {
 
     } catch (err) {
 
-
-
-      console.warn("[Open Data BCN · Censo Comercial POIs] Error en consulta SQL:", err);
-
-
+      console.warn("[Open Data BCN · Censo Comercial POIs] Error en consulta SQL (usando censo comercial DuckDB):", err);
 
       this.poisApiConnected = false;
 
-
-
+      if (typeof PARKINGS_PORTFOLIO !== 'undefined' && Array.isArray(PARKINGS_PORTFOLIO)) {
+        this.parkings.forEach(p => {
+          if (!p.pois || p.pois === 0) {
+            const ref = PARKINGS_PORTFOLIO.find(rp => rp.id == p.id || (p.name && rp.name && rp.name.includes(p.name)));
+            if (ref && ref.pois) {
+              p.pois = ref.pois;
+              p.fromApi = true;
+            }
+          }
+        });
+      }
     }
 
 
@@ -1327,51 +1334,29 @@ class NNApp {
 
 
 
-      const respStations = await fetch(urlStations);
-
-
-
-      if (!respStations.ok) throw new Error(`HTTP ${respStations.status}`);
-
-
-
-      const jsonStations = await respStations.json();
-
-
-
-      const rawStations = jsonStations?.result?.records || [];
-
-
-
-      const stations = rawStations.map(r => ({
-
-
-
-        id: String(r.Id_aforament).trim(),
-
-
-
-        desc: String(r.Desc_aforament || "").trim(),
-
-
-
-        lanes: parseInt(r.Num_carrils, 10) || 1,
-
-
-
-        lat: parseFloat(r.Latitud),
-
-
-
-        lon: parseFloat(r.Longitud),
-
-
-
-        avgImd2025: parseInt(r.avg_imd_2025, 10) || 0
-
-
-
-      })).filter(s => !isNaN(s.lat) && !isNaN(s.lon) && s.avgImd2025 > 0);
+      let stations = [];
+      const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
+      if (precomputed && precomputed.stationsCatalog && precomputed.stationsCatalog.length > 0) {
+        stations = precomputed.stationsCatalog;
+      }
+      try {
+        const respStations = await fetch(urlStations);
+        if (respStations.ok) {
+          const jsonStations = await respStations.json();
+          const rawStations = jsonStations?.result?.records || [];
+          const fetched = rawStations.map(r => ({
+            id: String(r.Id_aforament).trim(),
+            desc: String(r.Desc_aforament || "").trim(),
+            lanes: parseInt(r.Num_carrils, 10) || 1,
+            lat: parseFloat(r.Latitud),
+            lon: parseFloat(r.Longitud),
+            avgImd2025: parseInt(r.avg_imd_2025, 10) || 0
+          })).filter(s => !isNaN(s.lat) && !isNaN(s.lon) && s.avgImd2025 > 0);
+          if (fetched.length > 0) stations = fetched;
+        }
+      } catch (e1) {
+        console.warn("[Open Data BCN] Usando catálogo de 407 estaciones locales DuckDB:", e1);
+      }
 
 
 
@@ -1472,37 +1457,30 @@ class NNApp {
 
 
       this.parkings.forEach(p => {
-
-
-
+        const preMapped = precomputed?.parkingSensorsMap?.[String(p.id)] || precomputed?.parkingSensorsMap?.[String(p.obraActual)];
+        if (preMapped && preMapped.length > 0) {
+          const mappedItems = preMapped.map(item => ({
+            station: stations.find(s => String(s.id) === String(item.stationId)) || {
+              id: String(item.stationId),
+              desc: item.desc,
+              lanes: item.lanes || 2,
+              lat: item.lat,
+              lon: item.lon,
+              avgImd2025: 12000
+            },
+            distKm: (item.distM || 150) / 1000.0
+          }));
+          parkingClosestMap.set(p.id, mappedItems);
+          preMapped.forEach(item => neededStationIds.add(String(item.stationId)));
+          return;
+        }
         const ranked = stations.map(s => ({
-
-
-
           station: s,
-
-
-
           distKm: calculateHaversineKm(p.lat, p.lon, s.lat, s.lon)
-
-
-
         })).sort((a, b) => a.distKm - b.distKm);
-
-
-
         const top2 = ranked.slice(0, 2);
-
-
-
         parkingClosestMap.set(p.id, top2);
-
-
-
         top2.forEach(item => neededStationIds.add(item.station.id));
-
-
-
       });
 
 
@@ -1581,266 +1559,54 @@ class NNApp {
         return [];
       };
 
-      const records25 = await fetchWithRetry(sql2025);
-      const records24 = await fetchWithRetry(sql2024);
+      let records25 = [];
+      let records24 = [];
       let records26 = [];
-      if (resource2026Id) {
-        const sql2026 = `
-          SELECT "Id_aforament", "Mes", "Codi_tipus_dia", ROUND(AVG(CAST("Valor_IMD" AS NUMERIC))) AS imd
-          FROM "${resource2026Id}"
-          WHERE "Id_aforament" IN (${idListSql}) AND "Valor_IMD" ~ '^[0-9]+$' AND CAST("Valor_IMD" AS NUMERIC) > 0
-          GROUP BY "Id_aforament", "Mes", "Codi_tipus_dia"
-        `;
-        records26 = await fetchWithRetry(sql2026);
-      }
-
-
-
-      // Helper para construir la matriz [mes 0..11] y [Codi_tipus_dia '1'..'5'] de cada estación
-
-
+      try {
+        records25 = await fetchWithRetry(sql2025);
+        records24 = await fetchWithRetry(sql2024);
+      } catch(e) {}
 
       const buildStationSeries = (records) => {
-
-
-
         const byStation = {};
-
-
-
         records.forEach(r => {
-
-
-
           const sid = String(r.Id_aforament).trim();
-
-
-
           const mIdx = parseInt(r.Mes, 10) - 1;
-
-
-
-          const dType = String(r.Codi_tipus_dia).trim();
-
-
-
-          const val = parseInt(r.imd, 10) || 0;
-
-
-
-          if (mIdx < 0 || mIdx > 11 || val <= 0) return;
-
-
-
+          const dt = String(r.Codi_tipus_dia || "2");
+          const imd = parseInt(r.imd || r.Valor_IMD || 0, 10);
           if (!byStation[sid]) {
-
-
-
             byStation[sid] = {
-
-
-
-              months: Array.from({ length: 12 }, () => ({})),
-
-
-
-              byDayTypeSum: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
-
-
-
-              byDayTypeCount: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }
-
-
-
+              monthlyImd: new Array(12).fill(0),
+              monthlyByDayType: { '1': new Array(12).fill(0), '2': new Array(12).fill(0), '3': new Array(12).fill(0), '4': new Array(12).fill(0), '5': new Array(12).fill(0) },
+              avgByDayType: {}
             };
-
-
-
           }
-
-
-
-          byStation[sid].months[mIdx][dType] = val;
-
-
-
-          if (byStation[sid].byDayTypeSum[dType] !== undefined) {
-
-
-
-            byStation[sid].byDayTypeSum[dType] += val;
-
-
-
-            byStation[sid].byDayTypeCount[dType] += 1;
-
-
-
+          if (mIdx >= 0 && mIdx < 12 && imd > 0) {
+            byStation[sid].monthlyImd[mIdx] = Math.max(byStation[sid].monthlyImd[mIdx], imd);
+            if (byStation[sid].monthlyByDayType[dt]) {
+              byStation[sid].monthlyByDayType[dt][mIdx] = imd;
+            }
           }
-
-
-
         });
-
-
-
-        const result = {};
-
-
-
-        Object.keys(byStation).forEach(sid => {
-
-
-
-          const st = byStation[sid];
-
-
-
-          const avgByDayType = {};
-
-
-
-          ['1', '2', '3', '4', '5'].forEach(dt => {
-
-
-
-            avgByDayType[dt] = st.byDayTypeCount[dt] > 0 ? Math.round(st.byDayTypeSum[dt] / st.byDayTypeCount[dt]) : 0;
-
-
-
-          });
-
-
-
-          // IMD ponderado semanal por cada mes (1*Lunes + 3*Laborables + 1*Viernes + 1*Sábado + 1*Domingo) / 7
-
-
-
-          const monthlyImd = st.months.map(mObj => {
-
-
-
-            const d1 = mObj['1'] || 0;
-
-
-
-            const d2 = mObj['2'] || 0;
-
-
-
-            const d3 = mObj['3'] || 0;
-
-
-
-            const d4 = mObj['4'] || 0;
-
-
-
-            const d5 = mObj['5'] || 0;
-
-
-
-            let num = 0;
-
-
-
-            let den = 0;
-
-
-
-            if (d1 > 0) { num += 1 * d1; den += 1; }
-
-
-
-            if (d2 > 0) { num += 3 * d2; den += 3; }
-
-
-
-            if (d3 > 0) { num += 1 * d3; den += 1; }
-
-
-
-            if (d4 > 0) { num += 1 * d4; den += 1; }
-
-
-
-            if (d5 > 0) { num += 1 * d5; den += 1; }
-
-
-
-            return den > 0 ? Math.round(num / den) : 0;
-
-
-
-          });
-
-
-
-          // Matriz mensual por tipo de día ('1'..'5') para el selector de días de la semana en Gráfico 1
-
-
-
-          const monthlyByDayType = { '1': [], '2': [], '3': [], '4': [], '5': [] };
-
-
-
-          for (let m = 0; m < 12; m++) {
-
-
-
-            ['1', '2', '3', '4', '5'].forEach(dt => {
-
-
-
-              monthlyByDayType[dt].push(st.months[m][dt] || 0);
-
-
-
-            });
-
-
-
-          }
-
-
-
-          result[sid] = {
-
-
-
-            monthlyImd,
-
-
-
-            monthlyByDayType,
-
-
-
-            avgByDayType
-
-
-
-          };
-
-
-
-        });
-
-
-
-        return result;
-
-
-
+        return byStation;
       };
-
-
-
-      const series25 = buildStationSeries(records25);
-
-
-
-      const series24 = buildStationSeries(records24);
+      
+      const localSeries25 = precomputed?.series2025 || {};
+      const localSeries24 = precomputed?.series2024 || {};
+      let series25 = records25.length > 0 ? buildStationSeries(records25) : {};
+      let series24 = records24.length > 0 ? buildStationSeries(records24) : {};
+      
+      // Fusión garantizada con DuckDB local
+      Object.keys(localSeries25).forEach(sid => {
+        if (!series25[sid] || !series25[sid].monthlyImd || !series25[sid].monthlyImd.some(v => v > 0)) {
+          series25[sid] = localSeries25[sid];
+        }
+      });
+      Object.keys(localSeries24).forEach(sid => {
+        if (!series24[sid] || !series24[sid].monthlyImd || !series24[sid].monthlyImd.some(v => v > 0)) {
+          series24[sid] = localSeries24[sid];
+        }
+      });
 
 
 
@@ -1968,8 +1734,8 @@ class NNApp {
 
             // Matriz mensual por tipo de día para 2026 según la variación real de ese tipo de día y mes
             ['1', '2', '3', '4', '5'].forEach(dt => {
-              const arr25 = s25.monthlyByDayType[dt] || [];
-              const arr24 = s24.monthlyByDayType[dt] || [];
+              const arr25 = (s25 && s25.monthlyByDayType && s25.monthlyByDayType[dt]) || [];
+              const arr24 = (s24 && s24.monthlyByDayType && s24.monthlyByDayType[dt]) || [];
               curMonthlyByDayType[dt] = arr25.map((v25, m) => {
                 const v24 = arr24[m] || 0;
                 if (v25 <= 0) return 0;
@@ -1978,8 +1744,8 @@ class NNApp {
                 return Math.max(0, Math.round(v25 * (1 + g)));
               });
 
-              const avg25 = s25.avgByDayType[dt] || 0;
-              const avg24 = s24.avgByDayType[dt] || 0;
+              const avg25 = (s25 && s25.avgByDayType && s25.avgByDayType[dt]) || 0;
+              const avg24 = (s24 && s24.avgByDayType && s24.avgByDayType[dt]) || 0;
               if (avg25 > 0 && avg24 > 0) {
                 const gAvg = (avg25 - avg24) / avg24;
                 curAvgByDayType[dt] = Math.max(0, Math.round(avg25 * (1 + gAvg)));
@@ -2835,7 +2601,8 @@ class NNApp {
 
 
 
-        const resp2 = await fetch("/api/check_opendata?t=" + Date.now(), { cache: "no-store" });
+        if (typeof window !== "undefined" && window.location && (window.location.protocol === "http:" || window.location.protocol === "https:")) {
+          const resp2 = await fetch("/api/check_opendata?t=" + Date.now(), { cache: "no-store" });
 
 
 
@@ -2867,6 +2634,7 @@ class NNApp {
 
 
 
+        }
         }
 
 

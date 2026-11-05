@@ -9,15 +9,109 @@ Script de Sincronización e Ingesta Incremental Continua (Watermark Delta Sync)
 import os
 import duckdb
 import requests
+import urllib.parse
 from datetime import date, datetime, timedelta
 from export_snapshot import export_duckdb_to_snapshot
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, "data", "databases", "db_traffic_bcn.duckdb")
+DB_TRAFFIC_PATH = os.path.join(BASE_DIR, "data", "databases", "db_traffic_bcn.duckdb")
+DB_EVENTS_PATH = os.path.join(BASE_DIR, "data", "databases", "db_events_bcn.duckdb")
+
+def sync_events_incremental():
+    """Descarga e inserta incrementalmente eventos reales verificados en db_events_bcn.duckdb"""
+    print("4. Sincronizando eventos oficiales en tiempo real con db_events_bcn.duckdb...")
+    con_ev = duckdb.connect(DB_EVENTS_PATH)
+    today_iso = datetime.now().strftime("%Y-%m-%d")
+    sql = f'SELECT name, start_date, end_date, institution_name, addresses_road_name, geo_epgs_4326_lat, geo_epgs_4326_lon FROM "ab2d47b7-8493-4ed5-9f63-49ed116135f9" WHERE start_date >= \'{today_iso}\' ORDER BY start_date ASC LIMIT 50'
+    url = f'https://opendata-ajuntament.barcelona.cat/data/api/3/action/datastore_search_sql?sql={urllib.parse.quote(sql)}'
+    
+    saved_count = 0
+    try:
+        resp = requests.get(url, timeout=10)
+        if resp.status_code == 200:
+            records = resp.json().get("result", {}).get("records", [])
+            rows_to_insert = []
+            for idx, r in enumerate(records):
+                name = (r.get("name") or "").strip()
+                if not name:
+                    continue
+                lower_name = name.lower()
+                is_sports_or_macro = any(k in lower_name for k in [
+                    'partit', 'partido', 'fútbol', 'futbol', 'bàsquet', 'basquet', 'baloncesto',
+                    'cursa', 'marató', 'maraton', 'fira', 'campionat', 'campeonato', 'torneig',
+                    'torneo', 'barça', 'f.c. barcelona', 'fc barcelona', 'europa', 'sant jordi', 'olímpic'
+                ])
+                if not is_sports_or_macro:
+                    continue
+                
+                cat = 'fira'
+                venue_id = 'bcn_sport'
+                venue_name = r.get("institution_name") or r.get("addresses_road_name") or "Barcelona"
+                lat = float(r.get("geo_epgs_4326_lat") or 41.3879)
+                lon = float(r.get("geo_epgs_4326_lon") or 2.1699)
+                expected_att = 3500
+                ticket_status = "Entradas disponibles"
+                
+                if 'f.c. barcelona' in lower_name or 'fc barcelona' in lower_name or 'barça' in lower_name:
+                    cat = 'fcb'
+                    if 'bàsquet' in lower_name or 'basquet' in lower_name:
+                        venue_id = 'palau_blaugrana'
+                        venue_name = 'Palau Blaugrana (FCB)'
+                        lat, lon = 41.3802, 2.1205
+                        expected_att = 7200
+                    elif 'femení' in lower_name or 'femeni' in lower_name:
+                        venue_id = 'estadi_johan_cruyff'
+                        venue_name = 'Estadi Johan Cruyff / Spotify Camp Nou'
+                        lat, lon = 41.3809, 2.1228
+                        expected_att = 5000
+                    else:
+                        venue_id = 'estadi_olimpic'
+                        venue_name = 'Estadi Olímpic Lluís Companys'
+                        lat, lon = 41.3647, 2.1557
+                        expected_att = 45000
+                elif 'olímpic' in lower_name or 'sant jordi' in lower_name or 'montjuïc' in lower_name:
+                    cat = 'olimpic'
+                    venue_id = 'palau_sant_jordi'
+                    venue_name = 'Complex Olímpic Montjuïc'
+                    lat, lon = 41.3639, 2.1520
+                    expected_att = 15000
+                elif 'cursa' in lower_name or 'marató' in lower_name:
+                    cat = 'fira'
+                    venue_id = 'fira_montjuic'
+                    venue_name = r.get("addresses_road_name") or "Barcelona"
+                    expected_att = 16000 if 'bombers' in lower_name else 8000
+                    ticket_status = "Inscripciones activas"
+                
+                raw_start = r.get("start_date") or ""
+                start_date = raw_start[:10]
+                start_time = raw_start[11:16] + ":00" if len(raw_start) >= 16 else "12:00:00"
+                if start_time in ["00:00:00", "03:00:00"]:
+                    start_time = "18:00:00" if cat == "fcb" else "09:00:00"
+                
+                event_id = f"od_bcn_{start_date}_{idx}"
+                rows_to_insert.append((
+                    event_id, name, cat, venue_id, venue_name,
+                    start_date, start_time, start_date, expected_att,
+                    ticket_status, "Open Data Ajuntament de Barcelona", lat, lon
+                ))
+            
+            if rows_to_insert:
+                con_ev.executemany("""
+                    INSERT OR REPLACE INTO events_schedule
+                    (event_id, name, category, venue_id, venue_name, start_date, start_time, end_date, expected_attendance, ticket_status, source, latitude, longitude)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, rows_to_insert)
+                saved_count = len(rows_to_insert)
+                print(f"   -> Insertados/actualizados {saved_count} eventos reales en db_events_bcn.duckdb.")
+    except Exception as e:
+        print("   -> Aviso al sincronizar eventos oficiales:", e)
+    finally:
+        con_ev.close()
+    return saved_count
 
 def run_incremental_sync(target_date=None):
     print("=== INICIANDO SINCRONIZACIÓN INCREMENTAL DUCKDB ===")
-    con = duckdb.connect(DB_PATH)
+    con = duckdb.connect(DB_TRAFFIC_PATH)
 
     # 1. Obtener última marca de agua (watermark)
     res = con.execute("""
@@ -102,7 +196,12 @@ def run_incremental_sync(target_date=None):
     """, [len(new_states_rows), f"Incremento exitoso para fecha {next_date}"])
 
     con.close()
-    print("4. DuckDB actualizada con éxito. Regenerando snapshot para la web...")
+    print("4. Tráfico DuckDB actualizado con éxito.")
+
+    # 5. Sincronizar eventos reales oficiales en db_events_bcn.duckdb
+    sync_events_incremental()
+
+    print("5. Regenerando snapshot unificado para la web...")
     export_duckdb_to_snapshot()
     print(f"=== SINCRONIZACIÓN INCREMENTAL FINALIZADA EXITOSAMENTE ({next_date}) ===")
 

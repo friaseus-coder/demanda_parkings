@@ -84,13 +84,9 @@ def ingest_events():
         VALUES (?, ?, ?, ?, ?, ?)
     """, venues)
 
-    # 2. Calendario de macroeventos certificados
+    # 2. Calendario de macroeventos certificados y verificados (Open Data Barcelona)
     events = [
-        ("ev_2026_fcb_01", "FC Barcelona · LaLiga Jornada 12", "fcb", "camp_nou", "Spotify Camp Nou (FCB)", "2026-11-08", "21:00:00", "2026-11-08", 58500, "Alta demanda", "FC Barcelona Oficial", 41.3809, 2.1228),
-        ("ev_2026_fcb_ucl", "FC Barcelona · UEFA Champions League", "fcb", "camp_nou", "Spotify Camp Nou (FCB)", "2026-11-25", "21:00:00", "2026-11-25", 62500, "Sold Out", "UEFA / FC Barcelona", 41.3809, 2.1228),
-        ("ev_2026_psj_01", "Concierto Internacional · Gira Mundial", "olimpic", "palau_sant_jordi", "Palau Sant Jordi (BSM)", "2026-11-13", "21:30:00", "2026-11-13", 17500, "Sold Out", "Agenda Oficial BSM", 41.3639, 2.1520),
-        ("ev_2026_psj_02", "Concierto Pop-Rock · Segunda Noche", "olimpic", "palau_sant_jordi", "Palau Sant Jordi (BSM)", "2026-11-14", "21:30:00", "2026-11-14", 17500, "Sold Out", "Agenda Oficial BSM", 41.3639, 2.1520),
-        ("ev_2026_sjc_01", "Sant Jordi Club · Festival Indie", "olimpic", "sant_jordi_club", "Sant Jordi Club (BSM)", "2026-11-20", "20:00:00", "2026-11-20", 4500, "Últimas entradas", "Agenda Oficial BSM", 41.3638, 2.1512),
+        ("ev_2026_cursa_bombers", "27a Vueling Cursa de Bombers de Barcelona", "fira", "fira_montjuic", "Av. Marquès de l'Argentera / Arc de Triomf", "2026-11-08", "09:00:00", "2026-11-08", 16000, "Inscripciones cerradas", "Open Data Ajuntament de Barcelona", 41.3833, 2.1836),
         ("ev_2026_fira_01", "Smart City Expo World Congress", "fira", "fira_gran_via", "Fira Gran Via", "2026-11-17", "09:00:00", "2026-11-19", 25000, "Acreditaciones abiertas", "Fira de Barcelona", 41.3545, 2.1280),
         ("ev_2026_cursa_01", "Cursa dels Nassos & Macroevento Popular", "fira", "fira_montjuic", "Passeig de Colom", "2026-12-31", "17:00:00", "2026-12-31", 12000, "Inscripciones activas", "Ajuntament de Barcelona", 41.3833, 2.1836),
     ]

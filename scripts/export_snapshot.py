@@ -140,13 +140,42 @@ def export_duckdb_to_snapshot():
     # Leer el archivo original si existe para preservar compatibilidad con variables existentes
     series24 = {}
     series25 = {}
+    series26 = {}
     orig_src = os.path.join(BASE_DIR, "scratch", "bcn_real_sensors_data.json")
     if os.path.exists(orig_src):
         with open(orig_src, "r", encoding="utf-8") as f:
             orig = json.load(f)
-            snapshot_payload["series2024"] = orig.get("series2024", {})
-            snapshot_payload["series2025"] = orig.get("series2025", {})
+            series24 = orig.get("series2024", {})
+            series25 = orig.get("series2025", {})
+            snapshot_payload["series2024"] = series24
+            snapshot_payload["series2025"] = series25
             snapshot_payload["parkingSensorsMap"] = orig.get("parkingSensorsMap", {})
+
+    DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    for sid, s25 in series25.items():
+        s24 = series24.get(sid, {})
+        m25 = s25.get("monthlyImd", [0] * 12)
+        m24 = s24.get("monthlyImd", m25)
+        m26 = []
+        for m in range(12):
+            v25 = m25[m] if m < len(m25) else 0
+            v24 = m24[m] if m < len(m24) else 0
+            if v25 <= 0:
+                m26.append(0)
+            elif v24 <= 0:
+                m26.append(v25)
+            else:
+                g = (v25 - v24) / v24
+                m26.append(max(0, round(v25 * (1 + 0.75 * g))))
+        annual = sum(m26[m] * DAYS_IN_MONTH[m] for m in range(12))
+        series26[sid] = {
+            "stationId": sid,
+            "monthlyImd": m26,
+            "annualCars": annual,
+            "monthlyByDayType": s25.get("monthlyByDayType", {}),
+            "avgByDay": s25.get("avgByDay", {})
+        }
+    snapshot_payload["series2026"] = series26
 
     js_content = f"""// Ecosistema DuckDB Modular · Catálogo Oficial de Aforos, Calibración 2025 y Demanda 2026
 // Generado automáticamente desde las 4 bases de datos DuckDB independientes:

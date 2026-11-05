@@ -1520,262 +1520,47 @@ const BCN_VENUES = {
 
 const BCN_MAJOR_VENUES = BCN_VENUES;
 
-// Generador Dinámico de la Agenda Oficial de Grandes Recintos de Barcelona
-// Asegura que siempre se proyecten los macroeventos desde el día actual (Hoy) y los próximos 7 días en adelante,
-// sin incluir jamás eventos que ya hayan pasado.
+// Agenda Oficial de Grandes Recintos de Barcelona (Regla Real-Data-Only)
+// Solo carga eventos reales procedentes de la base de datos DuckDB (db_events_bcn)
+// o de las APIs oficiales en vivo. PROHIBIDO generar plantillas simuladas o eventos ficticios.
 function getBcnOfficialEventsSchedule(baseDate = new Date()) {
+  const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC)
+    ? window.BCN_PRECOMPUTED_REAL_TRAFFIC
+    : (typeof BCN_PRECOMPUTED_REAL_TRAFFIC !== 'undefined' ? BCN_PRECOMPUTED_REAL_TRAFFIC : null);
+
   const pad = n => String(n).padStart(2, '0');
-  const addDays = (d, n) => {
-    const copy = new Date(d);
-    copy.setDate(copy.getDate() + n);
-    return copy;
-  };
-  const formatDateIso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const todayIso = `${baseDate.getFullYear()}-${pad(baseDate.getMonth() + 1)}-${pad(baseDate.getDate())}`;
+  const endDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate() + 7);
+  const endDateIso = `${endDate.getFullYear()}-${pad(endDate.getMonth() + 1)}-${pad(endDate.getDate())}`;
   const wNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
   const mNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-  const formatDayLabel = (d, isToday) => {
-    const wDay = wNames[d.getDay()];
-    const mDay = pad(d.getDate());
-    const mName = mNames[d.getMonth()];
-    return isToday ? `HOY ${mDay} ${mName}` : `${wDay} ${mDay} ${mName}`;
+
+  const formatDayLabel = (dateStr) => {
+    try {
+      const parts = dateStr.slice(0, 10).split("-");
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      const isToday = (dateStr.slice(0, 10) === todayIso);
+      const wDay = wNames[d.getDay()] || "Día";
+      const mName = mNames[d.getMonth()] || "";
+      const dayNum = String(d.getDate()).padStart(2, "0");
+      return isToday ? `HOY ${dayNum} ${mName}` : `${wDay} ${dayNum} ${mName}`;
+    } catch (e) {
+      return dateStr.slice(0, 10);
+    }
   };
 
-  const templateEvents = [
-    {
-      dayOffset: 0, // HOY
-      title: "Pitbull · 'I'm Back!' World Tour",
-      artist: "Pitbull",
-      category: "olimpic",
-      categoryLabel: "BSM · Palau Sant Jordi",
-      venueId: "palau_sant_jordi",
-      venueName: "Palau Sant Jordi (BSM)",
-      time: "21:30",
-      lat: 41.3648,
-      lon: 2.1526,
-      expectedAttendance: 17500,
-      ticketStatus: "Sold Out",
-      source: "Agenda Oficial BSM · Palau Sant Jordi",
-      description: "Alta afluencia de público internacional y nacional. Fuerte demanda de aparcamiento en ejes de conexión."
-    },
-    {
-      dayOffset: 0, // HOY
-      title: "Medina Azahara · Gira 'El Sueño Eterno'",
-      artist: "Medina Azahara",
-      category: "olimpic",
-      categoryLabel: "BSM · Sant Jordi Club",
-      venueId: "sant_jordi_club",
-      venueName: "Sant Jordi Club (BSM)",
-      time: "20:30",
-      lat: 41.3638,
-      lon: 2.1512,
-      expectedAttendance: 3600,
-      ticketStatus: "Entradas disponibles",
-      source: "Agenda Oficial BSM · Sant Jordi Club",
-      description: "Doble evento musical en Montjuïc coincidiendo con el Palau Sant Jordi."
-    },
-    {
-      dayOffset: 1, // DÍA +1
-      title: "Smart City Expo World Congress · Fira Gran Via",
-      artist: "Fira de Barcelona",
-      category: "fira",
-      categoryLabel: "Fira de Barcelona · Macrocongreso",
-      venueId: "fira_gran_via",
-      venueName: "Fira de Barcelona · Gran Via",
-      time: "09:00 - 19:00",
-      lat: 41.3545,
-      lon: 2.1280,
-      expectedAttendance: 24000,
-      ticketStatus: "Acreditaciones profesionales",
-      source: "Fira de Barcelona",
-      description: "Mayor evento mundial de ciudades inteligentes. Gran trasvase de vehículos en Gran Via, Zona Franca y Pl. Europa."
-    },
-    {
-      dayOffset: 1, // DÍA +1
-      title: "Barça Basket vs. Olympiacos · EuroLeague",
-      artist: "FC Barcelona Baloncesto",
-      category: "fcb",
-      categoryLabel: "FC Barcelona · Bàsquet Palau",
-      venueId: "palau_blaugrana",
-      venueName: "Palau Blaugrana (FCB)",
-      time: "20:30",
-      lat: 41.3802,
-      lon: 2.1205,
-      expectedAttendance: 7100,
-      ticketStatus: "Aforo casi completo",
-      source: "FC Barcelona / Euroliga",
-      description: "Encuentro de alta rivalidad europea con ocupación plena de los viales de Les Corts."
-    },
-    {
-      dayOffset: 2, // DÍA +2
-      title: "La Oreja de Van Gogh · Gira 'Tantas Cosas Que Contar'",
-      artist: "La Oreja de Van Gogh",
-      category: "olimpic",
-      categoryLabel: "BSM · Palau Sant Jordi",
-      venueId: "palau_sant_jordi",
-      venueName: "Palau Sant Jordi (BSM)",
-      time: "21:00",
-      lat: 41.3648,
-      lon: 2.1526,
-      expectedAttendance: 16500,
-      ticketStatus: "Sold Out",
-      source: "Agenda Oficial BSM · Palau Sant Jordi",
-      description: "Primera de dos noches consecutivas en Montjuïc. Pico de tráfico en el inicio de fin de semana."
-    },
-    {
-      dayOffset: 2, // DÍA +2
-      title: "John Pollõn & Amigos · Directo Barcelona",
-      artist: "John Pollõn",
-      category: "olimpic",
-      categoryLabel: "BSM · Sant Jordi Club",
-      venueId: "sant_jordi_club",
-      venueName: "Sant Jordi Club (BSM)",
-      time: "21:00",
-      lat: 41.3638,
-      lon: 2.1512,
-      expectedAttendance: 4500,
-      ticketStatus: "Sold Out",
-      source: "Agenda Oficial BSM · Sant Jordi Club",
-      description: "Lleno en la sala anexa del Sant Jordi Club."
-    },
-    {
-      dayOffset: 3, // DÍA +3
-      title: "FC Barcelona Femení vs. Chelsea FC · UEFA Women's Champions League",
-      artist: "FC Barcelona Femení",
-      category: "fcb",
-      categoryLabel: "FC Barcelona · Estadi Olímpic",
-      venueId: "estadi_olimpic",
-      venueName: "Estadi Olímpic Lluís Companys",
-      time: "18:45",
-      lat: 41.3647,
-      lon: 2.1557,
-      expectedAttendance: 34500,
-      ticketStatus: "Alta demanda",
-      source: "FC Barcelona / BSM",
-      description: "Gran cita europea femenina en el Estadi Olímpic Lluís Companys. Fuerte demanda en aparcamientos de Sants-Montjuïc y ejes de acceso."
-    },
-    {
-      dayOffset: 3, // DÍA +3
-      title: "La Oreja de Van Gogh · Segunda Fecha",
-      artist: "La Oreja de Van Gogh",
-      category: "olimpic",
-      categoryLabel: "BSM · Palau Sant Jordi",
-      venueId: "palau_sant_jordi",
-      venueName: "Palau Sant Jordi (BSM)",
-      time: "21:00",
-      lat: 41.3648,
-      lon: 2.1526,
-      expectedAttendance: 16500,
-      ticketStatus: "Sold Out",
-      source: "Agenda Oficial BSM · Palau Sant Jordi",
-      description: "Segunda noche con lleno absoluto. Saturación en accesos a Montjuïc desde Sants, Espanya y Paral·lel."
-    },
-    {
-      dayOffset: 3, // DÍA +3
-      title: "Joe Bonamassa · Gira Blues Rock Guitar",
-      artist: "Joe Bonamassa",
-      category: "olimpic",
-      categoryLabel: "BSM · Sant Jordi Club",
-      venueId: "sant_jordi_club",
-      venueName: "Sant Jordi Club (BSM)",
-      time: "21:00",
-      lat: 41.3638,
-      lon: 2.1512,
-      expectedAttendance: 4300,
-      ticketStatus: "Últimas localidades",
-      source: "Agenda Oficial BSM · Sant Jordi Club",
-      description: "Noche de doble evento en Montjuïc."
-    },
-    {
-      dayOffset: 4, // DÍA +4
-      title: "27a Vueling Cursa de Bombers de Barcelona",
-      artist: "Cursa de Bombers",
-      category: "fira",
-      categoryLabel: "Cursa Popular & Macroevento",
-      venueId: "fira_montjuic",
-      venueName: "Av. Marquès de l'Argentera / Arc de Triomf",
-      time: "09:00",
-      lat: 41.3833,
-      lon: 2.1836,
-      expectedAttendance: 16000,
-      ticketStatus: "Inscripciones cerradas",
-      source: "Open Data Ajuntament de Barcelona",
-      description: "Cortes de tráfico y desvíos generalizados en el centro de Barcelona durante la mañana."
-    },
-    {
-      dayOffset: 5, // DÍA +5
-      title: "FC Barcelona vs. Aston Villa · UEFA Champions League",
-      artist: "FC Barcelona",
-      category: "fcb",
-      categoryLabel: "FC Barcelona · UEFA Champions League",
-      venueId: "camp_nou",
-      venueName: "Spotify Camp Nou (FCB)",
-      time: "21:00",
-      lat: 41.3809,
-      lon: 2.1228,
-      expectedAttendance: 62500,
-      ticketStatus: "Alta demanda",
-      source: "Open Data Ajuntament de Barcelona / FCB",
-      description: "Presión máxima en Les Corts, Av. Diagonal, Travessera de Les Corts, Numància y calles colindantes."
-    },
-    {
-      dayOffset: 6, // DÍA +6
-      title: "Melendi · Gira '20 Años Sin Noticias'",
-      artist: "Melendi",
-      category: "olimpic",
-      categoryLabel: "BSM · Palau Sant Jordi",
-      venueId: "palau_sant_jordi",
-      venueName: "Palau Sant Jordi (BSM)",
-      time: "21:00",
-      lat: 41.3648,
-      lon: 2.1526,
-      expectedAttendance: 17200,
-      ticketStatus: "Sold Out",
-      source: "Agenda Oficial BSM · Palau Sant Jordi",
-      description: "Gran afluencia en Montjuïc. Retenciones en Pg. Olímpic, Carrer Foc y acceso Pl. Espanya."
-    },
-    {
-      dayOffset: 7, // DÍA +7
-      title: "This is Michael · Tributo Mundial a Michael Jackson",
-      artist: "This is Michael",
-      category: "olimpic",
-      categoryLabel: "BSM · Sant Jordi Club",
-      venueId: "sant_jordi_club",
-      venueName: "Sant Jordi Club (BSM)",
-      time: "20:00",
-      lat: 41.3638,
-      lon: 2.1512,
-      expectedAttendance: 4200,
-      ticketStatus: "Últimas entradas",
-      source: "Agenda Oficial BSM · Sant Jordi Club",
-      description: "Concurrencia en la Anella Olímpica de Montjuïc."
-    }
-  ];
+  if (precomputed && Array.isArray(precomputed.eventsSchedule)) {
+    return precomputed.eventsSchedule
+      .filter(ev => ev && ev.date && ev.date >= todayIso && ev.date <= endDateIso)
+      .map(ev => ({
+        ...ev,
+        dayLabel: formatDayLabel(ev.date)
+      }));
+  }
 
-  return templateEvents.map((t, idx) => {
-    const targetD = addDays(baseDate, t.dayOffset);
-    const dateStr = formatDateIso(targetD);
-    return {
-      id: `evt_dyn_${idx}_${dateStr}`,
-      title: t.title,
-      artist: t.artist,
-      category: t.category,
-      categoryLabel: t.categoryLabel,
-      venueId: t.venueId,
-      venueName: t.venueName,
-      date: dateStr,
-      dayLabel: formatDayLabel(targetD, t.dayOffset === 0),
-      time: t.time,
-      lat: t.lat,
-      lon: t.lon,
-      expectedAttendance: t.expectedAttendance,
-      ticketStatus: t.ticketStatus,
-      source: t.source,
-      description: t.description
-    };
-  });
+  return [];
 }
 
-// Inicialización dinámica: la agenda oficial y el feed de 7 días arrancan SIEMPRE con el día actual y 7 días en adelante
 const BCN_OFFICIAL_EVENTS_SCHEDULE = getBcnOfficialEventsSchedule(new Date());
 const BCN_EVENTS_7DAYS = [...BCN_OFFICIAL_EVENTS_SCHEDULE];
 
