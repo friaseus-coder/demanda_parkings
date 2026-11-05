@@ -474,9 +474,9 @@ class NNApp {
         badgeTextEl.innerText = "OPENDATA BCN · CONECTADO EN VIVO";
       } else {
         const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
-        const snapDate = precomputed?.snapshotFormatted || "03/11/2026";
-        const snapVer = precomputed?.version || "v2025.11";
-        badgeTextEl.innerText = `MODO USB · DATOS: ${snapDate} (${snapVer})`;
+        const snapDate = precomputed?.snapshotFormatted || precomputed?.snapshotDate || "05/11/2026 20:07";
+        const snapVer = precomputed?.version || "v2026.duckdb";
+        badgeTextEl.innerText = `DUCKDB LOCAL · SYNC: ${snapDate}`;
       }
     }
 
@@ -3009,28 +3009,28 @@ class NNApp {
 
       this.openDataConnected = false;
       const precomputed = (typeof window !== 'undefined' && window.BCN_PRECOMPUTED_REAL_TRAFFIC) ? window.BCN_PRECOMPUTED_REAL_TRAFFIC : null;
-      const snapDate = precomputed?.snapshotFormatted || "03/11/2026";
-      const snapVer = precomputed?.version || "v2025.11";
+      const snapDate = precomputed?.snapshotFormatted || precomputed?.snapshotDate || "05/11/2026 20:07";
+      const snapVer = precomputed?.version || "v2026.duckdb";
       const totalSt = precomputed?.totalActiveStations || 407;
 
-      if (badgeTextEl) badgeTextEl.innerText = `MODO USB · DATOS: ${snapDate} (${snapVer})`;
-      if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-amber-500 ring-2 ring-amber-200";
+      if (badgeTextEl) badgeTextEl.innerText = `DUCKDB LOCAL · SYNC: ${snapDate}`;
+      if (badgeDotEl) badgeDotEl.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200";
       if (latencyEl) {
-        latencyEl.innerText = `Copia Local ${snapVer}`;
-        latencyEl.className = "text-[10px] text-amber-700 font-mono font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200";
+        latencyEl.innerText = `DuckDB ${snapVer}`;
+        latencyEl.className = "text-[10px] text-emerald-800 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200";
         latencyEl.classList.remove("hidden");
       }
       if (centerStatusEl) {
-        centerStatusEl.className = "font-mono-num font-semibold text-amber-700";
-        centerStatusEl.innerText = `Modo USB (${snapDate})`;
+        centerStatusEl.className = "font-mono-num font-semibold text-emerald-800";
+        centerStatusEl.innerText = `DuckDB Local (${snapDate})`;
       }
       if (centerPingEl) {
-        centerPingEl.innerText = `(${totalSt} espiras en USB)`;
+        centerPingEl.innerText = `(${totalSt} espiras en DuckDB)`;
       }
       const modalOpenDataEl = document.getElementById("modalStatusOpenData");
       if (modalOpenDataEl) {
-        modalOpenDataEl.className = "px-3 py-1 rounded-full font-bold text-[11px] bg-amber-50 text-amber-800 border border-amber-300 shrink-0";
-        modalOpenDataEl.innerText = `Modo USB Activo · Versión ${snapDate} (${totalSt} espiras auditadas)`;
+        modalOpenDataEl.className = "px-3 py-1 rounded-full font-bold text-[11px] bg-emerald-50 text-emerald-800 border border-emerald-300 shrink-0";
+        modalOpenDataEl.innerText = `DuckDB Local Activo · Sincronizado ${snapDate} (${totalSt} espiras)`;
       }
       if (userTriggered) {
 
